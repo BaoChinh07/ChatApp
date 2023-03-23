@@ -84,6 +84,15 @@ public class ChatsFragment extends Fragment {
                 Picasso.get().load(model.getProfilePic()).into(holder.civAvatarItemChat);
                 holder.tvItemChatName.setText(model.getUserName());
                 holder.tvLastMessage.setText(model.getLastMessage());
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getContext(), ChatActivity.class);
+                        intent.putExtra("userID", getRef(holder.getAdapterPosition()).getKey().toString());
+                        startActivity(intent);
+                    }
+                });
             }
 
             @NonNull
