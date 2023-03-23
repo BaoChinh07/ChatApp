@@ -7,25 +7,15 @@
     android:orientation="vertical"
     tools:context=".fragments.ContactFragment">
 
-    <LinearLayout
+    <include android:id="@+id/toolbar_contact"
+        layout="@layout/toolbar_contact_fragment"/>
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/action_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Toolbar
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:title="Có thể bạn quen biết"
-            android:titleTextColor="@color/black" />
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/action_search"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layoutDirection="rtl"
-            app:queryHint="Tìm liên hệ" />
-    </LinearLayout>
+        android:layout_margin="5dp"
+        app:queryHint="Tìm liên hệ" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvListContact"
