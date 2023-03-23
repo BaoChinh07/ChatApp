@@ -14,6 +14,7 @@ public class ChatAdapter extends RecyclerView.ViewHolder {
     public CircleImageView civAvatarItemChat;
     public TextView tvItemChatName, tvLastMessage;
 
+
     public ChatAdapter(@NonNull View itemView) {
         super(itemView);
         civAvatarItemChat = (CircleImageView) itemView.findViewById(R.id.civAvatarItemChat);

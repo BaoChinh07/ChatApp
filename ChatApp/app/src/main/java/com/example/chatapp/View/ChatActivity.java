@@ -54,7 +54,7 @@ public class ChatActivity extends AppCompatActivity {
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
     String userID, avatarURL, avatarBox, userName, dateTime, statusActivity;
-    String avatarUserListChat, userNameListChat, lastMessage;
+    String avatarUserListChat, userNameListChat, lastMessage, myName;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     DatabaseReference mUserReference, mFriendsReference, mSmsReference, mChatReference;
@@ -101,6 +101,7 @@ public class ChatActivity extends AppCompatActivity {
         loadAvatarBox();
         loadBoxChat(userID);
         loadSMS();
+        loadMyProfile();
 
         imageViewSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,6 +110,25 @@ public class ChatActivity extends AppCompatActivity {
                 createChatBox();
             }
         });
+    }
+
+    private void loadMyProfile() {
+        mUserReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    }
+                    if (snapshot.hasChild("userName")) {
+                        myName = snapshot.child("userName").getValue().toString();
+                    }
+                }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     private void loadBoxChat(String userID) {
@@ -154,17 +174,21 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 }
                 HashMap hashMap = new HashMap();
-                hashMap.put("avatarUserListChat", avatarUserListChat);
-                hashMap.put("userNameListChat",userNameListChat);
+                hashMap.put("profilePic", avatarUserListChat);
+                hashMap.put("userName",userNameListChat);
                 hashMap.put("lastMessage", lastMessage);
                 mChatReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
-                            mChatReference.child(userID).child(mUser.getUid()).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                            HashMap mHashMap = new HashMap();
+                            mHashMap.put("profilePic", avatarBox);
+                            mHashMap.put("userName", myName);
+                            mHashMap.put("lastMessage", lastMessage);
+                            mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap).addOnCompleteListener(new OnCompleteListener() {
                                 @Override
                                 public void onComplete(@NonNull Task task) {
-                                    Toast.makeText(ChatActivity.this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ChatActivity.this, "Thành công", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
