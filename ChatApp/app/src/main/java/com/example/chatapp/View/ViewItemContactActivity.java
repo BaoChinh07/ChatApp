@@ -37,6 +37,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
     Button btnSendFriendRequest, btnCancelSendFriendRequest;
     CircleImageView civAvatarSingleContact;
     String profilePicURL, userName, status, email, gender, describe, friendID, userID, currentState;
+    String myProfilePic, myUsername, myEmail, myGender, myDescribe, myUserID;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseDatabase mFirebaseDatabase;
@@ -50,7 +51,6 @@ public class ViewItemContactActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_item_contact);
         setControl();
-        callInformationItemContact(); // Hiển thị thông tin của người dùng khi click vào
         setEvent();
     }
 
@@ -92,7 +92,51 @@ public class ViewItemContactActivity extends AppCompatActivity {
                 cancelAction(userID);
             }
         });
-        checkUserExistance(userID);
+        checkUserExistance(userID); //Check trạng thái của Request
+
+        callInformationItemContact(); // Hiển thị thông tin của người dùng khi click vào
+        loadMyProfile(); //Load dữ liệu của bản thân
+    }
+
+    private void loadMyProfile() {
+        mDataReference.child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    myUserID = snapshot.child("userID").getValue().toString();
+                    myUsername = snapshot.child("userName").getValue().toString();
+                    myEmail = snapshot.child("email").getValue().toString();
+                    // Lấy thông tin ảnh đại diện của User
+                    if (snapshot.hasChild("profilePic")) {
+                        myProfilePic = snapshot.child("profilePic").getValue().toString();
+                    } else {
+                        mStorageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                myProfilePic = uri.toString();
+                            }
+                        });
+                    }
+                    if (snapshot.hasChild("describe")) {
+                        myDescribe = snapshot.child("describe").getValue().toString();
+                    } else {
+                        myDescribe = "";
+                    }
+                    if (snapshot.hasChild("gender")) {
+                        myGender = snapshot.child("gender").getValue().toString();
+                    } else {
+                        myGender = "";
+                    }
+                } else {
+                    Toast.makeText(ViewItemContactActivity.this, "Không tìm thấy dữ liệu", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ViewItemContactActivity.this, "" + error.getMessage().toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
@@ -189,11 +233,21 @@ public class ViewItemContactActivity extends AppCompatActivity {
                         hashMap.put("email",email);
                         hashMap.put("describe",describe);
                         hashMap.put("gender",gender);
+
+                        //Thông tin của bản thân sẽ lưu trong node của bạn bè
+                        final HashMap hashMap1 = new HashMap();
+                        hashMap1.put("status", "friend");
+                        hashMap1.put("friendID",myUserID);
+                        hashMap1.put("userName", myUsername);
+                        hashMap1.put("profilePic", myProfilePic);
+                        hashMap1.put("email",myEmail);
+                        hashMap1.put("describe",myDescribe);
+                        hashMap1.put("gender",myGender);
                         mFriendsReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                             @Override
                             public void onComplete(@NonNull Task task) {
                                 if (task.isSuccessful()) {
-                                    mFriendsReference.child(userID).child(mUser.getUid()).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                                    mFriendsReference.child(userID).child(mUser.getUid()).updateChildren(hashMap1).addOnCompleteListener(new OnCompleteListener() {
                                         @Override
                                         public void onComplete(@NonNull Task task) {
                                             Toast.makeText(ViewItemContactActivity.this, "Các bạn đã là bạn bè", Toast.LENGTH_SHORT).show();

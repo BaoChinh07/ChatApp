@@ -68,7 +68,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
         btnUnfriend = (Button) findViewById(R.id.btnUnfriend);
 
 
-        friendID = getIntent().getStringExtra("friendID").toString();
+        friendID = getIntent().getStringExtra("userID");
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mFriendReference = FirebaseDatabase.getInstance().getReference().child("Friends");

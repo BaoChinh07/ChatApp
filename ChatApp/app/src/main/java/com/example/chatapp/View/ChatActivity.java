@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -110,8 +111,35 @@ public class ChatActivity extends AppCompatActivity {
                 createChatBox();
             }
         });
+        civAvatarUserChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnClickAvatar(userID);
+            }
+        });
     }
+    private void btnClickAvatar(String userID) {
+        mFriendsReference.child(mUser.getUid()).child(userID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Intent intent = new Intent(ChatActivity.this, ViewSingleFriendActivity.class);
+                    intent.putExtra("userID", userID).toString();
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(ChatActivity.this, ViewItemContactActivity.class);
+                    intent.putExtra("userID", userID).toString();
+                    startActivity(intent);
+                }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
     private void loadMyProfile() {
         mUserReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
@@ -185,12 +213,7 @@ public class ChatActivity extends AppCompatActivity {
                             mHashMap.put("profilePic", avatarBox);
                             mHashMap.put("userName", myName);
                             mHashMap.put("lastMessage", lastMessage);
-                            mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap).addOnCompleteListener(new OnCompleteListener() {
-                                @Override
-                                public void onComplete(@NonNull Task task) {
-                                    Toast.makeText(ChatActivity.this, "Thành công", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                            mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap);
                         }
                     }
                 });

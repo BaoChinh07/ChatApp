@@ -1,19 +1,18 @@
 package com.example.chatapp.Models;
 
 public class Users {
-    String profilePic, userName, email, password, userID, lastMessage, describe , gender, statusActivity;
+    String profilePic, userName, email, password, userID,  describe , gender, statusActivity;
 
     public Users() {
 
     }
 
-    public Users(String profilePic, String userName, String email, String password, String userID, String lastMessage, String describe, String gender, String statusActivity) {
+    public Users(String profilePic, String userName, String email, String password, String userID, String describe, String gender, String statusActivity) {
         this.profilePic = profilePic;
         this.userName = userName;
         this.email = email;
         this.password = password;
         this.userID = userID;
-        this.lastMessage = lastMessage;
         this.describe = describe;
         this.gender = gender;
         this.statusActivity = statusActivity;
@@ -81,14 +80,6 @@ public class Users {
 
     public void setUserID(String userID) {
         this.userID = userID;
-    }
-
-    public String getLastMessage() {
-        return lastMessage;
-    }
-
-    public void setLastMessage(String lastMessage) {
-        this.lastMessage = lastMessage;
     }
 
     public String getDescribe() {
