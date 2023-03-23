@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/wallpaper1"
+    android:orientation="vertical"
+    android:gravity="center|center_vertical"
+    tools:context=".SignUpActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/ImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="30dp"
+            android:src="@drawable/baseline_message_24"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_username"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/grey"/>
+            <EditText
+                android:id="@+id/edtUserName"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@drawable/box_border"
+                android:layout_marginVertical="8dp"
+                android:layout_gravity="center"
+                android:hint="Nhập tên đăng nhập"
+                android:textColorHint="@color/light_grey"
+                android:inputType="textPersonName" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_email"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/grey"/>
+            <EditText
+                android:id="@+id/edtEmail"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@drawable/box_border"
+                android:layout_marginVertical="8dp"
+                android:layout_gravity="center"
+                android:hint="Nhập email"
+                android:inputType="textEmailAddress"
+                android:textColorHint="@color/light_grey"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_password"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/grey"/>
+            <EditText
+                android:id="@+id/edtPassword"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@drawable/box_border"
+                android:layout_marginVertical="8dp"
+                android:layout_gravity="center"
+                android:hint="Nhập mật khẩu"
+                android:textColorHint="@color/light_grey"
+                android:inputType="textPassword" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Xác nhận mật khẩu"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/grey"/>
+            <EditText
+                android:id="@+id/edtConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@drawable/box_border"
+                android:layout_marginVertical="8dp"
+                android:layout_gravity="center"
+                android:hint="Nhập lại mật khẩu"
+                android:textColorHint="@color/light_grey"
+                android:inputType="textPassword"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="right"
+                android:layout_marginBottom="5dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="2dp"
+                    android:text="Đã có tài khoản, "
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/grey"
+                    />
+                <TextView
+                    android:id="@+id/tvClickToSignIn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="3dp"
+                    android:text="@string/button_signin"
+                    android:textSize="15sp"
+                    android:textStyle="bold|italic"
+                    android:textColor="@color/white"
+                    android:clickable="true"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ngay"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/grey"
+                    />
+            </LinearLayout>
+            <Button
+                android:id="@+id/btnSignUp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="10dp"
+                android:text="@string/button_signup"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:backgroundTint="@color/primary"
+                app:cornerRadius="10dp"/>
+        </LinearLayout>
+
+</LinearLayout>

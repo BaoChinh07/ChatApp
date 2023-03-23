@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/civAvatarUserOne"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/default_avatar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvSmsUserOne"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/sms_user_number_one"
+        android:textColor="@color/grey"
+        android:textSize="16sp"
+        android:paddingStart="10dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="10dp"
+        android:text="@string/text_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/civAvatarUserOne"
+        app:layout_constraintTop_toTopOf="@+id/civAvatarUserOne"
+        app:layout_constraintWidth="wrap_content" />
+
+    <TextView
+        android:id="@+id/tvTimeMessageUserOne"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="3dp"
+        android:text="@string/text_time"
+        android:textSize="11sp"
+        android:textColor="@color/grey"
+        app:layout_constraintStart_toStartOf="@+id/tvSmsUserOne"
+        app:layout_constraintTop_toBottomOf="@+id/tvSmsUserOne"
+        app:layout_constraintWidth="wrap_content" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/civAvatarUserTwo"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/default_avatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvSmsUserTwo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/sms_user_number_two"
+        android:paddingStart="10dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="10dp"
+        android:text="@string/text_message"
+        android:textSize="16sp"
+        android:textColor="@color/grey"
+        app:layout_constraintEnd_toEndOf="@+id/civAvatarUserTwo"
+        app:layout_constraintEnd_toStartOf="@+id/civAvatarUserTwo"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/civAvatarUserOne"
+        app:layout_constraintTop_toTopOf="@+id/civAvatarUserOne"
+        app:layout_constraintWidth="wrap_content" />
+
+    <TextView
+        android:id="@+id/tvTimeMessageUserTwo"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="3dp"
+        android:text="@string/text_time"
+        android:textSize="10sp"
+        android:textColor="@color/grey"
+        app:layout_constraintEnd_toEndOf="@+id/tvSmsUserTwo"
+        app:layout_constraintTop_toBottomOf="@+id/tvSmsUserTwo"
+        app:layout_constraintWidth="wrap_content" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

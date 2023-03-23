@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/primary"
+    >
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/civAvatarUserChat"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/default_avatar" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/civOnline"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/icon_online"
+                android:layout_alignEnd="@id/civAvatarUserChat"
+                android:layout_alignBottom="@id/civAvatarUserChat"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
+                />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/civOffline"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/icon_offline"
+                android:layout_alignEnd="@id/civAvatarUserChat"
+                android:layout_alignBottom="@id/civAvatarUserChat"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
+                />
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginStart="5dp"
+            android:weightSum="2">
+            <TextView
+            android:id="@+id/tvUserNameToolChat"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:layout_weight="1"
+            android:text="@string/text_username"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+            <TextView
+                android:id="@+id/tvUserOnl_OffChat"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="@string/text_online"
+                android:textSize="12sp"
+                android:textColor="@color/grey"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.appcompat.widget.Toolbar>

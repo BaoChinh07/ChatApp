@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="10dp"
+    android:orientation="vertical">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        app:cardBackgroundColor="@color/background_card"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="15dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/civAvatarItemFriend"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/default_avatar" />
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/civItemFriendOnline"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/icon_online"
+                    android:layout_alignEnd="@id/civAvatarItemFriend"
+                    android:layout_alignBottom="@id/civAvatarItemFriend"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="2dp"
+                    />
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/civItemFriendOffline"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/icon_offline"
+                    android:layout_alignEnd="@id/civAvatarItemFriend"
+                    android:layout_alignBottom="@id/civAvatarItemFriend"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="2dp"
+                    />
+            </RelativeLayout>
+
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="5dp"
+                android:orientation="vertical"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/tvItemFriendName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="@string/text_username"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvItemFriendDescribe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="@string/text_describe"
+                    android:maxLines="1"
+                    android:textColor="@color/grey"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>
