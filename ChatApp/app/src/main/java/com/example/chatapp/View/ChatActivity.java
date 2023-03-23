@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
@@ -53,10 +54,12 @@ public class ChatActivity extends AppCompatActivity {
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
     String userID, avatarURL, avatarBox, userName, dateTime, statusActivity;
+    String avatarUserListChat, userNameListChat, lastMessage;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     DatabaseReference mUserReference, mFriendsReference, mSmsReference, mChatReference;
     StorageReference mStorageReference;
+    FirebaseStorage storage;
     Date currentTime;
 
     @Override
@@ -88,18 +91,90 @@ public class ChatActivity extends AppCompatActivity {
         mSmsReference = FirebaseDatabase.getInstance().getReference().child("Messages");
         mFriendsReference = FirebaseDatabase.getInstance().getReference().child("Friends");
         mChatReference = FirebaseDatabase.getInstance().getReference().child("Chats");
+        storage = FirebaseStorage.getInstance();
+        mStorageReference = storage.getReference().child("profilePic/default_avatar.png");
         userID = getIntent().getStringExtra("userID");
     }
 
     private void setEvent() {
         loadInformationUserChat(userID);
         loadAvatarBox();
+        loadBoxChat(userID);
         loadSMS();
 
         imageViewSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 SendSMS();
+                createChatBox();
+            }
+        });
+    }
+
+    private void loadBoxChat(String userID) {
+        mUserReference.child(userID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    if (snapshot.hasChild("profilePic")) {
+                        avatarUserListChat = snapshot.child("profilePic").getValue().toString();
+                    } else {
+                        mStorageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                avatarURL = uri.toString();
+                            }
+                        });
+                    }
+                    if (snapshot.hasChild("userName")) {
+                        userNameListChat = snapshot.child("userName").getValue().toString();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+
+    private void createChatBox() {
+        mSmsReference.child(mUser.getUid()).child(userID)
+                .orderByChild("datetime")
+                .limitToLast(1)
+                .addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.hasChildren()) {
+                    for (DataSnapshot snapshot1:snapshot.getChildren())
+                    {
+                        lastMessage = snapshot1.child("sms").getValue().toString();
+                    }
+                }
+                HashMap hashMap = new HashMap();
+                hashMap.put("avatarUserListChat", avatarUserListChat);
+                hashMap.put("userNameListChat",userNameListChat);
+                hashMap.put("lastMessage", lastMessage);
+                mChatReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                    @Override
+                    public void onComplete(@NonNull Task task) {
+                        if (task.isSuccessful()) {
+                            mChatReference.child(userID).child(mUser.getUid()).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                                @Override
+                                public void onComplete(@NonNull Task task) {
+                                    Toast.makeText(ChatActivity.this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }
