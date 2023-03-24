@@ -13,7 +13,7 @@
         android:layout_marginBottom="12dp"
         android:layout_marginTop="15dp"
         android:layout_gravity="center"
-        android:text="Đăng xuất khỏi tài khoản của bạn?"
+        android:text="Xóa toàn bộ cuộc trò chuyện này?"
         android:textColor="@color/black"
         android:textSize="18sp" />
 
@@ -27,7 +27,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btnCancelConfirm"
+            android:id="@+id/btnCancelConfirmDeleteChat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -40,12 +40,12 @@
             app:backgroundTint="@color/grey" />
 
         <Button
-            android:id="@+id/btnConfirm"
+            android:id="@+id/btnConfirmDeleteChat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginHorizontal="5dp"
-            android:text="@string/action_logout"
+            android:text="@string/action_delete"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textStyle="bold"

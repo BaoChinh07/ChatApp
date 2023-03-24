@@ -9,6 +9,7 @@
     <string name="action_search">Tìm kiếm</string>
     <string name="action_notifications">Thông báo</string>
     <string name="action_logout">Đăng xuất</string>
+    <string name="action_delete">Xóa</string>
 
     <!--    String TextView-->
     <string name="text_email">Email</string>

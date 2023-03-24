@@ -6,15 +6,21 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -85,8 +91,6 @@ public class ChatActivity extends AppCompatActivity {
         edtInputMessage = (EditText) findViewById(R.id.edtInputMessage);
         imageViewSendImage = (ImageView) findViewById(R.id.imageViewSendImage);
         imageViewSendMessage = (ImageView) findViewById(R.id.imageViewSendMessage);
-        ivActionCall = (ImageView) findViewById(R.id.ivActionCall);
-        ivActionVideoCall = (ImageView) findViewById(R.id.ivActionVideoCall);
         rvMessage = (RecyclerView) findViewById(R.id.rvMessage);
         rvMessage.setLayoutManager(new LinearLayoutManager(this));
         tvUserNameToolChat = (TextView) findViewById(R.id.tvUserNameToolChat);
@@ -94,10 +98,8 @@ public class ChatActivity extends AppCompatActivity {
         civAvatarUserChat = (CircleImageView) findViewById(R.id.civAvatarUserChat);
         civOnline = (CircleImageView) findViewById(R.id.civOnline);
         civOffline = (CircleImageView) findViewById(R.id.civOffline);
-
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mSmsReference = FirebaseDatabase.getInstance().getReference().child("Messages");
         mFriendsReference = FirebaseDatabase.getInstance().getReference().child("Friends");
@@ -128,21 +130,6 @@ public class ChatActivity extends AppCompatActivity {
                 btnClickAvatar(userID);
             }
         });
-
-        ivActionCall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(ChatActivity.this, "Chọn gọi thoại", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        ivActionVideoCall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(ChatActivity.this, "Chọn gọi video", Toast.LENGTH_SHORT).show();
-            }
-        });
-
 
         imageViewSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -469,47 +456,91 @@ public class ChatActivity extends AppCompatActivity {
                 });
                 break;
             case R.id.action_deleteChatbox:
-                ProgressDialog dialog = new ProgressDialog(ChatActivity.this);
-                dialog.setTitle("Xóa đoạn tin nhắn");
-                dialog.setMessage("Vui lòng đợi...");
-                dialog.show();
-                mSmsReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            mSmsReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        mChatReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    mSmsReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                            if (task.isSuccessful()) {
-                                                                Toast.makeText(ChatActivity.this, "Xóa thành công", Toast.LENGTH_SHORT).show();
-                                                                dialog.dismiss();
-                                                                Intent intent = new Intent(ChatActivity.this, MainActivity.class);
-                                                                startActivity(intent);
-                                                            }
-                                                        }
-                                                    });
-                                                }
-
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
+                openDialogConfirmDeleteChatbox(Gravity.CENTER);
+                break;
+            case R.id.action_call:
+                Toast.makeText(this, "Chọn gọi thoại", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.action_videoCall:
+                Toast.makeText(this, "Chọn gọi video", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
         }
         return true;
+    }
+
+    private void openDialogConfirmDeleteChatbox(int gravity) {
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.confirm_delete_chatbox_dialog);
+        Window window = (Window) dialog.getWindow();
+        if (window == null) {
+            return;
+        } else {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            WindowManager.LayoutParams windowAttributes = window.getAttributes();
+            window.setAttributes(windowAttributes);
+            if (Gravity.CENTER == gravity) {
+                dialog.setCancelable(true);
+            } else {
+                dialog.setCancelable(false);
+            }
+            Button btnConfirmDeleteChat = dialog.findViewById(R.id.btnConfirmDeleteChat);
+            Button btnCancelConfirmDeleteChat = dialog.findViewById(R.id.btnCancelConfirmDeleteChat);
+
+            btnConfirmDeleteChat.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ProgressDialog dialog = new ProgressDialog(ChatActivity.this);
+                    dialog.setTitle("Xóa đoạn tin nhắn");
+                    dialog.setMessage("Vui lòng đợi...");
+                    dialog.show();
+                    mSmsReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                mSmsReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            mChatReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        mSmsReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    Toast.makeText(ChatActivity.this, "Xóa thành công", Toast.LENGTH_SHORT).show();
+                                                                    dialog.dismiss();
+                                                                    Intent intent = new Intent(ChatActivity.this, MainActivity.class);
+                                                                    startActivity(intent);
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            btnCancelConfirmDeleteChat.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+        }
+        dialog.show();
     }
 }
