@@ -2,6 +2,7 @@ package com.example.chatapp.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -31,9 +32,10 @@ import java.util.HashMap;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ViewSingleFriendActivity extends AppCompatActivity {
+    Toolbar toolbar_singleFriend;
     CircleImageView civAvatarSingleFriend, civSingleFriendOnline, civSingleFriendOffline;
     TextView tvDescribeSingleFriend, tvUserNameSingleFriend, tvEmailSingleFriend, tvGenderSingleFriend;
-    Button btnSendMessage, btnUnfriend;
+    Button btnSendMessage, btnUnfriend, btnBackInViewSingleFriend;
 
     String friendID, profilePicURL, userName, email, gender, describe, statusActivity, currentStatus = "friend";
 
@@ -57,6 +59,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
 
 
     private void setControl() {
+        toolbar_singleFriend = (Toolbar) findViewById(R.id.toolbar_singleFriend);
         civAvatarSingleFriend = (CircleImageView) findViewById(R.id.civAvatarSingleFriend);
         civSingleFriendOnline = (CircleImageView) findViewById(R.id.civSingleFriendOnline);
         civSingleFriendOffline = (CircleImageView) findViewById(R.id.civSingleFriendOffline);
@@ -66,6 +69,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
         tvGenderSingleFriend = (TextView) findViewById(R.id.tvGenderSingleFriend);
         btnSendMessage = (Button) findViewById(R.id.btnSendMessage);
         btnUnfriend = (Button) findViewById(R.id.btnUnfriend);
+        btnBackInViewSingleFriend = (Button) findViewById(R.id.btnBackInViewSingleFriend);
 
 
         friendID = getIntent().getStringExtra("userID");
@@ -77,6 +81,13 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
     }
 
     private void SetEvent() {
+
+        btnBackInViewSingleFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         btnSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override

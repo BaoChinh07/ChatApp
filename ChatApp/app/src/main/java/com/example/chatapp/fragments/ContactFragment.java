@@ -1,31 +1,28 @@
 package com.example.chatapp.fragments;
 
-import android.app.Dialog;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.Gravity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.Toast;
+
 
 import com.example.chatapp.Adapter.ContactAdapter;
 import com.example.chatapp.Models.Users;
 import com.example.chatapp.R;
+import com.example.chatapp.SignInActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -38,7 +35,7 @@ import java.util.ArrayList;
 public class ContactFragment extends Fragment {
     public ContactFragment() {
     }
-
+    Toolbar toolbar_contact;
     FirebaseAuth mAuth;
     FirebaseUser mCurrentUser;
     ContactAdapter contactAdapter;
@@ -56,6 +53,7 @@ public class ContactFragment extends Fragment {
     }
 
     private void setControl(View mView) {
+        toolbar_contact = mView.findViewById(R.id.toolbar_contact);
         action_search = (SearchView) mView.findViewById(R.id.action_search);
         action_search.clearFocus();
         rvListContact = (RecyclerView) mView.findViewById(R.id.rvListContact);
@@ -74,6 +72,33 @@ public class ContactFragment extends Fragment {
     }
 
     private void setEvent() {
+
+        toolbar_contact.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.menu_toolbar,menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                switch (id) {
+                    case R.id.action_notifications:
+                        Toast.makeText(getContext(), "Chọn thông báo", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.action_logout:
+                        mAuth.signOut();
+                        Intent intent = new Intent(getActivity(), SignInActivity.class);
+                        startActivity(intent);
+                        Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+
         mDatabase.getReference().child("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

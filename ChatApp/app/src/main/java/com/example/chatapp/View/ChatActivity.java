@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -56,6 +57,7 @@ public class ChatActivity extends AppCompatActivity {
     Toolbar chat_toolbar;
     RecyclerView rvMessage;
     EditText edtInputMessage;
+    Button btnBackInChat;
     ImageView imageViewSendImage, imageViewSendMessage, ivActionCall, ivActionVideoCall;
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
@@ -79,6 +81,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void setControl() {
         chat_toolbar = (Toolbar) findViewById(R.id.chat_toolbar);
+        btnBackInChat = (Button) findViewById(R.id.btnBackInChat);
         edtInputMessage = (EditText) findViewById(R.id.edtInputMessage);
         imageViewSendImage = (ImageView) findViewById(R.id.imageViewSendImage);
         imageViewSendMessage = (ImageView) findViewById(R.id.imageViewSendMessage);
@@ -111,6 +114,13 @@ public class ChatActivity extends AppCompatActivity {
         loadBoxChat(userID);
         loadSMS();
         loadMyProfile();
+
+        btnBackInChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         civAvatarUserChat.setOnClickListener(new View.OnClickListener() {
             @Override

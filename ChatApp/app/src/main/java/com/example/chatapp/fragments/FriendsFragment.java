@@ -5,20 +5,25 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.chatapp.Adapter.FriendAdapter;
-import com.example.chatapp.MainActivity;
 import com.example.chatapp.Models.Friends;
 import com.example.chatapp.R;
-import com.example.chatapp.View.ChatActivity;
+import com.example.chatapp.SignInActivity;
 import com.example.chatapp.View.ViewSingleFriendActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -32,9 +37,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-
 public class FriendsFragment extends Fragment {
+    Toolbar toolbar_friend;
     SearchView action_searchFriend;
     RecyclerView rvListFriend;
     FirebaseRecyclerOptions<Friends> options;
@@ -54,6 +58,7 @@ public class FriendsFragment extends Fragment {
     }
 
     private void setControl(View mView) {
+        toolbar_friend = mView.findViewById(R.id.toolbar_friend);
         action_searchFriend = mView.findViewById(R.id.action_searchFriend);
         rvListFriend = mView.findViewById(R.id.rvListFriend);
         mAuth = FirebaseAuth.getInstance();
@@ -70,6 +75,32 @@ public class FriendsFragment extends Fragment {
     }
 
     private void setEvent() {
+        toolbar_friend.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.menu_toolbar,menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                switch (id) {
+                    case R.id.action_notifications:
+                        Toast.makeText(getContext(), "Chọn thông báo", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.action_logout:
+                        mAuth.signOut();
+                        Intent intent = new Intent(getActivity(), SignInActivity.class);
+                        startActivity(intent);
+                        Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+
 //        loadFriends();
         loadFriend("");
     }

@@ -15,6 +15,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
@@ -23,6 +24,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -55,6 +57,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class ProfileFragment extends Fragment {
+    Toolbar toolbar_profile;
     private static final int MY_REQUEST_CODE = 100;
     private View mView;
     private FirebaseAuth mAuth;
@@ -83,6 +86,7 @@ public class ProfileFragment extends Fragment {
 
     // Hàm khởi tạo các biến
     private void setControl(View mView) {
+        toolbar_profile = (Toolbar) mView.findViewById(R.id.toolbar_profile);
         btnUpdateProfile = (Button) mView.findViewById(R.id.btnUpdateProfile);
         btnUpdateAvatar = (ImageButton) mView.findViewById(R.id.btnUpdateAvatar);
         btnLogOut = (Button) mView.findViewById(R.id.btnLogOut);
@@ -123,6 +127,33 @@ public class ProfileFragment extends Fragment {
 
     // Hàm xử lý sự kiện
     private void setEvent() {
+
+        //Xử lý toolbar
+        toolbar_profile.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.menu_toolbar,menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                switch (id) {
+                    case R.id.action_notifications:
+                        Toast.makeText(getContext(), "Chọn thông báo", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.action_logout:
+                        mAuth.signOut();
+                        Intent intent = new Intent(getActivity(), SignInActivity.class);
+                        startActivity(intent);
+                        Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
         //Nút Cập nhật
         btnUpdateProfile.setOnClickListener(new View.OnClickListener() {
             @Override

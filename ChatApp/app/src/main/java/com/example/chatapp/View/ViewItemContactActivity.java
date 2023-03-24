@@ -2,16 +2,21 @@ package com.example.chatapp.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.chatapp.MainActivity;
 import com.example.chatapp.R;
+import com.example.chatapp.SignInActivity;
 import com.example.chatapp.fragments.FriendsFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,8 +38,9 @@ import java.util.concurrent.atomic.AtomicMarkableReference;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ViewItemContactActivity extends AppCompatActivity {
+    Toolbar toolbar_singleContact;
     TextView tvDescribeSingleContact, tvUserNameSingleContact, tvEmailSingleContact;
-    Button btnSendFriendRequest, btnCancelSendFriendRequest;
+    Button btnSendFriendRequest, btnCancelSendFriendRequest, btnBackInViewSingleContact;
     CircleImageView civAvatarSingleContact;
     String profilePicURL, userName, status, email, gender, describe, friendID, userID, currentState;
     String myProfilePic, myUsername, myEmail, myGender, myDescribe, myUserID;
@@ -56,12 +62,14 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
 
     private void setControl() {
+        toolbar_singleContact = (Toolbar) findViewById(R.id.toolbar_singleContact);
         civAvatarSingleContact = (CircleImageView) findViewById(R.id.civAvatarSingleContact);
         tvDescribeSingleContact = (TextView) findViewById(R.id.tvDescribeSingleContact);
         tvUserNameSingleContact = (TextView) findViewById(R.id.tvUserNameSingleContact);
         tvEmailSingleContact = (TextView) findViewById(R.id.tvEmailSingleContact);
         btnSendFriendRequest = (Button) findViewById(R.id.btnSendFriendRequest);
         btnCancelSendFriendRequest = (Button) findViewById(R.id.btnCancelSendFriendRequest);
+        btnBackInViewSingleContact = (Button) findViewById(R.id.btnBackInViewSingleContact);
         userID = getIntent().getStringExtra("userID"); // Sử dụng put/getExtra để truyền dữ liệu từ ContactAdapter sang ViewItemContactActivity
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -77,12 +85,18 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
 
     private void setEvent() {
+
+        btnBackInViewSingleContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
         /* Xử lý sự kiện nút GỬI kết bạn */
         btnSendFriendRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendAction(userID);
-
             }
         });
         /* Xử lý sự kiện nút HỦY kết bạn */
@@ -419,4 +433,28 @@ public class ViewItemContactActivity extends AppCompatActivity {
         statusActivity("Offline");
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_toolbar,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_notifications:
+                Toast.makeText(ViewItemContactActivity.this, "Chọn thông báo", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.action_logout:
+                mAuth.signOut();
+                Intent intent = new Intent(ViewItemContactActivity.this, SignInActivity.class);
+                startActivity(intent);
+                Toast.makeText(ViewItemContactActivity.this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
 }

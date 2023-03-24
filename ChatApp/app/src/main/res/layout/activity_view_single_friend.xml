@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".View.ViewItemContactActivity">
+    <include android:id="@+id/toolbar_singleFriend"
+        layout = "@layout/tool_bar_view_single_friend"/>
 
     <RelativeLayout
         android:layout_width="wrap_content"

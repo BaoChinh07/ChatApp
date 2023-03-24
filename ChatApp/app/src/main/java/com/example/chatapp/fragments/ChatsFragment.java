@@ -93,11 +93,13 @@ public class ChatsFragment extends Fragment {
                 switch (id) {
                     case R.id.action_notifications:
                         Toast.makeText(getContext(), "Chọn thông báo", Toast.LENGTH_SHORT).show();
+                        break;
                     case R.id.action_logout:
                         mAuth.signOut();
                         Intent intent = new Intent(getActivity(), SignInActivity.class);
                         startActivity(intent);
                         Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                        break;
                     default:
                         break;
                 }

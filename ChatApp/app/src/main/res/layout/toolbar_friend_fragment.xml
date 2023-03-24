@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             app:defaultQueryHint="Tìm kiếm đoạn chat"
-            android:layoutDirection="rtl"/>
+            android:layoutDirection="rtl"
+            app:searchIcon="@drawable/icon_search"/>
     </LinearLayout>
 </androidx.appcompat.widget.Toolbar>
