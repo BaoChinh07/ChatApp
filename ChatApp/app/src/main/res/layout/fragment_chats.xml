@@ -7,7 +7,7 @@
     tools:context=".fragments.ChatsFragment">
 
     <include
-        android:id="@+id/chatFragment"
+        android:id="@+id/toolbar_chats"
         layout="@layout/toolbar_chat" />
 
     <androidx.recyclerview.widget.RecyclerView

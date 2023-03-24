@@ -6,14 +6,19 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.chatapp.Adapter.ChatAdapter;
 import com.example.chatapp.Adapter.FriendAdapter;
@@ -38,7 +43,7 @@ import org.checkerframework.checker.units.qual.C;
 
 public class ChatsFragment extends Fragment {
     SearchView action_searchChat;
-    Toolbar chatFragment;
+    Toolbar toolbar_chats;
     RecyclerView rvListChat;
     FirebaseRecyclerOptions<Chat> optionsChat;
     FirebaseRecyclerAdapter<Chat,ChatAdapter> adapterChat;
@@ -57,6 +62,7 @@ public class ChatsFragment extends Fragment {
     }
 
     private void setControl(View mView) {
+        toolbar_chats = (Toolbar) mView.findViewById(R.id.toolbar_chats);
         rvListChat = (RecyclerView) mView.findViewById(R.id.rvListChat);
         action_searchChat = mView.findViewById(R.id.action_searchChat);
         mAuth = FirebaseAuth.getInstance();
@@ -73,6 +79,26 @@ public class ChatsFragment extends Fragment {
     }
     private void setEvent() {
         loadListChat("");
+        toolbar_chats.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.menu_toolbar,menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                switch (id) {
+                    case R.id.action_notifications:
+                        Toast.makeText(getContext(), "Chọn thông báo", Toast.LENGTH_SHORT).show();
+                    case R.id.action_logout:
+                        Toast.makeText(getContext(), "Chọn Đăng xuất", Toast.LENGTH_SHORT).show();
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     private void loadListChat(String s) {
