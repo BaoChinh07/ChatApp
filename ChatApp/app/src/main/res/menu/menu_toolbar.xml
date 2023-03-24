@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:title="@string/action_notifications"
+    <item android:id="@+id/action_notifications"
+        android:title="@string/action_notifications"
         android:icon="@drawable/icon_notifications"
-        android:id="@+id/action_notifications"
+        android:actionLayout="@layout/custom_notification_layout"
         app:showAsAction="always"/>
+
     <item android:title="@string/action_logout"
         android:id="@+id/action_logout"
         android:icon="@drawable/icon_logout"

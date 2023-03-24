@@ -204,7 +204,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
         if (currentState.equals("nothing_happen")) {
             HashMap hashMap = new HashMap();
-            hashMap.put("status", "pending");
+            hashMap.put("status", "Gửi lời mời kết bạn");
             mRequestReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {

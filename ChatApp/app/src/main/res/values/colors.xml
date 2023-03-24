@@ -17,4 +17,5 @@
     <color name = "light_grey">#D8D9CF</color>
     <color name="background_card">#FFFBF5</color>
     <color name="background_sms">#BBD6B8</color>
+    <color name="red">#FF0000</color>
 </resources>
