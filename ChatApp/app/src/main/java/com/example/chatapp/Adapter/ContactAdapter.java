@@ -36,7 +36,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         this.context = context;
         this.listContacts = listContacts;
         this.listFilterContacts = listContacts;
-
     }
 
     @NonNull

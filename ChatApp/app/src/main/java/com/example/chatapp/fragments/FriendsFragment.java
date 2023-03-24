@@ -24,25 +24,25 @@ import com.example.chatapp.Adapter.FriendAdapter;
 import com.example.chatapp.Models.Friends;
 import com.example.chatapp.R;
 import com.example.chatapp.SignInActivity;
-import com.example.chatapp.View.ViewSingleFriendActivity;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 public class FriendsFragment extends Fragment {
+    public FriendsFragment() {
+    }
+
+    FriendAdapter friendAdapter;
+    ArrayList<Friends> listFriends = new ArrayList<>();
     Toolbar toolbar_friend;
     SearchView action_searchFriend;
     RecyclerView rvListFriend;
-    FirebaseRecyclerOptions<Friends> options;
-    FirebaseRecyclerAdapter<Friends, FriendAdapter> friendsAdapter;
     FirebaseAuth mAuth;
     DatabaseReference mFriendReference, mDatabaseReference;
     String friendID;
@@ -64,8 +64,10 @@ public class FriendsFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         mFriendReference = FirebaseDatabase.getInstance().getReference().child("Friends");
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
-
         mUser = mAuth.getCurrentUser();
+
+        friendAdapter = new FriendAdapter(getContext(), listFriends);
+        rvListFriend.setAdapter(friendAdapter);
         /* Tạo ngăn cách giữa 2 đối tượng*/
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         rvListFriend.addItemDecoration(itemDecoration);
@@ -75,10 +77,12 @@ public class FriendsFragment extends Fragment {
     }
 
     private void setEvent() {
+
+        loadFriend();
         toolbar_friend.addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.menu_toolbar,menu);
+                menuInflater.inflate(R.menu.menu_toolbar, menu);
             }
 
             @Override
@@ -101,59 +105,42 @@ public class FriendsFragment extends Fragment {
             }
         });
 
-//        loadFriends();
-        loadFriend("");
-    }
-
-    private void loadFriend(String s) {
-        Query query = mFriendReference.child(mUser.getUid()).orderByChild("userName").startAt(s).endAt(s+"\uf8ff");
-        options = new FirebaseRecyclerOptions.Builder<Friends>().setQuery(query,Friends.class).build();
-        friendsAdapter = new FirebaseRecyclerAdapter<Friends, FriendAdapter>(options) {
+        action_searchFriend.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            protected void onBindViewHolder(@NonNull FriendAdapter holder, int position, @NonNull Friends model) {
-                Picasso.get().load(model.getProfilePic()).into(holder.civAvatarItemFriend);
-                holder.tvItemFriendName.setText(model.getUserName());
-                holder.tvItemFriendDescribe.setText(model.getDescribe());
-
-                mDatabaseReference.child(model.getFriendID()).child("statusActivity").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            if (snapshot.getValue().toString().equals("Online")) {
-                                holder.civItemFriendOnline.setVisibility(View.VISIBLE);
-                                holder.civItemFriendOffline.setVisibility(View.GONE);
-                            } else {
-                                holder.civItemFriendOnline.setVisibility(View.GONE);
-                                holder.civItemFriendOffline.setVisibility(View.VISIBLE);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(getContext(), ViewSingleFriendActivity.class);
-                        intent.putExtra("userID", getRef(holder.getAdapterPosition()).getKey().toString());
-                        startActivity(intent);
-                    }
-                });
+            public boolean onQueryTextSubmit(String query) {
+                friendAdapter.getFilter().filter(query);
+                return false;
             }
 
-            @NonNull
             @Override
-            public FriendAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View mView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend,parent,false);
-                return new FriendAdapter(mView);
+            public boolean onQueryTextChange(String newText) {
+                friendAdapter.getFilter().filter(newText);
+                return false;
             }
-        };
-        friendsAdapter.startListening();
-        rvListFriend.setAdapter(friendsAdapter);
+        });
+
+
     }
 
+    private void loadFriend() {
+        mFriendReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listFriends.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Friends friends = dataSnapshot.getValue(Friends.class);
+                    mAuth = FirebaseAuth.getInstance();
+                    mUser = mAuth.getCurrentUser();
+                    friends.setFriendID(dataSnapshot.getKey());
+                    listFriends.add(friends);
+                }
+                friendAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
 }
