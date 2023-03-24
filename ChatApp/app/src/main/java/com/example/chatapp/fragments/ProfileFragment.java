@@ -143,10 +143,7 @@ public class ProfileFragment extends Fragment {
                         Toast.makeText(getContext(), "Chọn thông báo", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.action_logout:
-                        mAuth.signOut();
-                        Intent intent = new Intent(getActivity(), SignInActivity.class);
-                        startActivity(intent);
-                        Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                        openLogout(Gravity.CENTER);
                         break;
                     default:
                         break;
@@ -327,5 +324,45 @@ public class ProfileFragment extends Fragment {
                 }
             });
         }
+    }
+    private void openLogout(int gravity) {
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.confirm_dialog);
+        Window window = (Window) dialog.getWindow();
+        if (window == null) {
+            return;
+        } else {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            WindowManager.LayoutParams windowAttributes = window.getAttributes();
+            window.setAttributes(windowAttributes);
+
+            if (Gravity.CENTER == gravity) {
+                dialog.setCancelable(true);
+            } else {
+                dialog.setCancelable(false);
+            }
+            Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
+            Button btnCancelConfirm = dialog.findViewById(R.id.btnCancelConfirm);
+
+            btnConfirm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mAuth.signOut();
+                    Intent intent = new Intent(getActivity(), SignInActivity.class);
+                    startActivity(intent);
+                    Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                }
+            });
+            btnCancelConfirm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+        }
+        dialog.show();
     }
 }
