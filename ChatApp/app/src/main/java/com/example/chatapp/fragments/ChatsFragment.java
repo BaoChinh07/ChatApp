@@ -22,26 +22,18 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.chatapp.Adapter.ChatAdapter;
-import com.example.chatapp.Adapter.FriendAdapter;
 import com.example.chatapp.Models.Chat;
-import com.example.chatapp.Models.Friends;
 import com.example.chatapp.R;
 import com.example.chatapp.SignInActivity;
 import com.example.chatapp.View.ChatActivity;
-import com.example.chatapp.View.ViewSingleFriendActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
-import org.checkerframework.checker.units.qual.C;
 
 public class ChatsFragment extends Fragment {
     SearchView action_searchChat;
@@ -109,8 +101,8 @@ public class ChatsFragment extends Fragment {
     }
 
     private void loadListChat(String s) {
-        Query query = mChatReference.child(mUser.getUid()).orderByChild("userName").startAt(s).endAt(s+"\uf8ff");
-        optionsChat = new FirebaseRecyclerOptions.Builder<Chat>().setQuery(query,Chat.class).build();
+        Query query = mChatReference.child(mUser.getUid()).orderByChild("userName").startAt(s).endAt(s + "\uf8ff");
+        optionsChat = new FirebaseRecyclerOptions.Builder<Chat>().setQuery(query, Chat.class).build();
         adapterChat = new FirebaseRecyclerAdapter<Chat, ChatAdapter>(optionsChat) {
             @Override
             protected void onBindViewHolder(@NonNull ChatAdapter holder, int position, @NonNull Chat model) {
@@ -131,7 +123,7 @@ public class ChatsFragment extends Fragment {
             @NonNull
             @Override
             public ChatAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat,parent,false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat, parent, false);
                 return new ChatAdapter(view);
             }
         };
