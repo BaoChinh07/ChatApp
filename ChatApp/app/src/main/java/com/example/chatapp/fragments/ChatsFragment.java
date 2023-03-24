@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuProvider;
@@ -25,6 +26,7 @@ import com.example.chatapp.Adapter.FriendAdapter;
 import com.example.chatapp.Models.Chat;
 import com.example.chatapp.Models.Friends;
 import com.example.chatapp.R;
+import com.example.chatapp.SignInActivity;
 import com.example.chatapp.View.ChatActivity;
 import com.example.chatapp.View.ViewSingleFriendActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -92,7 +94,10 @@ public class ChatsFragment extends Fragment {
                     case R.id.action_notifications:
                         Toast.makeText(getContext(), "Chọn thông báo", Toast.LENGTH_SHORT).show();
                     case R.id.action_logout:
-                        Toast.makeText(getContext(), "Chọn Đăng xuất", Toast.LENGTH_SHORT).show();
+                        mAuth.signOut();
+                        Intent intent = new Intent(getActivity(), SignInActivity.class);
+                        startActivity(intent);
+                        Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
                     default:
                         break;
                 }

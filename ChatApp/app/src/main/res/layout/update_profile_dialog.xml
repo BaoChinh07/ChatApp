@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/frame_update_profile"
     android:layout_marginHorizontal="10dp"
+    android:background="@drawable/frame_update_profile"
     android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:background="@drawable/frame_update_profile_header"
         android:gravity="center"
         android:text="Cập nhật hồ sơ cá nhân"
@@ -22,29 +22,31 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginVertical="10dp"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <ImageView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="5dp"
-            android:src="@drawable/icon_edit" />
+            android:layout_marginStart="37dp"
+            android:layout_marginBottom="3dp"
+            android:gravity="center"
+            android:text="@string/text_describe"
+            android:textColor="@color/grey"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
-                android:gravity="center"
-                android:text="@string/text_describe"
-                android:textColor="@color/grey"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/icon_edit" />
+
 
             <EditText
                 android:id="@+id/edtDescribe"
@@ -62,29 +64,32 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginBottom="10dp"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <ImageView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="5dp"
-            android:src="@drawable/icon_username" />
+            android:layout_marginStart="37dp"
+            android:layout_marginBottom="3dp"
+            android:gravity="center"
+            android:text="Tên người dùng"
+            android:textColor="@color/grey"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
-                android:gravity="center"
-                android:text="Tên người dùng"
-                android:textColor="@color/grey"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/icon_username" />
+
 
             <EditText
                 android:id="@+id/edtUpdateUserName"
@@ -103,29 +108,32 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginBottom="10dp"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <ImageView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="5dp"
-            android:src="@drawable/icon_gender" />
+            android:layout_marginStart="37dp"
+            android:layout_marginBottom="3dp"
+            android:gravity="center"
+            android:text="Giới tính"
+            android:textColor="@color/grey"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
-                android:gravity="center"
-                android:text="Giới tính"
-                android:textColor="@color/grey"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/icon_gender" />
+
 
             <RadioGroup
                 android:layout_width="wrap_content"
@@ -152,7 +160,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="30dp"
         android:orientation="horizontal">
 
         <Button

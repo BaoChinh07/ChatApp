@@ -21,14 +21,18 @@
     <string name="text_offline">Offline</string>
     <string name="text_time">Time</string>
     <string name="text_message">Message</string>
+    <string name="text_view_profile">Xem trang cá nhân</string>
+    <string name="text_delete_chatBox">Xóa đoạn chat</string>
     <!--    String Button-->
     <string name="button_signup">ĐĂNG KÝ</string>
     <string name="button_signin">ĐĂNG NHẬP</string>
     <string name="button_update">CẬP NHẬT</string>
     <string name="button_logout">ĐĂNG XUẤT</string>
+    <string name="button_save">Lưu</string>
     <string name="button_send_friend_request">Thêm bạn bè</string>
     <string name="button_send_message">Gửi tin nhắn</string>
     <string name="button_cancel_send">Hủy yêu cầu</string>
+    <string name="button_cancel">Hủy</string>
     <string name="button_unfriend">Hủy kết bạn</string>
     <string name="button_accept_friend_request">Chấp nhận</string>
     <string name="button_decline_friend_request">Từ chối</string>

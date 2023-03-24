@@ -6,10 +6,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -18,8 +21,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapp.Adapter.MessageAdapter;
+import com.example.chatapp.MainActivity;
 import com.example.chatapp.Models.Message;
 import com.example.chatapp.R;
+import com.example.chatapp.SignInActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -51,7 +56,7 @@ public class ChatActivity extends AppCompatActivity {
     Toolbar chat_toolbar;
     RecyclerView rvMessage;
     EditText edtInputMessage;
-    ImageView imageViewSendImage, imageViewSendMessage;
+    ImageView imageViewSendImage, imageViewSendMessage, ivActionCall, ivActionVideoCall;
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
     String userID, avatarURL, avatarBox, userName, dateTime, statusActivity;
@@ -77,6 +82,8 @@ public class ChatActivity extends AppCompatActivity {
         edtInputMessage = (EditText) findViewById(R.id.edtInputMessage);
         imageViewSendImage = (ImageView) findViewById(R.id.imageViewSendImage);
         imageViewSendMessage = (ImageView) findViewById(R.id.imageViewSendMessage);
+        ivActionCall = (ImageView) findViewById(R.id.ivActionCall);
+        ivActionVideoCall = (ImageView) findViewById(R.id.ivActionVideoCall);
         rvMessage = (RecyclerView) findViewById(R.id.rvMessage);
         rvMessage.setLayoutManager(new LinearLayoutManager(this));
         tvUserNameToolChat = (TextView) findViewById(R.id.tvUserNameToolChat);
@@ -95,6 +102,7 @@ public class ChatActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         mStorageReference = storage.getReference().child("profilePic/default_avatar.png");
         userID = getIntent().getStringExtra("userID");
+        setSupportActionBar(chat_toolbar);
     }
 
     private void setEvent() {
@@ -104,6 +112,28 @@ public class ChatActivity extends AppCompatActivity {
         loadSMS();
         loadMyProfile();
 
+        civAvatarUserChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnClickAvatar(userID);
+            }
+        });
+
+        ivActionCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ChatActivity.this, "Chọn gọi thoại", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        ivActionVideoCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ChatActivity.this, "Chọn gọi video", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
         imageViewSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,13 +141,9 @@ public class ChatActivity extends AppCompatActivity {
                 createChatBox();
             }
         });
-        civAvatarUserChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                btnClickAvatar(userID);
-            }
-        });
+
     }
+
     private void btnClickAvatar(String userID) {
         mFriendsReference.child(mUser.getUid()).child(userID).addValueEventListener(new ValueEventListener() {
             @Override
@@ -140,16 +166,17 @@ public class ChatActivity extends AppCompatActivity {
         });
 
     }
+
     private void loadMyProfile() {
         mUserReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    }
-                    if (snapshot.hasChild("userName")) {
-                        myName = snapshot.child("userName").getValue().toString();
-                    }
                 }
+                if (snapshot.hasChild("userName")) {
+                    myName = snapshot.child("userName").getValue().toString();
+                }
+            }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -193,37 +220,36 @@ public class ChatActivity extends AppCompatActivity {
                 .orderByChild("datetime")
                 .limitToLast(1)
                 .addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.hasChildren()) {
-                    for (DataSnapshot snapshot1:snapshot.getChildren())
-                    {
-                        lastMessage = snapshot1.child("sms").getValue().toString();
-                    }
-                }
-                HashMap hashMap = new HashMap();
-                hashMap.put("profilePic", avatarUserListChat);
-                hashMap.put("userName",userNameListChat);
-                hashMap.put("lastMessage", lastMessage);
-                mChatReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                     @Override
-                    public void onComplete(@NonNull Task task) {
-                        if (task.isSuccessful()) {
-                            HashMap mHashMap = new HashMap();
-                            mHashMap.put("profilePic", avatarBox);
-                            mHashMap.put("userName", myName);
-                            mHashMap.put("lastMessage", lastMessage);
-                            mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap);
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.hasChildren()) {
+                            for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                                lastMessage = snapshot1.child("sms").getValue().toString();
+                            }
                         }
+                        HashMap hashMap = new HashMap();
+                        hashMap.put("profilePic", avatarUserListChat);
+                        hashMap.put("userName", userNameListChat);
+                        hashMap.put("lastMessage", lastMessage);
+                        mChatReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                            @Override
+                            public void onComplete(@NonNull Task task) {
+                                if (task.isSuccessful()) {
+                                    HashMap mHashMap = new HashMap();
+                                    mHashMap.put("profilePic", avatarBox);
+                                    mHashMap.put("userName", myName);
+                                    mHashMap.put("lastMessage", lastMessage);
+                                    mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap);
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
                     }
                 });
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
     }
 
 
@@ -296,7 +322,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void SendSMS() {
-        String sms = edtInputMessage.getText().toString();
+        String sms = edtInputMessage.getText().toString().trim();
         currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy, HH:mm a");
         dateTime = simpleDateFormat.format(currentTime);
@@ -397,5 +423,81 @@ public class ChatActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         statusActivity("Offline");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_chat_activity, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_view_profile:
+                mFriendsReference.child(mUser.getUid()).child(userID).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            Intent intent = new Intent(ChatActivity.this, ViewSingleFriendActivity.class);
+                            intent.putExtra("userID", userID).toString();
+                            startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(ChatActivity.this, ViewItemContactActivity.class);
+                            intent.putExtra("userID", userID).toString();
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                break;
+            case R.id.action_deleteChatbox:
+                ProgressDialog dialog = new ProgressDialog(ChatActivity.this);
+                dialog.setTitle("Xóa đoạn tin nhắn");
+                dialog.setMessage("Vui lòng đợi...");
+                dialog.show();
+                mSmsReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            mSmsReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        mChatReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    mSmsReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            if (task.isSuccessful()) {
+                                                                Toast.makeText(ChatActivity.this, "Xóa thành công", Toast.LENGTH_SHORT).show();
+                                                                dialog.dismiss();
+                                                                Intent intent = new Intent(ChatActivity.this, MainActivity.class);
+                                                                startActivity(intent);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 }

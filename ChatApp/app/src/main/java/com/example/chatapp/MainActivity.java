@@ -9,6 +9,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,8 +29,11 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
+    private int backPressCount = 0;
+    private boolean doubleBackToExitPressedOnce = false;
     private BottomNavigationView mBottomNavigationView;
     private ViewPager mViewPager;
+
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     DatabaseReference mDatabaseReference;
@@ -132,5 +136,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         statusActivity("Offline");
+    }
+
+
+    //Xử lý khi ấn back 2 lần
+    Handler mHandler = new Handler();
+    Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            doubleBackToExitPressedOnce = false;
+            backPressCount = 0;
+        }
+    };
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            finishAffinity();
+            super.onBackPressed();
+            return;
+        }
+
+        doubleBackToExitPressedOnce = true;
+        backPressCount++;
+
+        if (backPressCount == 1) {
+            Toast.makeText(this, "Nhấn back lần nữa để thoát", Toast.LENGTH_SHORT).show();
+        } else if (backPressCount == 2) {
+            Toast.makeText(this, "Thoát ứng dụng", Toast.LENGTH_SHORT).show();
+            finishAffinity();
+            return;
+        }
+        mHandler.postDelayed(mRunnable, 2000);
     }
 }
