@@ -241,6 +241,7 @@ public class ChatActivity extends AppCompatActivity {
                         hashMap.put("profilePic", avatarUserListChat);
                         hashMap.put("userName", userNameListChat);
                         hashMap.put("lastMessage", lastMessage);
+                        hashMap.put("friendID",userID);
                         mChatReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                             @Override
                             public void onComplete(@NonNull Task task) {
@@ -249,6 +250,7 @@ public class ChatActivity extends AppCompatActivity {
                                     mHashMap.put("profilePic", avatarBox);
                                     mHashMap.put("userName", myName);
                                     mHashMap.put("lastMessage", lastMessage);
+                                    mHashMap.put("friendID",mUser.getUid());
                                     mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap);
                                 }
                             }
@@ -334,7 +336,7 @@ public class ChatActivity extends AppCompatActivity {
     private void SendSMS() {
         String sms = edtInputMessage.getText().toString().trim();
         currentTime = Calendar.getInstance().getTime();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy, HH:mm a");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy, hh:mm a");
         dateTime = simpleDateFormat.format(currentTime);
 
         if (sms.isEmpty()) {

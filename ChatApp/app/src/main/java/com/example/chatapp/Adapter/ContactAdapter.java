@@ -30,7 +30,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     Context context;
     ArrayList<Users> listContacts;
     ArrayList<Users> listFilterContacts;
-    FirebaseAuth mAuth;
 
     public ContactAdapter(Context context, ArrayList<Users> listContacts) {
         this.context = context;
