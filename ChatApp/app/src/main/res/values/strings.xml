@@ -2,7 +2,7 @@
     <string name="app_name">ChatApp</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="action_chats">Tin nhắn</string>
-    <string name="action_contacts">Có thể bạn quen biết</string>
+    <string name="action_contacts">Người dùng</string>
     <string name="action_friends">Bạn bè</string>
     <string name="action_calls">Cuộc gọi</string>
     <string name="action_profile">Hồ sơ</string>
@@ -37,6 +37,6 @@
     <string name="button_unfriend">Hủy kết bạn</string>
     <string name="button_accept_friend_request">Chấp nhận</string>
     <string name="button_decline_friend_request">Từ chối</string>
-        <!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

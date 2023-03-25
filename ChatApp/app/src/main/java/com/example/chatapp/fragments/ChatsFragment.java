@@ -100,7 +100,7 @@ public class ChatsFragment extends Fragment {
                 int id = menuItem.getItemId();
                 switch (id) {
                     case R.id.action_notifications:
-                        Toast.makeText(getContext(), "Chọn thông báo", Toast.LENGTH_SHORT).show();
+                        openNotificationsDialog(Gravity.CENTER);
                         break;
                     case R.id.action_logout:
                         openLogout(Gravity.CENTER);
@@ -124,6 +124,29 @@ public class ChatsFragment extends Fragment {
                 return false;
             }
         });
+    }
+
+    private void openNotificationsDialog(int gravity) {
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_notifications);
+        Window window = (Window) dialog.getWindow();
+        if (window == null) {
+            return;
+        } else {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            WindowManager.LayoutParams windowAttributes = window.getAttributes();
+            window.setAttributes(windowAttributes);
+
+            if (Gravity.CENTER == gravity) {
+                dialog.setCancelable(true);
+            } else {
+                dialog.setCancelable(false);
+            }
+        }
+        dialog.show();
     }
 
     private void openLogout(int gravity) {

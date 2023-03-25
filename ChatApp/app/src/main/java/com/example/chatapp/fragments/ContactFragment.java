@@ -35,6 +35,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -45,12 +46,13 @@ public class ContactFragment extends Fragment {
     }
     Toolbar toolbar_contact;
     FirebaseAuth mAuth;
-    FirebaseUser mCurrentUser;
+    FirebaseUser mUser;
     ContactAdapter contactAdapter;
     RecyclerView rvListContact;
     SearchView action_search;
     ArrayList<Users> listContact = new ArrayList<>();
     FirebaseDatabase mDatabase;
+    DatabaseReference mFriendReference;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,6 +68,8 @@ public class ContactFragment extends Fragment {
         action_search.clearFocus();
         rvListContact = (RecyclerView) mView.findViewById(R.id.rvListContact);
         mDatabase = FirebaseDatabase.getInstance();
+        mFriendReference = FirebaseDatabase.getInstance().getReference().child("Friends");
+
         /* Khởi tạo đối tượng Adapter*/
         contactAdapter = new ContactAdapter(getContext(), listContact);
         rvListContact.setAdapter(contactAdapter);
@@ -104,27 +108,28 @@ public class ContactFragment extends Fragment {
             }
         });
 
-        mDatabase.getReference().child("Users").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                listContact.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Users users = dataSnapshot.getValue(Users.class);
-                    mAuth = FirebaseAuth.getInstance();
-                    mCurrentUser = mAuth.getCurrentUser();
-                    if (mCurrentUser != null && !users.getEmail().equals(mCurrentUser.getEmail())) {
-                        users.setUserID(dataSnapshot.getKey());
-                        listContact.add(users);
+            mDatabase.getReference().child("Users").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    listContact.clear();
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Users users = dataSnapshot.getValue(Users.class);
+                        mAuth = FirebaseAuth.getInstance();
+                        mUser = mAuth.getCurrentUser();
+                        if (mUser != null && !users.getEmail().equals(mUser.getEmail())) {
+                            users.setUserID(dataSnapshot.getKey());
+                            listContact.add(users);
+                        }
+
                     }
+                    contactAdapter.notifyDataSetChanged();
                 }
-                contactAdapter.notifyDataSetChanged();
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                }
+            });
         // Xử lý sự kiện tìm kiếm
         action_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

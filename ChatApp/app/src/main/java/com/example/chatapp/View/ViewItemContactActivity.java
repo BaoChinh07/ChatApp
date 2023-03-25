@@ -204,17 +204,26 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
         if (currentState.equals("nothing_happen")) {
             HashMap hashMap = new HashMap();
-            hashMap.put("status", "Gửi lời mời kết bạn");
+            hashMap.put("status", "pending");
             mRequestReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
                     if (task.isSuccessful()) {
-                        Toast.makeText(ViewItemContactActivity.this, "Bạn đã gửi lời mời kết bạn", Toast.LENGTH_SHORT).show();
-                        btnCancelSendFriendRequest.setVisibility(View.GONE);
-                        currentState = "i_sent_pending";
-                        btnSendFriendRequest.setText(R.string.button_cancel_send);
-                    } else {
-                        Toast.makeText(ViewItemContactActivity.this, "" + task.getException().toString(), Toast.LENGTH_SHORT).show();
+                        HashMap mHashMap = new HashMap();
+                        mHashMap.put("status", "wait_confirm");
+                        mRequestReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap).addOnCompleteListener(new OnCompleteListener() {
+                            @Override
+                            public void onComplete(@NonNull Task task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(ViewItemContactActivity.this, "Bạn đã gửi lời mời kết bạn", Toast.LENGTH_SHORT).show();
+                                    btnCancelSendFriendRequest.setVisibility(View.GONE);
+                                    currentState = "i_sent_pending";
+                                    btnSendFriendRequest.setText(R.string.button_cancel_send);
+                                } else {
+                                    Toast.makeText(ViewItemContactActivity.this, "" + task.getException().toString(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     }
                 }
             });
@@ -224,12 +233,19 @@ public class ViewItemContactActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
-                        Toast.makeText(ViewItemContactActivity.this, "Bạn đã hủy yêu cầu kết bạn", Toast.LENGTH_SHORT).show();
-                        currentState = "nothing_happen";
-                        btnSendFriendRequest.setText(R.string.button_send_friend_request);
-                        btnCancelSendFriendRequest.setVisibility(View.GONE);
-                    } else {
-                        Toast.makeText(ViewItemContactActivity.this, "" + task.getException().toString(), Toast.LENGTH_SHORT).show();
+                        mRequestReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(ViewItemContactActivity.this, "Bạn đã hủy yêu cầu kết bạn", Toast.LENGTH_SHORT).show();
+                                    currentState = "nothing_happen";
+                                    btnSendFriendRequest.setText(R.string.button_send_friend_request);
+                                    btnCancelSendFriendRequest.setVisibility(View.GONE);
+                                } else {
+                                    Toast.makeText(ViewItemContactActivity.this, "" + task.getException().toString(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     }
                 }
             });
@@ -239,42 +255,48 @@ public class ViewItemContactActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
-                        final HashMap hashMap = new HashMap();
-                        hashMap.put("status", "friend");
-                        hashMap.put("friendID",friendID);
-                        hashMap.put("userName", userName);
-                        hashMap.put("profilePic", profilePicURL);
-                        hashMap.put("email",email);
-                        hashMap.put("describe",describe);
-                        hashMap.put("gender",gender);
-
-                        //Thông tin của bản thân sẽ lưu trong node của bạn bè
-                        final HashMap hashMap1 = new HashMap();
-                        hashMap1.put("status", "friend");
-                        hashMap1.put("friendID",myUserID);
-                        hashMap1.put("userName", myUsername);
-                        hashMap1.put("profilePic", myProfilePic);
-                        hashMap1.put("email",myEmail);
-                        hashMap1.put("describe",myDescribe);
-                        hashMap1.put("gender",myGender);
-                        mFriendsReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                        mRequestReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
-                            public void onComplete(@NonNull Task task) {
+                            public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    mFriendsReference.child(userID).child(mUser.getUid()).updateChildren(hashMap1).addOnCompleteListener(new OnCompleteListener() {
+                                    final HashMap hashMap = new HashMap();
+                                    hashMap.put("status", "friend");
+                                    hashMap.put("friendID",friendID);
+                                    hashMap.put("userName", userName);
+                                    hashMap.put("profilePic", profilePicURL);
+                                    hashMap.put("email",email);
+                                    hashMap.put("describe",describe);
+                                    hashMap.put("gender",gender);
+
+                                    //Thông tin của bản thân sẽ lưu trong node của bạn bè
+                                    final HashMap hashMap1 = new HashMap();
+                                    hashMap1.put("status", "friend");
+                                    hashMap1.put("friendID",myUserID);
+                                    hashMap1.put("userName", myUsername);
+                                    hashMap1.put("profilePic", myProfilePic);
+                                    hashMap1.put("email",myEmail);
+                                    hashMap1.put("describe",myDescribe);
+                                    hashMap1.put("gender",myGender);
+                                    mFriendsReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                                         @Override
                                         public void onComplete(@NonNull Task task) {
-                                            Toast.makeText(ViewItemContactActivity.this, "Các bạn đã là bạn bè", Toast.LENGTH_SHORT).show();
-                                            currentState = "friend";
-                                            btnSendFriendRequest.setText(R.string.button_send_message);
-                                            btnCancelSendFriendRequest.setText(R.string.button_unfriend);
-                                            btnCancelSendFriendRequest.setVisibility(View.VISIBLE);
+                                            if (task.isSuccessful()) {
+                                                mFriendsReference.child(userID).child(mUser.getUid()).updateChildren(hashMap1).addOnCompleteListener(new OnCompleteListener() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task task) {
+                                                        Toast.makeText(ViewItemContactActivity.this, "Các bạn đã là bạn bè", Toast.LENGTH_SHORT).show();
+                                                        currentState = "friend";
+                                                        btnSendFriendRequest.setText(R.string.button_send_message);
+                                                        btnCancelSendFriendRequest.setText(R.string.button_unfriend);
+                                                        btnCancelSendFriendRequest.setVisibility(View.VISIBLE);
+                                                    }
+                                                });
+                                            }
                                         }
                                     });
                                 }
                             }
                         });
-
                     }
 
                 }
@@ -343,15 +365,30 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
             }
         });
-        mRequestReference.child(userID).child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+
+        mRequestReference.child(mUser.getUid()).child(userID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    if (snapshot.child("status").getValue().toString().equals("pending")) {
-                        currentState = "he_sent_pending";
-                        btnSendFriendRequest.setText(R.string.button_accept_friend_request);
-                        btnCancelSendFriendRequest.setText(R.string.button_decline_friend_request);
-                        btnCancelSendFriendRequest.setVisibility(View.VISIBLE);
+                    if (snapshot.child("status").getValue().toString().equals("wait_confirm")) {
+                        mRequestReference.child(userID).child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    if (snapshot.child("status").getValue().toString().equals("pending")) {
+                                        currentState = "he_sent_pending";
+                                        btnSendFriendRequest.setText(R.string.button_accept_friend_request);
+                                        btnCancelSendFriendRequest.setText(R.string.button_decline_friend_request);
+                                        btnCancelSendFriendRequest.setVisibility(View.VISIBLE);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     }
                 }
             }
@@ -361,6 +398,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
             }
         });
+
         if (currentState.equals("nothing_happen")) {
             currentState = "nothing_happen";
             btnSendFriendRequest.setText(R.string.button_send_friend_request);
@@ -390,13 +428,21 @@ public class ViewItemContactActivity extends AppCompatActivity {
         }
         if (currentState.equals("he_sent_pending")) {
             mRequestReference.child(userID).child(mAuth.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener() {
+
                 @Override
                 public void onComplete(@NonNull Task task) {
                     if (task.isSuccessful()) {
-                        Toast.makeText(ViewItemContactActivity.this, "Đã từ chối kết bạn", Toast.LENGTH_SHORT).show();
-                        currentState = "nothing_happen";
-                        btnSendFriendRequest.setText(R.string.button_send_friend_request);
-                        btnCancelSendFriendRequest.setVisibility(View.GONE);
+                        mRequestReference.child(mAuth.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(ViewItemContactActivity.this, "Đã từ chối kết bạn", Toast.LENGTH_SHORT).show();
+                                    currentState = "nothing_happen";
+                                    btnSendFriendRequest.setText(R.string.button_send_friend_request);
+                                    btnCancelSendFriendRequest.setVisibility(View.GONE);
+                                }
+                            }
+                        });
                     }
                 }
             });
