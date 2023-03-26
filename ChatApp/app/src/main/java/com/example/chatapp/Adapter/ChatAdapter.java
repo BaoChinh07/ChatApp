@@ -46,7 +46,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         if (chat == null) {
             return;
         } else {
-            Picasso.get().load(chat.getProfilePic()).into(holder.civAvatarItemChat);
+            Picasso.get().load(chat.getProfilePic()).placeholder(R.drawable.default_avatar).into(holder.civAvatarItemChat);
             holder.tvItemChatName.setText(chat.getUserName());
             holder.tvLastMessage.setText(chat.getLastMessage());
 

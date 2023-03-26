@@ -211,6 +211,9 @@ public class ViewItemContactActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         HashMap mHashMap = new HashMap();
                         mHashMap.put("status", "wait_confirm");
+                        mHashMap.put("userName", myUsername);
+                        mHashMap.put("profilePic", myProfilePic);
+                        mHashMap.put("userID", myUserID);
                         mRequestReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap).addOnCompleteListener(new OnCompleteListener() {
                             @Override
                             public void onComplete(@NonNull Task task) {

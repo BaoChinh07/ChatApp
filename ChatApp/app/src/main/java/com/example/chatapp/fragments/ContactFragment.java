@@ -52,7 +52,7 @@ public class ContactFragment extends Fragment {
     SearchView action_search;
     ArrayList<Users> listContact = new ArrayList<>();
     FirebaseDatabase mDatabase;
-    DatabaseReference mFriendReference;
+    DatabaseReference mFriendReference, mDatabaseReference;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,7 +67,7 @@ public class ContactFragment extends Fragment {
         action_search = (SearchView) mView.findViewById(R.id.action_search);
         action_search.clearFocus();
         rvListContact = (RecyclerView) mView.findViewById(R.id.rvListContact);
-        mDatabase = FirebaseDatabase.getInstance();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mFriendReference = FirebaseDatabase.getInstance().getReference().child("Friends");
 
         /* Khởi tạo đối tượng Adapter*/
@@ -108,7 +108,7 @@ public class ContactFragment extends Fragment {
             }
         });
 
-            mDatabase.getReference().child("Users").addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     listContact.clear();

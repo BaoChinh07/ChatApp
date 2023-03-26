@@ -292,7 +292,7 @@ public class ChatActivity extends AppCompatActivity {
 
                     holder.tvSmsUserTwo.setText(model.getSms());
                     holder.tvTimeMessageUserTwo.setText(model.getDatetime());
-                    Picasso.get().load(avatarBox).into(holder.civAvatarUserTwo);
+                    Picasso.get().load(avatarBox).placeholder(R.drawable.default_avatar).into(holder.civAvatarUserTwo);
 
                 } else {
                     holder.tvSmsUserOne.setVisibility(View.VISIBLE);
@@ -304,7 +304,7 @@ public class ChatActivity extends AppCompatActivity {
 
                     holder.tvSmsUserOne.setText(model.getSms());
                     holder.tvTimeMessageUserOne.setText(model.getDatetime());
-                    Picasso.get().load(avatarURL).into(holder.civAvatarUserOne);
+                    Picasso.get().load(avatarURL).placeholder(R.drawable.default_avatar).into(holder.civAvatarUserOne);
 
                 }
             }
@@ -372,7 +372,7 @@ public class ChatActivity extends AppCompatActivity {
                     userName = snapshot.child("userName").getValue().toString().trim();
                     statusActivity = snapshot.child("statusActivity").getValue().toString();
 
-                    Picasso.get().load(avatarURL).into(civAvatarUserChat);
+                    Picasso.get().load(avatarURL).placeholder(R.drawable.default_avatar).into(civAvatarUserChat);
                     tvUserNameToolChat.setText(userName);
                     tvUserOnl_OffChat.setText(statusActivity);
 
