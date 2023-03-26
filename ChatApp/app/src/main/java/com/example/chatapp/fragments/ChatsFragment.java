@@ -30,7 +30,9 @@ import android.widget.Toast;
 
 import com.example.chatapp.Adapter.ChatAdapter;
 import com.example.chatapp.Adapter.ContactAdapter;
+import com.example.chatapp.Adapter.RequestAdapter;
 import com.example.chatapp.Models.Chat;
+import com.example.chatapp.Models.Requests;
 import com.example.chatapp.Models.Users;
 import com.example.chatapp.R;
 import com.example.chatapp.SignInActivity;
@@ -56,7 +58,7 @@ public class ChatsFragment extends Fragment {
     ChatAdapter chatAdapter;
     ArrayList<Chat> listChat = new ArrayList<>();
     FirebaseAuth mAuth;
-    DatabaseReference mChatReference, mUserReference;
+    DatabaseReference mChatReference, mUserReference, mRequestReference;
     String friendID;
     FirebaseUser mUser;
 
@@ -76,18 +78,17 @@ public class ChatsFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         mChatReference = FirebaseDatabase.getInstance().getReference().child("Chats");
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");
         mUser = mAuth.getCurrentUser();
+        //
         chatAdapter = new ChatAdapter(getContext(), listChat);
         rvListChat.setAdapter(chatAdapter);
-        /* Tạo ngăn cách giữa 2 đối tượng*/
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL); /* Tạo ngăn cách giữa 2 đối tượng*/
         rvListChat.addItemDecoration(itemDecoration);
-        /* Khởi tạo một LinearLayout và gán vào RecycleView */
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext()); /* Khởi tạo một LinearLayout và gán vào RecycleView */
         rvListChat.setLayoutManager(layoutManager);
     }
     private void setEvent() {
-//        loadListChat("");
         loadListChats();
         toolbar_chats.addMenuProvider(new MenuProvider() {
             @Override
@@ -145,6 +146,38 @@ public class ChatsFragment extends Fragment {
             } else {
                 dialog.setCancelable(false);
             }
+            RecyclerView rvListRequests = dialog.findViewById(R.id.rvListRequests);
+            RequestAdapter requestAdapter;
+            ArrayList<Requests> listRequests = new ArrayList<>();
+            requestAdapter = new RequestAdapter(getContext(), listRequests);
+            rvListRequests.setAdapter(requestAdapter);
+            LinearLayoutManager layoutManager1 = new LinearLayoutManager(getContext()); /* Khởi tạo một LinearLayout và gán vào RecycleView */
+            rvListRequests.setLayoutManager(layoutManager1);
+            mRequestReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    listRequests.clear();
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Requests requests = dataSnapshot.getValue(Requests.class);
+                        mAuth = FirebaseAuth.getInstance();
+                        mUser = mAuth.getCurrentUser();
+                        String check = requests.getStatus().trim();
+
+                        if (mUser != null && !check.equals("pending")){
+                            requests.setUserID(dataSnapshot.getKey());
+                            listRequests.add(requests);
+                        }
+
+                    }
+                    requestAdapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
         }
         dialog.show();
     }

@@ -22,6 +22,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
     Context context;
     ArrayList<Requests> requestsList;
+    public RequestAdapter(Context context, ArrayList<Requests> requestsList) {
+        this.context = context;
+        this.requestsList = requestsList;
+    }
 
     @NonNull
     @Override
