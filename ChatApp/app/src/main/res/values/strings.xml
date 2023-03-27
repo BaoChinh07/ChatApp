@@ -10,6 +10,8 @@
     <string name="action_notifications">Thông báo</string>
     <string name="action_logout">Đăng xuất</string>
     <string name="action_delete">Xóa</string>
+    <string name="action_share">Chia sẻ</string>
+    <string name="action_feedback">Góp ý với chúng tôi</string>
 
     <!--    String TextView-->
     <string name="text_email">Email</string>

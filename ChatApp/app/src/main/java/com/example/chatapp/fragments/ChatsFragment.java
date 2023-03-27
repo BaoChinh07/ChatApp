@@ -7,10 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,9 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -29,31 +23,23 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.chatapp.Adapter.ChatAdapter;
-import com.example.chatapp.Adapter.ContactAdapter;
 import com.example.chatapp.Adapter.RequestAdapter;
 import com.example.chatapp.Models.Chat;
 import com.example.chatapp.Models.Requests;
-import com.example.chatapp.Models.Users;
 import com.example.chatapp.R;
 import com.example.chatapp.SignInActivity;
-import com.example.chatapp.View.ChatActivity;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 public class ChatsFragment extends Fragment {
     SearchView action_searchChat;
-    Toolbar toolbar_chats;
     RecyclerView rvListChat;
     ChatAdapter chatAdapter;
     ArrayList<Chat> listChat = new ArrayList<>();
@@ -72,7 +58,6 @@ public class ChatsFragment extends Fragment {
     }
 
     private void setControl(View mView) {
-        toolbar_chats = (Toolbar) mView.findViewById(R.id.toolbar_chats);
         rvListChat = (RecyclerView) mView.findViewById(R.id.rvListChat);
         action_searchChat = mView.findViewById(R.id.action_searchChat);
         mAuth = FirebaseAuth.getInstance();
@@ -90,29 +75,6 @@ public class ChatsFragment extends Fragment {
     }
     private void setEvent() {
         loadListChats();
-        toolbar_chats.addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.menu_toolbar,menu);
-            }
-
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                switch (id) {
-                    case R.id.action_notifications:
-                        openNotificationsDialog(Gravity.CENTER);
-                        break;
-                    case R.id.action_logout:
-                        openLogout(Gravity.CENTER);
-                        break;
-                    default:
-                        break;
-                }
-                return true;
-            }
-        });
-
         action_searchChat.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -125,102 +87,6 @@ public class ChatsFragment extends Fragment {
                 return false;
             }
         });
-    }
-
-    private void openNotificationsDialog(int gravity) {
-        final Dialog dialog = new Dialog(getActivity());
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_notifications);
-        Window window = (Window) dialog.getWindow();
-        if (window == null) {
-            return;
-        } else {
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-            WindowManager.LayoutParams windowAttributes = window.getAttributes();
-            window.setAttributes(windowAttributes);
-
-            if (Gravity.CENTER == gravity) {
-                dialog.setCancelable(true);
-            } else {
-                dialog.setCancelable(false);
-            }
-            RecyclerView rvListRequests = dialog.findViewById(R.id.rvListRequests);
-            RequestAdapter requestAdapter;
-            ArrayList<Requests> listRequests = new ArrayList<>();
-            requestAdapter = new RequestAdapter(getContext(), listRequests);
-            rvListRequests.setAdapter(requestAdapter);
-            LinearLayoutManager layoutManager1 = new LinearLayoutManager(getContext()); /* Khởi tạo một LinearLayout và gán vào RecycleView */
-            rvListRequests.setLayoutManager(layoutManager1);
-            mRequestReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    listRequests.clear();
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        Requests requests = dataSnapshot.getValue(Requests.class);
-                        mAuth = FirebaseAuth.getInstance();
-                        mUser = mAuth.getCurrentUser();
-                        String check = requests.getStatus().trim();
-
-                        if (mUser != null && !check.equals("pending")){
-                            requests.setUserID(dataSnapshot.getKey());
-                            listRequests.add(requests);
-                        }
-
-                    }
-                    requestAdapter.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
-        }
-        dialog.show();
-    }
-
-    private void openLogout(int gravity) {
-            final Dialog dialog = new Dialog(getActivity());
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.setContentView(R.layout.confirm_dialog);
-            Window window = (Window) dialog.getWindow();
-            if (window == null) {
-                return;
-            } else {
-                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-                WindowManager.LayoutParams windowAttributes = window.getAttributes();
-                window.setAttributes(windowAttributes);
-
-                if (Gravity.CENTER == gravity) {
-                    dialog.setCancelable(true);
-                } else {
-                    dialog.setCancelable(false);
-                }
-                Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
-                Button btnCancelConfirm = dialog.findViewById(R.id.btnCancelConfirm);
-
-                btnConfirm.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mAuth.signOut();
-                        Intent intent = new Intent(getActivity(), SignInActivity.class);
-                        startActivity(intent);
-                        Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                btnCancelConfirm.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                    }
-                });
-            }
-            dialog.show();
     }
 
     private void loadListChats() {

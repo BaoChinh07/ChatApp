@@ -36,11 +36,13 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.chatapp.MainActivity;
 import com.example.chatapp.Models.Users;
 import com.example.chatapp.R;
 import com.example.chatapp.SignInActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,22 +59,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class ProfileFragment extends Fragment {
-    Toolbar toolbar_profile;
     private static final int MY_REQUEST_CODE = 100;
     private View mView;
     private FirebaseAuth mAuth;
-    private FirebaseDatabase mFirebaseDatabase;
-    private FirebaseStorage mFirebaseStorage;
-    private DatabaseReference mDatabaseReference;
+    FirebaseDatabase mFirebaseDatabase;
+    FirebaseUser mUser;
+    DatabaseReference mUserReference, mDatabaseReference;
     private StorageReference mStorageReference;
-    Toolbar toolbarProfile;
     Button btnLogOut, btnUpdateProfile;
     ImageButton btnUpdateAvatar;
     TextView tvUserName, tvEmail, tvDescribe, tvGender;
     CircleImageView civAvatar;
     String describe, userName, gender;
-    Uri uri;
-    Bitmap bitmap;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -86,7 +84,6 @@ public class ProfileFragment extends Fragment {
 
     // Hàm khởi tạo các biến
     private void setControl(View mView) {
-        toolbar_profile = (Toolbar) mView.findViewById(R.id.toolbar_profile);
         btnUpdateProfile = (Button) mView.findViewById(R.id.btnUpdateProfile);
         btnUpdateAvatar = (ImageButton) mView.findViewById(R.id.btnUpdateAvatar);
         btnLogOut = (Button) mView.findViewById(R.id.btnLogOut);
@@ -96,9 +93,10 @@ public class ProfileFragment extends Fragment {
         tvGender = (TextView) mView.findViewById(R.id.tvGender);
         civAvatar = (CircleImageView) mView.findViewById(R.id.civAvatar);
         mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mFirebaseStorage = FirebaseStorage.getInstance();
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("User");
+        mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
         mStorageReference = FirebaseStorage.getInstance().getReference();
         civAvatar.setTag("man");
     }
@@ -108,13 +106,15 @@ public class ProfileFragment extends Fragment {
         mFirebaseDatabase.getReference().child("Users").child(mAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Users users = snapshot.getValue(Users.class);
-                Picasso.get().load(users.getProfilePic()).placeholder(R.drawable.default_avatar).into(civAvatar);
-                tvDescribe.setText(users.getDescribe());
-                tvUserName.setText(users.getUserName());
-                tvEmail.setText(users.getEmail());
-                tvGender.setText(users.getGender());
 
+                if (snapshot.exists()) {
+                    Users users = snapshot.getValue(Users.class);
+                    Picasso.get().load(users.getProfilePic()).placeholder(R.drawable.default_avatar).into(civAvatar);
+                    tvDescribe.setText(users.getDescribe());
+                    tvUserName.setText(users.getUserName());
+                    tvEmail.setText(users.getEmail());
+                    tvGender.setText(users.getGender());
+                }
             }
 
             @Override
@@ -127,30 +127,6 @@ public class ProfileFragment extends Fragment {
 
     // Hàm xử lý sự kiện
     private void setEvent() {
-
-        //Xử lý toolbar
-        toolbar_profile.addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.menu_toolbar,menu);
-            }
-
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                switch (id) {
-                    case R.id.action_notifications:
-                        Toast.makeText(getContext(), "Chọn thông báo", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.action_logout:
-                        openLogout(Gravity.CENTER);
-                        break;
-                    default:
-                        break;
-                }
-                return true;
-            }
-        });
         //Nút Cập nhật
         btnUpdateProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,9 +182,10 @@ public class ProfileFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     mAuth.signOut();
-                Intent intent = new Intent(getActivity(), SignInActivity.class);
-                startActivity(intent);
-                Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getActivity(), SignInActivity.class);
+                    startActivity(intent);
+                    Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+                    statusActivity("Offline", mDatabaseReference);
                 }
             });
             btnCancelConfirm.setOnClickListener(new View.OnClickListener() {
@@ -219,6 +196,12 @@ public class ProfileFragment extends Fragment {
             });
         }
         dialog.show();
+    }
+    public void statusActivity(String statusActivity, DatabaseReference reference) {
+        reference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("statusActivity", statusActivity);
+        reference.updateChildren(hashMap);
     }
 
 
@@ -324,45 +307,5 @@ public class ProfileFragment extends Fragment {
                 }
             });
         }
-    }
-    private void openLogout(int gravity) {
-        final Dialog dialog = new Dialog(getActivity());
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.confirm_dialog);
-        Window window = (Window) dialog.getWindow();
-        if (window == null) {
-            return;
-        } else {
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-            WindowManager.LayoutParams windowAttributes = window.getAttributes();
-            window.setAttributes(windowAttributes);
-
-            if (Gravity.CENTER == gravity) {
-                dialog.setCancelable(true);
-            } else {
-                dialog.setCancelable(false);
-            }
-            Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
-            Button btnCancelConfirm = dialog.findViewById(R.id.btnCancelConfirm);
-
-            btnConfirm.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mAuth.signOut();
-                    Intent intent = new Intent(getActivity(), SignInActivity.class);
-                    startActivity(intent);
-                    Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
-                }
-            });
-            btnCancelConfirm.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    dialog.dismiss();
-                }
-            });
-        }
-        dialog.show();
     }
 }

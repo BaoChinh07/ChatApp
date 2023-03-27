@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginStart="5dp"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:weightSum="2">
 
                 <TextView
@@ -43,19 +43,19 @@
                     android:gravity="center_vertical"
                     android:text="@string/text_username"
                     android:textColor="@color/black"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="2dp"
+                    android:layout_marginStart="0dp"
                     android:gravity="center_vertical"
                     android:text="đã gửi lời mời kết bạn"
                     android:maxLines="1"
                     android:textColor="@color/grey"
-                    android:textSize="14sp" />
+                    android:textSize="15sp" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

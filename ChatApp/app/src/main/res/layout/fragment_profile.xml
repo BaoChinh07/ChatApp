@@ -6,8 +6,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".fragments.ProfileFragment">
-    <include android:id="@+id/toolbar_profile"
-        layout="@layout/toolbar_profile_fragment"/>
+
+    <Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize" />
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,8 +55,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="3dp"
             android:layout_marginStart="37dp"
+            android:layout_marginBottom="3dp"
             android:gravity="center"
             android:text="@string/text_username"
             android:textColor="@color/grey"
@@ -91,11 +94,12 @@
         android:layout_marginHorizontal="10dp"
         android:layout_marginBottom="10dp"
         android:orientation="vertical">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="3dp"
             android:layout_marginStart="37dp"
+            android:layout_marginBottom="3dp"
             android:gravity="center"
             android:text="@string/text_email"
             android:textColor="@color/grey"
@@ -103,11 +107,11 @@
             android:textStyle="bold" />
 
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -133,17 +137,17 @@
         android:layout_marginHorizontal="10dp"
         android:layout_marginBottom="10dp"
         android:orientation="vertical">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="3dp"
             android:layout_marginStart="37dp"
+            android:layout_marginBottom="3dp"
             android:gravity="center"
             android:text="@string/text_gender"
             android:textColor="@color/grey"
             android:textSize="15sp"
             android:textStyle="bold" />
-
 
 
         <LinearLayout

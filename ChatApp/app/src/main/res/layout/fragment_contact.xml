@@ -7,15 +7,19 @@
     android:orientation="vertical"
     tools:context=".fragments.ContactFragment">
 
-    <include android:id="@+id/toolbar_contact"
-        layout="@layout/toolbar_contact_fragment"/>
+    <Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"/>
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/action_search"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        app:queryHint="Tìm liên hệ" />
+        android:layout_height="48dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/search_frame"
+        app:queryHint="Tìm người dùng"
+        app:searchIcon="@drawable/icon_search"
+        app:searchHintIcon="@drawable/icon_search"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvListContact"

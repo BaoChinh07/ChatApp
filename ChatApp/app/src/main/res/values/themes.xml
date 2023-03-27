@@ -17,4 +17,19 @@
     <style name="MyOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="android:tint">@android:color/white</item>
     </style>
+    <style name="Theme.ChatApp.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Navigation.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.Navigation.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="SearchViewStyle">
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="marginHorizontal">8dp</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="background">@drawable/search_frame</item>
+    </style>
 </resources>

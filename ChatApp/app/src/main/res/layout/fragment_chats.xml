@@ -3,17 +3,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".fragments.ChatsFragment">
+    <Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"/>
 
-    <include
-        android:id="@+id/toolbar_chats"
-        layout="@layout/toolbar_chat" />
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/action_searchChat"
+        android:layout_height="48dp"
+        android:layout_width="match_parent"
+        android:layout_margin="8dp"
+        android:background="@drawable/search_frame"
+        android:layout_gravity="center_vertical"
+        app:queryHint="Tìm kiếm đoạn chat"
+        app:searchIcon="@drawable/icon_search"
+        app:searchHintIcon="@drawable/icon_search" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvListChat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="8dp" />
 
 </LinearLayout>

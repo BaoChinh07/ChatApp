@@ -24,7 +24,6 @@
         android:layout_marginHorizontal="60dp"
         android:layout_marginVertical="20dp"
         android:gravity="center"
-        android:hint="@string/text_describe"
         android:textSize="15sp" />
 
     <LinearLayout

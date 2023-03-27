@@ -44,7 +44,6 @@ import java.util.ArrayList;
 public class ContactFragment extends Fragment {
     public ContactFragment() {
     }
-    Toolbar toolbar_contact;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     ContactAdapter contactAdapter;
@@ -63,7 +62,6 @@ public class ContactFragment extends Fragment {
     }
 
     private void setControl(View mView) {
-        toolbar_contact = mView.findViewById(R.id.toolbar_contact);
         action_search = (SearchView) mView.findViewById(R.id.action_search);
         action_search.clearFocus();
         rvListContact = (RecyclerView) mView.findViewById(R.id.rvListContact);
@@ -85,29 +83,6 @@ public class ContactFragment extends Fragment {
 
     private void setEvent() {
 
-        toolbar_contact.addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.menu_toolbar,menu);
-            }
-
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                switch (id) {
-                    case R.id.action_notifications:
-                        Toast.makeText(getContext(), "Chọn thông báo", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.action_logout:
-                        openLogout(Gravity.CENTER);
-                        break;
-                    default:
-                        break;
-                }
-                return true;
-            }
-        });
-
             mDatabaseReference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -116,7 +91,7 @@ public class ContactFragment extends Fragment {
                         Users users = dataSnapshot.getValue(Users.class);
                         mAuth = FirebaseAuth.getInstance();
                         mUser = mAuth.getCurrentUser();
-                        if (mUser != null && !users.getEmail().equals(mUser.getEmail())) {
+                        if (mUser != null && !users.getEmail().equals(mUser.getEmail()) ) {
                             users.setUserID(dataSnapshot.getKey());
                             listContact.add(users);
                         }
@@ -143,47 +118,5 @@ public class ContactFragment extends Fragment {
                 return false;
             }
         });
-    }
-
-    //Mở dialog khi ấn biểu tượng đăng xuất
-    private void openLogout(int gravity) {
-        final Dialog dialog = new Dialog(getActivity());
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.confirm_dialog);
-        Window window = (Window) dialog.getWindow();
-        if (window == null) {
-            return;
-        } else {
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-            WindowManager.LayoutParams windowAttributes = window.getAttributes();
-            window.setAttributes(windowAttributes);
-
-            if (Gravity.CENTER == gravity) {
-                dialog.setCancelable(true);
-            } else {
-                dialog.setCancelable(false);
-            }
-            Button btnConfirm = dialog.findViewById(R.id.btnConfirm);
-            Button btnCancelConfirm = dialog.findViewById(R.id.btnCancelConfirm);
-
-            btnConfirm.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mAuth.signOut();
-                    Intent intent = new Intent(getActivity(), SignInActivity.class);
-                    startActivity(intent);
-                    Toast.makeText(getActivity(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
-                }
-            });
-            btnCancelConfirm.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    dialog.dismiss();
-                }
-            });
-        }
-        dialog.show();
     }
 }
