@@ -494,38 +494,25 @@ public class ChatActivity extends AppCompatActivity {
             btnConfirmDeleteChat.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ProgressDialog dialog = new ProgressDialog(ChatActivity.this);
-                    dialog.setTitle("Xóa đoạn tin nhắn");
-                    dialog.setMessage("Vui lòng đợi...");
-                    dialog.show();
+                    ProgressDialog dialogMessage = new ProgressDialog(ChatActivity.this);
+                    dialogMessage.setTitle("Xóa đoạn tin nhắn");
+                    dialogMessage.setMessage("Vui lòng đợi...");
+                    dialogMessage.show();
                     mSmsReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                mSmsReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                mChatReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            mChatReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        mSmsReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-                                                                if (task.isSuccessful()) {
-                                                                    Toast.makeText(ChatActivity.this, "Xóa thành công", Toast.LENGTH_SHORT).show();
-                                                                    dialog.dismiss();
-                                                                    Intent intent = new Intent(ChatActivity.this, MainActivity.class);
-                                                                    startActivity(intent);
-                                                                }
-                                                            }
-                                                        });
-                                                    }
-
-                                                }
-                                            });
+                                            Toast.makeText(ChatActivity.this, "Xóa thành công", Toast.LENGTH_SHORT).show();
+                                            dialogMessage.dismiss();
+                                            dialog.dismiss();
+                                            Intent intent = new Intent(ChatActivity.this, MainActivity.class);
+                                            startActivity(intent);
                                         }
+
                                     }
                                 });
                             }

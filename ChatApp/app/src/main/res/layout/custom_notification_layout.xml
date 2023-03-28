@@ -13,7 +13,7 @@
         app:srcCompat="@drawable/icon_notifications"/>
 
     <TextView
-        android:id="@+id/tv_badge_text"
+        android:id="@+id/textViewBadge"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_gravity="right|end|top"

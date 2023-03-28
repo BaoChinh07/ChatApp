@@ -1,15 +1,12 @@
 package com.example.chatapp;
 
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,18 +15,15 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,7 +51,6 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int FRAGMENT_CHAT = 1;
@@ -75,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Toolbar toolbar;
     NavigationView navigationView;
     ActionBarDrawerToggle drawerToggle;
-    TextView notificationBadge;
+    TextView textViewBadge;
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
@@ -247,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Intent intent = new Intent(MainActivity.this, SignInActivity.class);
                     startActivity(intent);
                     Toast.makeText(MainActivity.this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
-                    statusActivity("Offline", mDatabaseReference);
+                    statusActivity("Offline");
                 }
             });
             btnCancelConfirm.setOnClickListener(new View.OnClickListener() {
@@ -297,7 +290,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         if (mUser != null && !check.equals("pending")) {
                             requests.setUserID(dataSnapshot.getKey());
                             listRequests.add(requests);
-                            numberNotification = listRequests.size();
                         }
                     }
                     requestAdapter.notifyDataSetChanged();
@@ -315,8 +307,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     /* Xét trạng thái hoạt động của CurrentUser */
-    private void statusActivity(String statusActivity, DatabaseReference reference) {
-        reference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
+    private void statusActivity(String statusActivity) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("statusActivity", statusActivity);
         reference.updateChildren(hashMap);
@@ -325,25 +317,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        statusActivity("Online", mDatabaseReference);
+        statusActivity("Online");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        statusActivity("Online", mDatabaseReference);
+        statusActivity("Online");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        statusActivity("Offline", mDatabaseReference);
+        statusActivity("Offline");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        statusActivity("Offline", mDatabaseReference);
+        statusActivity("Offline");
     }
 
     /* ------------------------------------------------------------------------------------------- */
@@ -464,6 +456,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
+    /* -------------------------------- Xử lý logic cho Notifications Badge -------------------------------- */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar_main_activity, menu);
@@ -471,53 +464,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mRequestReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                numberNotification = 0;
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Requests requests = dataSnapshot.getValue(Requests.class);
-                    String check = requests.getStatus().trim();
-                    if (mUser != null && !check.equals("pending")) {
-                        numberNotification ++;
+                if (snapshot.exists()) {
+                    numberNotification = 0;
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        if (mUser != null && dataSnapshot.child("status").getValue().toString().equals("wait_confirm")) {
+                            numberNotification++;
+                        }
                     }
                     if (numberNotification == 0) {
                         menuItem.setActionView(null);
                     } else {
                         menuItem.setActionView(R.layout.custom_notification_layout);
                         View view = menuItem.getActionView();
-                        notificationBadge = view.findViewById(R.id.tv_badge_text);
-                        notificationBadge.setText(String.valueOf(numberNotification));
+                        textViewBadge = view.findViewById(R.id.textViewBadge);
+                        textViewBadge.setText(String.valueOf(numberNotification));
                         view.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 openDialogNotifications(Gravity.CENTER);
-                                System.out.println(numberNotification);
                             }
                         });
                     }
+
+                } else {
+                    menuItem.setActionView(null);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
         return super.onCreateOptionsMenu(menu);
     }
-//    private void countNotifications(){
-//        mRequestReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                numberNotification = 0;
-//                for (DataSnapshot dataSnapshot:snapshot.getChildren()){
-//                    if (dataSnapshot.child("status").getValue().toString().equals("wait_confirm"));
-//                    numberNotification =
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
 }

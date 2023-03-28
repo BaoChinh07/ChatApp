@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.chatapp.Adapter.ContactAdapter;
+import com.example.chatapp.Models.Friends;
 import com.example.chatapp.Models.Users;
 import com.example.chatapp.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -54,6 +55,8 @@ public class ContactFragment extends Fragment {
         rvListContact = (RecyclerView) mView.findViewById(R.id.rvListContact);
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mFriendReference = FirebaseDatabase.getInstance().getReference().child("Friends");
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
 
         /* Khởi tạo đối tượng Adapter*/
         contactAdapter = new ContactAdapter(getContext(), listContact);
@@ -69,6 +72,10 @@ public class ContactFragment extends Fragment {
 
     private void setEvent() {
 
+        loadContact();
+
+
+
         mDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -77,16 +84,14 @@ public class ContactFragment extends Fragment {
                     Users users = dataSnapshot.getValue(Users.class);
                     mAuth = FirebaseAuth.getInstance();
                     mUser = mAuth.getCurrentUser();
+                    String userEmail = users.getEmail();
                     if (mUser != null && !users.getEmail().equals(mUser.getEmail())) {
                         users.setUserID(dataSnapshot.getKey());
                         listContact.add(users);
-//                        String temp = users.getUserID().toString();
-//                        System.out.println(temp);
                     }
-
                 }
                 contactAdapter.notifyDataSetChanged();
-            }
+                    }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -106,6 +111,24 @@ public class ContactFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 contactAdapter.getFilter().filter(newText);
                 return false;
+            }
+        });
+    }
+
+    private void loadContact() {
+        final String[] friendID = new String[100];
+        mFriendReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Friends friends = dataSnapshot.getValue(Friends.class);
+                    friendID[0] = snapshot.getKey();
+                    System.out.println(dataSnapshot.getKey());
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }
