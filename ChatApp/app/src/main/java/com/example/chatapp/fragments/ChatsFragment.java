@@ -1,33 +1,18 @@
 package com.example.chatapp.fragments;
 
-import android.app.Dialog;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.Toast;
-
 import com.example.chatapp.Adapter.ChatAdapter;
-import com.example.chatapp.Adapter.RequestAdapter;
 import com.example.chatapp.Models.Chat;
-import com.example.chatapp.Models.Requests;
 import com.example.chatapp.R;
-import com.example.chatapp.SignInActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +20,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 
 public class ChatsFragment extends Fragment {
@@ -65,7 +49,7 @@ public class ChatsFragment extends Fragment {
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");
         mUser = mAuth.getCurrentUser();
-        //
+
         chatAdapter = new ChatAdapter(getContext(), listChat);
         rvListChat.setAdapter(chatAdapter);
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL); /* Tạo ngăn cách giữa 2 đối tượng*/

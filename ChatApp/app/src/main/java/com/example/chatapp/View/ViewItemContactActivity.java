@@ -4,12 +4,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -418,10 +424,9 @@ public class ViewItemContactActivity extends AppCompatActivity {
                         mFriendsReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(ViewItemContactActivity.this, "Hủy kết bạn thành công", Toast.LENGTH_SHORT).show();
-                                currentState = "nothing_happen";
-                                btnSendFriendRequest.setText(R.string.button_send_friend_request);
-                                btnCancelSendFriendRequest.setVisibility(View.GONE);
+                                if (task.isSuccessful()){
+                                    openConfirmUnfriendDialog(Gravity.CENTER);
+                                }
 
                             }
                         });
@@ -451,6 +456,49 @@ public class ViewItemContactActivity extends AppCompatActivity {
             });
         }
     }
+
+    private void openConfirmUnfriendDialog(int gravity) {
+            final Dialog dialog = new Dialog(this);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.confirm_unfriend_dialog);
+            Window window = (Window) dialog.getWindow();
+            if (window == null) {
+                return;
+            } else {
+                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                WindowManager.LayoutParams windowAttributes = window.getAttributes();
+                window.setAttributes(windowAttributes);
+
+                if (Gravity.CENTER == gravity) {
+                    dialog.setCancelable(true);
+                } else {
+                    dialog.setCancelable(false);
+                }
+                Button btnConfirm = dialog.findViewById(R.id.btnConfirmUnfriend);
+                Button btnCancelConfirm = dialog.findViewById(R.id.btnCancelConfirmUnfriend);
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                        Toast.makeText(ViewItemContactActivity.this, "Đã hủy kết bạn", Toast.LENGTH_SHORT).show();
+                        currentState = "nothing_happen";
+                        btnSendFriendRequest.setText(R.string.button_send_friend_request);
+                        btnCancelSendFriendRequest.setVisibility(View.GONE);
+                    }
+                });
+                btnCancelConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
+            }
+            dialog.show();
+        }
+
     private void statusActivity(String statusActivity) {
         mDataReference.child(mUser.getUid());
         HashMap<String,Object> hashMap = new HashMap<>();

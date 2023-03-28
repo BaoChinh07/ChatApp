@@ -6,6 +6,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
@@ -22,6 +23,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -56,15 +58,16 @@ import java.util.HashMap;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final int FRAGMENT_CHAT=1;
-    private static final int FRAGMENT_FRIEND=2;
-    private static final int FRAGMENT_CONTACT=3;
-    private static final int FRAGMENT_CALL=4;
-    private static final int FRAGMENT_PROFILE=5;
-    private  int currentFragment=FRAGMENT_CHAT;
+    private static final int FRAGMENT_CHAT = 1;
+    private static final int FRAGMENT_FRIEND = 2;
+    private static final int FRAGMENT_CONTACT = 3;
+    private static final int FRAGMENT_CALL = 4;
+    private static final int FRAGMENT_PROFILE = 5;
+    private int currentFragment = FRAGMENT_CHAT;
     private int backPressCount = 0;
+    long numberNotification;
     private boolean doubleBackToExitPressedOnce = false;
     private BottomNavigationView mBottomNavigationView;
 
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Toolbar toolbar;
     NavigationView navigationView;
     ActionBarDrawerToggle drawerToggle;
+    TextView notificationBadge;
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
@@ -140,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void loadHeaderNavigation() {
-        NavigationView navigationView = (NavigationView)  findViewById(R.id.navigationView);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
         View headerNavigation = navigationView.getHeaderView(0);
         CircleImageView nav_header_userPhoto = (CircleImageView) headerNavigation.findViewById(R.id.nav_header_userPhoto);
         TextView nav_header_userName = (TextView) headerNavigation.findViewById(R.id.nav_header_userName);
@@ -174,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_friend) {
             openFriendFragment();
             mBottomNavigationView.getMenu().findItem(R.id.action_friends).setChecked(true);
-        }  else if (id == R.id.nav_contact) {
+        } else if (id == R.id.nav_contact) {
             openContactFragment();
             mBottomNavigationView.getMenu().findItem(R.id.action_contacts).setChecked(true);
         } else if (id == R.id.nav_call) {
@@ -187,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             openDialogConfirmLogout(Gravity.CENTER);
         }
         setTitleToolBar();
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)){
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START);
         }
         return true;
@@ -201,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setActionDrawerToggle() {
-        drawerToggle = new ActionBarDrawerToggle(this, drawer_layout,R.string.app_name,R.string.app_name);
+        drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, R.string.app_name, R.string.app_name);
         drawer_layout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
     }
@@ -290,9 +294,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         Requests requests = dataSnapshot.getValue(Requests.class);
                         String check = requests.getStatus().trim();
-                        if (mUser != null && !check.equals("pending")){
+                        if (mUser != null && !check.equals("pending")) {
                             requests.setUserID(dataSnapshot.getKey());
                             listRequests.add(requests);
+                            numberNotification = listRequests.size();
                         }
                     }
                     requestAdapter.notifyDataSetChanged();
@@ -312,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /* Xét trạng thái hoạt động của CurrentUser */
     private void statusActivity(String statusActivity, DatabaseReference reference) {
         reference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
-        HashMap<String,Object> hashMap = new HashMap<>();
+        HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("statusActivity", statusActivity);
         reference.updateChildren(hashMap);
     }
@@ -328,10 +333,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onPause();
         statusActivity("Online", mDatabaseReference);
     }
+
     @Override
     protected void onStop() {
         super.onStop();
-        statusActivity("Offline",mDatabaseReference);
+        statusActivity("Offline", mDatabaseReference);
     }
 
     @Override
@@ -351,11 +357,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             backPressCount = 0;
         }
     };
+
     @Override
     public void onBackPressed() {
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)){
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START);
-        }else {
+        } else {
             if (doubleBackToExitPressedOnce) {
                 finishAffinity();
                 super.onBackPressed();
@@ -378,33 +385,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    private void openChatFragment(){
-        if (currentFragment!=FRAGMENT_CHAT){
+    private void openChatFragment() {
+        if (currentFragment != FRAGMENT_CHAT) {
             replaceFragment(new ChatsFragment());
             currentFragment = FRAGMENT_CHAT;
         }
     }
 
-    private void openFriendFragment(){
-        if (currentFragment!=FRAGMENT_FRIEND){
+    private void openFriendFragment() {
+        if (currentFragment != FRAGMENT_FRIEND) {
             replaceFragment(new FriendsFragment());
             currentFragment = FRAGMENT_FRIEND;
         }
     }
-    private void openContactFragment(){
-        if (currentFragment!=FRAGMENT_CONTACT){
+
+    private void openContactFragment() {
+        if (currentFragment != FRAGMENT_CONTACT) {
             replaceFragment(new ContactFragment());
             currentFragment = FRAGMENT_CONTACT;
         }
     }
-    private void openCallFragment(){
-        if (currentFragment!=FRAGMENT_CALL){
+
+    private void openCallFragment() {
+        if (currentFragment != FRAGMENT_CALL) {
             replaceFragment(new CallFragment());
             currentFragment = FRAGMENT_CALL;
         }
     }
-    private void openProfileFragment(){
-        if (currentFragment!=FRAGMENT_PROFILE){
+
+    private void openProfileFragment() {
+        if (currentFragment != FRAGMENT_PROFILE) {
             replaceFragment(new ProfileFragment());
             currentFragment = FRAGMENT_PROFILE;
         }
@@ -413,12 +423,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /* Thay thế fragment này bằng một fragment khác */
     private void replaceFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.content_view,fragment);
+        transaction.replace(R.id.content_view, fragment);
         transaction.commit();
     }
 
     /* Xét lại title cho mỗi Fragment */
-    private void setTitleToolBar(){
+    private void setTitleToolBar() {
         String title = "";
         switch (currentFragment) {
             case FRAGMENT_CHAT:
@@ -437,26 +447,77 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 title = getString(R.string.action_profile);
                 break;
         }
-        if (getSupportActionBar()!=null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(title);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(drawerToggle.onOptionsItemSelected(item)) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
         if (item.getItemId() == R.id.action_notification) {
             openDialogNotifications(Gravity.CENTER);
             return true;
         }
-            return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar_main_activity, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_notification);
+        mRequestReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                numberNotification = 0;
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Requests requests = dataSnapshot.getValue(Requests.class);
+                    String check = requests.getStatus().trim();
+                    if (mUser != null && !check.equals("pending")) {
+                        numberNotification ++;
+                    }
+                    if (numberNotification == 0) {
+                        menuItem.setActionView(null);
+                    } else {
+                        menuItem.setActionView(R.layout.custom_notification_layout);
+                        View view = menuItem.getActionView();
+                        notificationBadge = view.findViewById(R.id.tv_badge_text);
+                        notificationBadge.setText(String.valueOf(numberNotification));
+                        view.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                openDialogNotifications(Gravity.CENTER);
+                                System.out.println(numberNotification);
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
+//    private void countNotifications(){
+//        mRequestReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                numberNotification = 0;
+//                for (DataSnapshot dataSnapshot:snapshot.getChildren()){
+//                    if (dataSnapshot.child("status").getValue().toString().equals("wait_confirm"));
+//                    numberNotification =
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//    }
 }
