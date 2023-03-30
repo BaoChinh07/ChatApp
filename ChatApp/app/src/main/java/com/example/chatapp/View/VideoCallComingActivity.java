@@ -48,30 +48,6 @@ public class VideoCallComingActivity extends AppCompatActivity {
         senderID = getIntent().getStringExtra("userID");
     }
 
-    private void setEvent() {
-        loadSenderProfile();
-    }
-
-    private void loadSenderProfile() {
-        {
-            mUserReference.child(senderID).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        Users users = snapshot.getValue(Users.class);
-                        Picasso.get().load(users.getProfilePic()).placeholder(R.drawable.default_avatar).into(cirAvatarVideoCalComing);
-                        tvNameVideoCalComing.setText(users.getUserName());
-                        tvEmailVideoCallComing.setText(users.getEmail());
-                    } else {
-                        Toast.makeText(VideoCallComingActivity.this, "Không tìm thấy dữ liệu", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
+    private void setEvent(){
     }
 }

@@ -1,9 +1,11 @@
 package com.example.chatapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -11,10 +13,13 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -61,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int FRAGMENT_CONTACT = 3;
     private static final int FRAGMENT_CALL = 4;
     private static final int FRAGMENT_PROFILE = 5;
+    private static final int NOTIFICATION_PERMISSION_CODE = 100;
     private int currentFragment = FRAGMENT_CHAT;
     private int backPressCount = 0;
     long numberNotification;
@@ -83,6 +89,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         setControl();
         setEvent();
+        checkPermissionNotification();
+    }
+
+
+    //Xin cấp quyền thông báo
+    private void checkPermissionNotification() {
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU) {
+            int permissionNotification = ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS);
+            if (permissionNotification == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Quyền thông báo đã được cấp", Toast.LENGTH_SHORT).show();
+            } else {
+                String[] NOTIFICATION_PERMISSION = {Manifest.permission.POST_NOTIFICATIONS};
+                ActivityCompat.requestPermissions(this, NOTIFICATION_PERMISSION, NOTIFICATION_PERMISSION_CODE);
+            }
+        } else {
+            return;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == NOTIFICATION_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Quyền thông báo đã được cấp", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Quyền thông báo bị từ chôi", Toast.LENGTH_SHORT).show();
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public void setControl() {
@@ -94,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mUser = mAuth.getCurrentUser();
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
-        mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");;
+        mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");
     }
 
     public void setEvent() {
