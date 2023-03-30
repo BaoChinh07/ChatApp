@@ -68,14 +68,14 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
 
     private void setControl() {
-        toolbar_singleContact = (Toolbar) findViewById(R.id.toolbar_singleContact);
-        civAvatarSingleContact = (CircleImageView) findViewById(R.id.civAvatarSingleContact);
-        tvDescribeSingleContact = (TextView) findViewById(R.id.tvDescribeSingleContact);
-        tvUserNameSingleContact = (TextView) findViewById(R.id.tvUserNameSingleContact);
-        tvEmailSingleContact = (TextView) findViewById(R.id.tvEmailSingleContact);
-        btnSendFriendRequest = (Button) findViewById(R.id.btnSendFriendRequest);
-        btnCancelSendFriendRequest = (Button) findViewById(R.id.btnCancelSendFriendRequest);
-        btnBackInViewSingleContact = (Button) findViewById(R.id.btnBackInViewSingleContact);
+        toolbar_singleContact = findViewById(R.id.toolbar_singleContact);
+        civAvatarSingleContact = findViewById(R.id.civAvatarSingleContact);
+        tvDescribeSingleContact = findViewById(R.id.tvDescribeSingleContact);
+        tvUserNameSingleContact = findViewById(R.id.tvUserNameSingleContact);
+        tvEmailSingleContact = findViewById(R.id.tvEmailSingleContact);
+        btnSendFriendRequest = findViewById(R.id.btnSendFriendRequest);
+        btnCancelSendFriendRequest = findViewById(R.id.btnCancelSendFriendRequest);
+        btnBackInViewSingleContact = findViewById(R.id.btnBackInViewSingleContact);
         userID = getIntent().getStringExtra("userID"); // Sử dụng put/getExtra để truyền dữ liệu từ ContactAdapter sang ViewItemContactActivity
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -387,7 +387,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
                                     if (snapshot.child("status").getValue().toString().equals("pending")) {
                                         currentState = "he_sent_pending";
                                         btnSendFriendRequest.setText(R.string.button_accept_friend_request);
-                                        btnCancelSendFriendRequest.setText(R.string.button_decline_friend_request);
+                                        btnCancelSendFriendRequest.setText(R.string.button_decline);
                                         btnCancelSendFriendRequest.setVisibility(View.VISIBLE);
                                     }
                                 }

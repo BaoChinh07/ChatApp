@@ -57,12 +57,12 @@ public class SignInActivity extends AppCompatActivity {
 
     //Hàm khởi tạo
     public void setControl() {
-        edtEmail = (EditText) findViewById(R.id.edtEmail);
-        edtPassword = (EditText) findViewById(R.id.edtPassword);
-        tvClickToSignUp = (TextView) findViewById(R.id.tvClickToSignUp);
-        btnSignIn = (Button) findViewById(R.id.btnSignIn);
-        btnGoogle = (Button) findViewById(R.id.btnGoogle);
-        btnFacebook = (Button) findViewById(R.id.btnFacebook);
+        edtEmail = findViewById(R.id.edtEmail);
+        edtPassword = findViewById(R.id.edtPassword);
+        tvClickToSignUp = findViewById(R.id.tvClickToSignUp);
+        btnSignIn = findViewById(R.id.btnSignIn);
+        btnGoogle = findViewById(R.id.btnGoogle);
+        btnFacebook = findViewById(R.id.btnFacebook);
         firebaseDatabase = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
@@ -195,11 +195,5 @@ public class SignInActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    private void homeActivity() {
-        finish();
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
     }
 }

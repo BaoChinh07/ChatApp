@@ -31,7 +31,6 @@ import com.example.chatapp.Adapter.MessageAdapter;
 import com.example.chatapp.MainActivity;
 import com.example.chatapp.Models.Message;
 import com.example.chatapp.R;
-import com.example.chatapp.SignInActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -47,7 +46,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -64,11 +62,11 @@ public class ChatActivity extends AppCompatActivity {
     RecyclerView rvMessage;
     EditText edtInputMessage;
     Button btnBackInChat;
-    ImageView imageViewSendImage, imageViewSendMessage, ivActionCall, ivActionVideoCall;
+    ImageView imageViewSendImage, imageViewSendMessage;
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
     String userID, avatarURL, avatarBox, userName, dateTime, statusActivity;
-    String avatarUserListChat, userNameListChat, lastMessage, myName;
+    String avatarUserListChat, userNameListChat, lastMessage, myName, myUserID;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     DatabaseReference mUserReference, mFriendsReference, mSmsReference, mChatReference;
@@ -86,18 +84,20 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void setControl() {
-        chat_toolbar = (Toolbar) findViewById(R.id.chat_toolbar);
-        btnBackInChat = (Button) findViewById(R.id.btnBackInChat);
-        edtInputMessage = (EditText) findViewById(R.id.edtInputMessage);
-        imageViewSendImage = (ImageView) findViewById(R.id.imageViewSendImage);
-        imageViewSendMessage = (ImageView) findViewById(R.id.imageViewSendMessage);
-        rvMessage = (RecyclerView) findViewById(R.id.rvMessage);
+        chat_toolbar = findViewById(R.id.chat_toolbar);
+        btnBackInChat = findViewById(R.id.btnBackInChat);
+        edtInputMessage = findViewById(R.id.edtInputMessage);
+        imageViewSendImage = findViewById(R.id.imageViewSendImage);
+        imageViewSendMessage = findViewById(R.id.imageViewSendMessage);
+//        btnAudioCall = findViewById(R.id.btnAudioCall);
+//        btnVideoCall = findViewById(R.id.btnVideoCall);
+        rvMessage = findViewById(R.id.rvMessage);
         rvMessage.setLayoutManager(new LinearLayoutManager(this));
-        tvUserNameToolChat = (TextView) findViewById(R.id.tvUserNameToolChat);
-        tvUserOnl_OffChat = (TextView) findViewById(R.id.tvUserOnl_OffChat);
-        civAvatarUserChat = (CircleImageView) findViewById(R.id.civAvatarUserChat);
-        civOnline = (CircleImageView) findViewById(R.id.civOnline);
-        civOffline = (CircleImageView) findViewById(R.id.civOffline);
+        tvUserNameToolChat = findViewById(R.id.tvUserNameToolChat);
+        tvUserOnl_OffChat = findViewById(R.id.tvUserOnl_OffChat);
+        civAvatarUserChat = findViewById(R.id.civAvatarUserChat);
+        civOnline = findViewById(R.id.civOnline);
+        civOffline = findViewById(R.id.civOffline);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -172,6 +172,9 @@ public class ChatActivity extends AppCompatActivity {
                 }
                 if (snapshot.hasChild("userName")) {
                     myName = snapshot.child("userName").getValue().toString();
+                }
+                if (snapshot.hasChild("email")) {
+                    myUserID = snapshot.child("email").getValue().toString();
                 }
             }
 
@@ -458,11 +461,13 @@ public class ChatActivity extends AppCompatActivity {
             case R.id.action_deleteChatbox:
                 openDialogConfirmDeleteChatbox(Gravity.CENTER);
                 break;
-            case R.id.action_call:
-                Toast.makeText(this, "Chọn gọi thoại", Toast.LENGTH_SHORT).show();
+            case R.id.action_voiceCall:
                 break;
             case R.id.action_videoCall:
-                Toast.makeText(this, "Chọn gọi video", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ChatActivity.this, VideoCallOutgoingActivity.class);
+                intent.putExtra("friendID", userID);
+                startActivity(intent);
+                finish();
                 break;
             default:
                 break;

@@ -35,6 +35,8 @@ import com.example.chatapp.fragments.ChatsFragment;
 import com.example.chatapp.fragments.ContactFragment;
 import com.example.chatapp.fragments.FriendsFragment;
 import com.example.chatapp.fragments.ProfileFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,6 +46,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -83,15 +86,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void setControl() {
-        toolbar = (Toolbar) findViewById(R.id.toolbarMain);
-        drawer_layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        navigationView = (NavigationView) findViewById(R.id.navigationView);
-        mBottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        toolbar = findViewById(R.id.toolbarMain);
+        drawer_layout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigationView);
+        mBottomNavigationView = findViewById(R.id.bottom_navigation);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
-        mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");
+        mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");;
     }
 
     public void setEvent() {
@@ -101,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         replaceFragment(new ChatsFragment()); //Đặt Fragment đầu tiên là ChatFragment
         actionNavigationDrawer();
         setTitleToolBar();
+        updateFCMToken();
 
         /* Xử lý logic cho Bottom Navigation trong MainActivity */
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -134,6 +138,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
 
+    }
+
+    private void updateFCMToken() {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                if (task.isSuccessful()) {
+                    String fcmToken = task.getResult();
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put("fcmToken", fcmToken);
+                    if (mUser!= null){
+                        mUserReference.child(mUser.getUid()).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    Toast.makeText(MainActivity.this, "Cập nhật Token thành công", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Cập nhật Token thất bại", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
     }
 
     private void loadHeaderNavigation() {
@@ -236,6 +265,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             btnConfirm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    // Xóa FCM_TOKEN
+                    if (mUser != null) {
+                        mUserReference.child(mUser.getUid()).child("fcmToken").removeValue();
+                    }
                     mAuth.signOut();
                     Intent intent = new Intent(MainActivity.this, SignInActivity.class);
                     startActivity(intent);

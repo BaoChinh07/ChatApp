@@ -19,4 +19,5 @@
     <color name="background_card">#FFFBF5</color>
     <color name="background_sms">#BBD6B8</color>
     <color name="red">#FF0000</color>
+    <color name="high_green">#163a3a</color>
 </resources>

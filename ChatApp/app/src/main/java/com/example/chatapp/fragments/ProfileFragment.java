@@ -40,7 +40,9 @@ import com.example.chatapp.MainActivity;
 import com.example.chatapp.Models.Users;
 import com.example.chatapp.R;
 import com.example.chatapp.SignInActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -181,6 +183,9 @@ public class ProfileFragment extends Fragment {
             btnConfirm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    if (mUser != null) {
+                        mUserReference.child(mUser.getUid()).child("fcmToken").removeValue();
+                    }
                     mAuth.signOut();
                     Intent intent = new Intent(getActivity(), SignInActivity.class);
                     startActivity(intent);

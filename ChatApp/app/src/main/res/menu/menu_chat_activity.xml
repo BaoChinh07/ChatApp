@@ -7,12 +7,12 @@
         android:icon="@drawable/icon_username"/>
     <item android:title="@string/text_delete_chatBox"
         android:id="@+id/action_deleteChatbox"
-        android:icon="@drawable/icon_back"/>
-    <item android:title="@string/text_delete_chatBox"
-        android:id="@+id/action_call"
+        android:icon="@drawable/icon_delete"/>
+    <item android:title="@string/menu_voice_call"
+        android:id="@+id/action_voiceCall"
         android:icon="@drawable/icon_call2"
         app:showAsAction="always"/>
-    <item android:title="@string/text_delete_chatBox"
+    <item android:title="@string/menu_video_call"
         android:id="@+id/action_videoCall"
         android:icon="@drawable/icon_video"
         app:showAsAction="always"/>

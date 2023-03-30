@@ -38,14 +38,14 @@ public class    SignUpActivity extends AppCompatActivity {
         setEvent();
     }
     public void setControl(){
-        btnSignUp = (Button) findViewById(R.id.btnSignUp);
-        tvClickToSignIn = (TextView) findViewById(R.id.tvClickToSignIn);
+        btnSignUp = findViewById(R.id.btnSignUp);
+        tvClickToSignIn = findViewById(R.id.tvClickToSignIn);
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
-        edtUserName = (EditText) findViewById(R.id.edtUserName);
-        edtEmail = (EditText) findViewById(R.id.edtEmail);
-        edtPassword = (EditText) findViewById(R.id.edtPassword);
-        edtConfirmPassword = (EditText) findViewById(R.id.edtConfirmPassword);
+        edtUserName = findViewById(R.id.edtUserName);
+        edtEmail = findViewById(R.id.edtEmail);
+        edtPassword = findViewById(R.id.edtPassword);
+        edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
     }
     public void setEvent(){
         ProgressDialog dialog = new ProgressDialog(SignUpActivity.this);

@@ -13,9 +13,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatapp.Models.Chat;
-import com.example.chatapp.Models.Users;
 import com.example.chatapp.R;
 import com.example.chatapp.View.ChatActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -23,6 +29,11 @@ import java.util.ArrayList;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> implements Filterable {
+
+    FirebaseAuth mAuth;
+    FirebaseUser mUser;
+    DatabaseReference mUserReference;
+    String myName, myEmail;
     Context context;
     ArrayList<Chat> listChats;
     ArrayList<Chat> listFilterChatts;
@@ -104,5 +115,23 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 notifyDataSetChanged();
             }
         };
+    }
+
+    private void Information(){
+        mUserReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
+        mUserReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    myName = snapshot.child("userName").getValue().toString().trim();
+                    myEmail = snapshot.child("email").getValue().toString().trim();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

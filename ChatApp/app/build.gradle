@@ -47,7 +47,14 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828' //picasso
     implementation 'androidx.room:room-common:2.4.2'
     implementation 'com.nex3z:notification-badge:1.0.5'
+    implementation 'com.android.volley:volley:1.2.1'
+    implementation 'com.google.firebase:firebase-messaging:23.0.3'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.4.5'
 
+    // Retrofit2
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.1.2'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -55,20 +62,14 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:31.2.3')
     implementation 'com.google.firebase:firebase-analytics'
 
-    //Load image from url()
-    implementation 'com.github.bumptech.glide:glide:4.15.0'
-
+    implementation 'com.github.bumptech.glide:glide:4.15.0' //Load image from url()
     implementation "androidx.cardview:cardview:1.0.0" //CardView
     implementation 'com.firebaseui:firebase-ui-database:8.0.2'
+    implementation 'com.firebaseui:firebase-ui-firestore:8.0.2' // FirebaseUI for Cloud Firestore
+    implementation 'com.firebaseui:firebase-ui-auth:8.0.2' // FirebaseUI for Firebase Auth
+    implementation 'com.firebaseui:firebase-ui-storage:8.0.2' // FirebaseUI for Cloud Storage
 
-    // FirebaseUI for Cloud Firestore
-    implementation 'com.firebaseui:firebase-ui-firestore:8.0.2'
-
-    // FirebaseUI for Firebase Auth
-    implementation 'com.firebaseui:firebase-ui-auth:8.0.2'
-
-    // FirebaseUI for Cloud Storage
-    implementation 'com.firebaseui:firebase-ui-storage:8.0.2'
+    implementation ('org.jitsi.react:jitsi-meet-sdk:+') { transitive = true }
 
 
 }

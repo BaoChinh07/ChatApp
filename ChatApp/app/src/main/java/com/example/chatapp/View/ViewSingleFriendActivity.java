@@ -65,17 +65,17 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
 
 
     private void setControl() {
-        toolbar_singleFriend = (Toolbar) findViewById(R.id.toolbar_singleFriend);
-        civAvatarSingleFriend = (CircleImageView) findViewById(R.id.civAvatarSingleFriend);
-        civSingleFriendOnline = (CircleImageView) findViewById(R.id.civSingleFriendOnline);
-        civSingleFriendOffline = (CircleImageView) findViewById(R.id.civSingleFriendOffline);
-        tvDescribeSingleFriend = (TextView) findViewById(R.id.tvDescribeSingleFriend);
-        tvUserNameSingleFriend = (TextView) findViewById(R.id.tvUserNameSingleFriend);
-        tvEmailSingleFriend = (TextView) findViewById(R.id.tvEmailSingleFriend);
-        tvGenderSingleFriend = (TextView) findViewById(R.id.tvGenderSingleFriend);
-        btnSendMessage = (Button) findViewById(R.id.btnSendMessage);
-        btnUnfriend = (Button) findViewById(R.id.btnUnfriend);
-        btnBackInViewSingleFriend = (Button) findViewById(R.id.btnBackInViewSingleFriend);
+        toolbar_singleFriend = findViewById(R.id.toolbar_singleFriend);
+        civAvatarSingleFriend = findViewById(R.id.civAvatarSingleFriend);
+        civSingleFriendOnline = findViewById(R.id.civSingleFriendOnline);
+        civSingleFriendOffline = findViewById(R.id.civSingleFriendOffline);
+        tvDescribeSingleFriend = findViewById(R.id.tvDescribeSingleFriend);
+        tvUserNameSingleFriend = findViewById(R.id.tvUserNameSingleFriend);
+        tvEmailSingleFriend = findViewById(R.id.tvEmailSingleFriend);
+        tvGenderSingleFriend = findViewById(R.id.tvGenderSingleFriend);
+        btnSendMessage = findViewById(R.id.btnSendMessage);
+        btnUnfriend = findViewById(R.id.btnUnfriend);
+        btnBackInViewSingleFriend = findViewById(R.id.btnBackInViewSingleFriend);
 
 
         friendID = getIntent().getStringExtra("userID");
