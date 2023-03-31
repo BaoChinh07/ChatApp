@@ -1,38 +1,116 @@
 package com.example.chatapp.Firebase;
 
-import android.annotation.SuppressLint;
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.view.ContextMenu;
+import android.content.pm.PackageManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Vibrator;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
-import com.example.chatapp.MyApplication;
+
 import com.example.chatapp.R;
 import com.example.chatapp.View.VideoCallComingActivity;
-import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-@SuppressLint("MissingFirebaseInstanceTokenRefresh")
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
+import java.util.Map;
+
+public class MyFirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
+    private static final String CHANNEL_ID = "MY_CHANNEL_ID";
+    NotificationManager mNotificationManager;
+    CharSequence name = "ChatApp";
+
+
     @Override
-    public void onMessageReceived(@NonNull RemoteMessage message) {
-        RemoteMessage.Notification notification = message.getNotification();
-        if (notification == null) {
-            return;
-        }
-        String setTitle = notification.getTitle();
-        String setMessage = notification.getBody();
-
-
-        sendPushNotification(setTitle,setMessage);
-
+    public void onMessageReceived(RemoteMessage message) {
         super.onMessageReceived(message);
+
+        String type = message.getNotification().getTitle();
+        String body = message.getNotification().getBody();
+
+        if (type.equals("v")) {
+            startVideoCall(body);
+
+        } else if (type.equals("Chat App")) {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
+            Intent resultIntent = new Intent(this, VideoCallComingActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_IMMUTABLE);
+
+            builder.setContentTitle(message.getNotification().getTitle());
+            builder.setContentText(message.getNotification().getBody());
+            builder.setContentIntent(pendingIntent);
+            builder.setSmallIcon(R.mipmap.ic_launcher);
+            builder.setStyle(new NotificationCompat.BigTextStyle().bigText(message.getNotification().getBody()));
+            builder.setAutoCancel(true);
+            builder.setPriority(Notification.PRIORITY_MAX);
+
+            mNotificationManager =
+                    (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel(
+                        CHANNEL_ID,
+                        name,
+                        NotificationManager.IMPORTANCE_HIGH);
+                mNotificationManager.createNotificationChannel(channel);
+                builder.setChannelId(CHANNEL_ID);
+            }
+
+            mNotificationManager.notify(100, builder.build());
+        }
+    }
+
+    private void startVideoCall(String body) {
+
+        Intent intent = new Intent(this, VideoCallComingActivity.class);
+        intent.putExtra("senderID", body);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "CHANNEL_ID");
+//        Intent resultIntent = new Intent(this, VideoCallComingActivity.class);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_IMMUTABLE);
+//
+//        builder.setContentTitle(message.getNotification().getTitle());
+//        builder.setContentText(message.getNotification().getBody());
+//        builder.setContentIntent(pendingIntent);
+//        builder.setSmallIcon(R.mipmap.ic_launcher);
+//        builder.setStyle(new NotificationCompat.BigTextStyle().bigText(message.getNotification().getBody()));
+//        builder.setAutoCancel(true);
+//        builder.setPriority(Notification.PRIORITY_MAX);
+//
+//        mNotificationManager =
+//                (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+//        {
+//            NotificationChannel channel = new NotificationChannel(
+//                    CHANNEL_ID,
+//                    name,
+//                    NotificationManager.IMPORTANCE_HIGH);
+//            mNotificationManager.createNotificationChannel(channel);
+//            builder.setChannelId(CHANNEL_ID);
+//        }
+//
+//// notificationId is a unique int for each notification that you must define
+//        mNotificationManager.notify(100, builder.build());
+
+
+    @Override
+    public void onDeletedMessages() {
+        super.onDeletedMessages();
     }
 
     @Override
@@ -40,20 +118,4 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         super.onNewToken(token);
     }
 
-    private void sendPushNotification(String setTitle, String setMessage) {
-        Intent intent = new Intent(this, VideoCallComingActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_IMMUTABLE);
-
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, MyApplication.CHANNEL_ID)
-                .setContentTitle(setTitle)
-                .setContentText(setMessage)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentIntent(pendingIntent);
-
-        Notification notification = notificationBuilder.build();
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager!= null){
-            notificationManager.notify(1, notification);
-        }
-    }
 }
