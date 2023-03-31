@@ -35,6 +35,8 @@ import android.widget.Toast;
 import com.example.chatapp.Adapter.RequestAdapter;
 import com.example.chatapp.Models.Requests;
 import com.example.chatapp.Models.Users;
+import com.example.chatapp.View.ChatActivity;
+import com.example.chatapp.View.VideoCallOutgoingActivity;
 import com.example.chatapp.fragments.CallFragment;
 import com.example.chatapp.fragments.ChatsFragment;
 import com.example.chatapp.fragments.ContactFragment;
@@ -52,10 +54,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.normal.TedPermission;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -66,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int FRAGMENT_CONTACT = 3;
     private static final int FRAGMENT_CALL = 4;
     private static final int FRAGMENT_PROFILE = 5;
-    private static final int NOTIFICATION_PERMISSION_CODE = 100;
+    public static final int MY_REQUEST_CODE = 10;
     private int currentFragment = FRAGMENT_CHAT;
     private int backPressCount = 0;
     long numberNotification;
@@ -95,29 +100,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //Xin cấp quyền thông báo
     private void checkPermissionNotification() {
-        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU) {
-            int permissionNotification = ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS);
-            if (permissionNotification == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Quyền thông báo đã được cấp", Toast.LENGTH_SHORT).show();
-            } else {
-                String[] NOTIFICATION_PERMISSION = {Manifest.permission.POST_NOTIFICATIONS};
-                ActivityCompat.requestPermissions(this, NOTIFICATION_PERMISSION, NOTIFICATION_PERMISSION_CODE);
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                return;
             }
-        } else {
-            return;
-        }
-    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == NOTIFICATION_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Quyền thông báo đã được cấp", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Quyền thông báo bị từ chôi", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onPermissionDenied(List<String> deniedPermissions) {
+                Toast.makeText(MainActivity.this, "Quyền bị từ chối\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
             }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        };
+        TedPermission.create()
+                .setPermissionListener(permissionlistener)
+                .setPermissions(Manifest.permission.POST_NOTIFICATIONS)
+                .check();
     }
 
     public void setControl() {
@@ -184,16 +181,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     HashMap<String, Object> hashMap = new HashMap<>();
                     hashMap.put("fcmToken", fcmToken);
                     if (mUser!= null){
-                        mUserReference.child(mUser.getUid()).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    Toast.makeText(MainActivity.this, "Cập nhật Token thành công", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(MainActivity.this, "Cập nhật Token thất bại", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+                        mUserReference.child(mUser.getUid()).updateChildren(hashMap);
                     }
                 }
             }

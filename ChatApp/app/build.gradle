@@ -70,6 +70,8 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:8.0.2' // FirebaseUI for Firebase Auth
     implementation 'com.firebaseui:firebase-ui-storage:8.0.2' // FirebaseUI for Cloud Storage
 
+    implementation 'io.github.ParkSangGwon:tedpermission-normal:3.3.0' //Ted Permission
+
     implementation ('org.jitsi.react:jitsi-meet-sdk:+') { transitive = true }
 
 

@@ -3,15 +3,19 @@ package com.example.chatapp.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -45,15 +49,22 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.normal.TedPermission;
 import com.squareup.picasso.Picasso;
+
+import org.checkerframework.checker.units.qual.C;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
+    private  static final int MY_REQUEST_PERMISSION_CODE = 10;
 
     FirebaseRecyclerOptions<Message> optionsMessage;
     FirebaseRecyclerAdapter<Message, MessageAdapter> messageAdapter;
@@ -462,17 +473,57 @@ public class ChatActivity extends AppCompatActivity {
                 openDialogConfirmDeleteChatbox(Gravity.CENTER);
                 break;
             case R.id.action_voiceCall:
+                requestMicrophonePermission();
                 break;
             case R.id.action_videoCall:
-                Intent intent = new Intent(ChatActivity.this, VideoCallOutgoingActivity.class);
-                intent.putExtra("friendID", userID);
-                startActivity(intent);
-                finish();
+                requestPermission();
                 break;
             default:
                 break;
         }
         return true;
+    }
+
+    private void requestMicrophonePermission() {
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                Intent intent = new Intent(ChatActivity.this,VideoCallOutgoingActivity.class);
+                intent.putExtra("friendID", userID);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onPermissionDenied(List<String> deniedPermissions) {
+                Toast.makeText(ChatActivity.this, "Quyền bị từ chối\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+        };
+        TedPermission.create()
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("Nếu bạn từ chối quyền, bạn không thể sử dụng dịch vụ này\n\nVui lòng bật quyền tại [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.RECORD_AUDIO)
+                .check();
+    }
+
+    private void requestPermission() {
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                Intent intent = new Intent(ChatActivity.this,VideoCallOutgoingActivity.class);
+                intent.putExtra("friendID", userID);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onPermissionDenied(List<String> deniedPermissions) {
+                Toast.makeText(ChatActivity.this, "Quyền bị từ chối\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+        };
+        TedPermission.create()
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("Nếu bạn từ chối quyền, bạn không thể sử dụng dịch vụ này\n\nVui lòng bật quyền tại [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+                .check();
     }
 
     private void openDialogConfirmDeleteChatbox(int gravity) {

@@ -3,18 +3,25 @@ package com.example.chatapp.fragments;
 
 import static android.app.Activity.RESULT_OK;
 
+import static com.example.chatapp.MainActivity.MY_REQUEST_CODE;
+
+import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -61,7 +68,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class ProfileFragment extends Fragment {
-    private static final int MY_REQUEST_CODE = 100;
+    public static final int READ_STORAGE_PERMISSION_CODE = 100;
     private View mView;
     private FirebaseAuth mAuth;
     FirebaseDatabase mFirebaseDatabase;
@@ -149,13 +156,40 @@ public class ProfileFragment extends Fragment {
         btnUpdateAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                openGallery();
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                startActivityForResult(intent, MY_REQUEST_CODE);
+                openGallery();
             }
         });
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, MY_REQUEST_CODE);
+    }
+    //Xử lý kết quả trả về từ hành động startActivityForResult
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MY_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            if (data.getData() != null) {
+                Uri uri = data.getData();
+                civAvatar.setImageURI(uri);
+                final StorageReference reference = mStorageReference.child("profilePic").child(mAuth.getUid());
+                reference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                mFirebaseDatabase.getReference().child("Users").child(mAuth.getUid()).child("profilePic").setValue(uri.toString());
+                            }
+                        });
+                    }
+                });
+            }
+        }
     }
 
     private void openConfirmDialog(int gravity) {
@@ -202,9 +236,10 @@ public class ProfileFragment extends Fragment {
         }
         dialog.show();
     }
+
     public void statusActivity(String statusActivity, DatabaseReference reference) {
         reference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
-        HashMap<String,Object> hashMap = new HashMap<>();
+        HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("statusActivity", statusActivity);
         reference.updateChildren(hashMap);
     }
@@ -288,29 +323,5 @@ public class ProfileFragment extends Fragment {
             });
         }
         dialog.show();
-    }
-
-    //Xử lý kết quả trả về từ hành động startActivityForResult
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (data.getData() != null) {
-            Uri uri = data.getData();
-            civAvatar.setImageURI(uri);
-            final StorageReference reference = mStorageReference.child("profilePic").child(mAuth.getUid());
-            reference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            mFirebaseDatabase.getReference().child("Users").child(mAuth.getUid()).child("profilePic").setValue(uri.toString());
-                        }
-                    });
-                }
-            });
-        }
     }
 }
