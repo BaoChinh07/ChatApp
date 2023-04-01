@@ -37,14 +37,12 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
     CircleImageView cirAvatarVideoCalOutGoing;
     TextView tvNameVideoCallOutGoing, tvEmailVideoCallOutGoing;
     FloatingActionButton fabCallEnd;
-    String receiveID, receive_token, senderID;
+    String receiveID, receive_token, senderID, senderName;
 
     DatabaseReference mUserReference, mVideoCallReference;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     FirebaseUser mUser;
     FirebaseAuth mAuth;
-
-    VideoCallModel model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +66,19 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
 
         receiveID = getIntent().getStringExtra("friendID");
         senderID = mUser.getUid();
-        model = new VideoCallModel();
+        mUserReference.child(senderID).child("userName").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    senderName = snapshot.getValue().toString().trim();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void setEvent() {
@@ -86,12 +96,12 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
 
     private void cancelVideoCall() {
         HashMap hashMap = new HashMap();
-        hashMap.put("key",receiveID);
-        hashMap.put("response","no");
+        hashMap.put("key", receiveID);
+        hashMap.put("response", "no");
         mVideoCallReference.child(senderID).child(receiveID).child("response").updateChildren(hashMap);
         Toast.makeText(this, "Kết thúc cuộc gọi", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(VideoCallOutgoingActivity.this, ChatActivity.class);
-        intent.putExtra("userID",receiveID);
+        intent.putExtra("userID", receiveID);
         startActivity(intent);
         finish();
         Handler handler = new Handler();
@@ -100,7 +110,7 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
             public void run() {
                 mVideoCallReference.child(senderID).child(receiveID).removeValue();
             }
-        },1000);
+        }, 1000);
     }
 
 
@@ -142,17 +152,17 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
         });
         HashMap hashMap = new HashMap<>();
         hashMap.put("key", senderID + receiveID);
-        hashMap.put("response","wait_confirm");
+        hashMap.put("response", "wait_confirm");
         mVideoCallReference.child(senderID).child(receiveID).child("response").updateChildren(hashMap);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                FcmNotificationsSender fcmNotificationsSender = new FcmNotificationsSender(receive_token,"v",senderID,getApplicationContext(),VideoCallOutgoingActivity.this);
+                FcmNotificationsSender fcmNotificationsSender = new FcmNotificationsSender(receive_token, "VideoCall", senderID, getApplicationContext(), VideoCallOutgoingActivity.this);
                 fcmNotificationsSender.sendNotifications();
             }
-        },1000);
+        }, 1000);
     }
 
     private void checkResponse() {
@@ -165,9 +175,9 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
 
                     if (response.equals("yes")) {
                         joinMeeting(key);
-                    } else if (response.equals("no")) {;
+                    } else if (response.equals("no")) {
                         Intent intent = new Intent(VideoCallOutgoingActivity.this, ChatActivity.class);
-                        intent.putExtra("userID",receiveID);
+                        intent.putExtra("userID", receiveID);
                         startActivity(intent);
                         finish();
                     } else {
@@ -189,11 +199,12 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
                     .setServerURL(new URL("https://meet.jit.si"))
                     .setRoom(key)
                     .setFeatureFlag("welcomepage.enabled", false)
+                    .setFeatureFlag("prejoinpage.enabled", false)
                     .build();
             JitsiMeetActivity.launch(VideoCallOutgoingActivity.this, options);
             finish();
         } catch (Exception e) {
-            Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
     }

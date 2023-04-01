@@ -42,7 +42,6 @@ public class VideoCallComingActivity extends AppCompatActivity {
     String senderName, senderID, receiveID;
     FirebaseUser mUser;
     FirebaseAuth mAuth;
-    VideoCallModel model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,6 +152,7 @@ public class VideoCallComingActivity extends AppCompatActivity {
                     .setServerURL(new URL("https://meet.jit.si"))
                     .setRoom(senderName+receiveID)
                     .setFeatureFlag("welcomepage.enabled", false)
+                    .setFeatureFlag("prejoinpage.enabled",false)
                     .build();
             JitsiMeetActivity.launch(VideoCallComingActivity.this, options);
             finish();

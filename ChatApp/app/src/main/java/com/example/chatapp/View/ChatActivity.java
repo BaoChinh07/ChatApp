@@ -55,6 +55,7 @@ import com.squareup.picasso.Picasso;
 
 import org.checkerframework.checker.units.qual.C;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -226,46 +227,6 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    private void createChatBox() {
-        mSmsReference.child(mUser.getUid()).child(userID)
-                .orderByChild("datetime")
-                .limitToLast(1)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.hasChildren()) {
-                            for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                                lastMessage = snapshot1.child("sms").getValue().toString();
-                            }
-                        }
-                        HashMap hashMap = new HashMap();
-                        hashMap.put("profilePic", avatarUserListChat);
-                        hashMap.put("userName", userNameListChat);
-                        hashMap.put("lastMessage", lastMessage);
-                        hashMap.put("friendID",userID);
-                        mChatReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
-                            @Override
-                            public void onComplete(@NonNull Task task) {
-                                if (task.isSuccessful()) {
-                                    HashMap mHashMap = new HashMap();
-                                    mHashMap.put("profilePic", avatarBox);
-                                    mHashMap.put("userName", myName);
-                                    mHashMap.put("lastMessage", lastMessage);
-                                    mHashMap.put("friendID",mUser.getUid());
-                                    mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap);
-                                }
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-    }
-
-
     private void loadAvatarBox() {
         mUserReference.child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -339,6 +300,13 @@ public class ChatActivity extends AppCompatActivity {
         currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy, hh:mm a");
         dateTime = simpleDateFormat.format(currentTime);
+        Date date = null;
+        try {
+            date = simpleDateFormat.parse(dateTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        long timestamp = date.getTime();
 
         if (sms.isEmpty()) {
             Toast.makeText(this, "Tin nhắn không được để trống", Toast.LENGTH_SHORT).show();
@@ -348,6 +316,7 @@ public class ChatActivity extends AppCompatActivity {
             hashMap.put("status", "Đã gửi");
             hashMap.put("userID", mUser.getUid());
             hashMap.put("datetime", dateTime);
+            hashMap.put("timestamp", timestamp);
             mSmsReference.child(userID).child(mUser.getUid()).push().updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
@@ -366,6 +335,46 @@ public class ChatActivity extends AppCompatActivity {
             });
 
         }
+    }
+
+
+    private void createChatBox() {
+        mSmsReference.child(mUser.getUid()).child(userID)
+                .orderByChild("timestamp")
+                .limitToLast(1)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.hasChildren()) {
+                            for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                                lastMessage = snapshot1.child("sms").getValue().toString();
+                            }
+                        }
+                        HashMap hashMap = new HashMap();
+                        hashMap.put("profilePic", avatarUserListChat);
+                        hashMap.put("userName", userNameListChat);
+                        hashMap.put("lastMessage", lastMessage);
+                        hashMap.put("friendID",userID);
+                        mChatReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                            @Override
+                            public void onComplete(@NonNull Task task) {
+                                if (task.isSuccessful()) {
+                                    HashMap mHashMap = new HashMap();
+                                    mHashMap.put("profilePic", avatarBox);
+                                    mHashMap.put("userName", myName);
+                                    mHashMap.put("lastMessage", lastMessage);
+                                    mHashMap.put("friendID",mUser.getUid());
+                                    mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap);
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void loadInformationUserChat(String userID) {
@@ -488,8 +497,8 @@ public class ChatActivity extends AppCompatActivity {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                Intent intent = new Intent(ChatActivity.this,VideoCallOutgoingActivity.class);
-                intent.putExtra("friendID", userID);
+                Intent intent = new Intent(ChatActivity.this,VoiceCallOutGoingActivity.class);
+                intent.putExtra("receiverID", userID);
                 startActivity(intent);
             }
 
