@@ -432,7 +432,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        statusActivity("Offline");
+        statusActivity("Online");
     }
 
     @Override
@@ -500,6 +500,7 @@ public class ChatActivity extends AppCompatActivity {
                 Intent intent = new Intent(ChatActivity.this,VoiceCallOutGoingActivity.class);
                 intent.putExtra("receiverID", userID);
                 startActivity(intent);
+                finish();
             }
 
             @Override
@@ -521,6 +522,7 @@ public class ChatActivity extends AppCompatActivity {
                 Intent intent = new Intent(ChatActivity.this,VideoCallOutgoingActivity.class);
                 intent.putExtra("friendID", userID);
                 startActivity(intent);
+                finish();
             }
 
             @Override

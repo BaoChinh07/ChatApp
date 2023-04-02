@@ -69,9 +69,10 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
     }
 
     private void setEvent() {
-        loadSenderProfile();
+        loadReceiverProfile();
         sendVoiceCallInvitation();
         checkResponse();
+        autoCancel();
 
         fabVoiceCallEnd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,7 +102,7 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
     }
 
 
-    private void loadSenderProfile() {
+    private void loadReceiverProfile() {
         mUserReference.child(receiverID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -195,5 +196,35 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void autoCancel() {
+        mVoiceCallReference.child(senderID).child(receiverID).child("response").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String response = snapshot.child("response").getValue().toString().trim();
+                    if (response.equals("wait_confirm")) {
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(VoiceCallOutGoingActivity.this, "Hiện tại không thể liên lạc", Toast.LENGTH_SHORT).show();
+                                mVoiceCallReference.child(senderID).child(receiverID).removeValue();
+                                Intent intent = new Intent(VoiceCallOutGoingActivity.this, ChatActivity.class);
+                                intent.putExtra("userID", receiverID);
+                                startActivity(intent);
+                                finish();
+                            }
+                        }, 30000);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
