@@ -32,6 +32,7 @@ import com.example.chatapp.Adapter.MessageAdapter;
 import com.example.chatapp.MainActivity;
 import com.example.chatapp.Models.HistoryCallModel;
 import com.example.chatapp.Models.Message;
+import com.example.chatapp.Models.Users;
 import com.example.chatapp.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -61,8 +62,6 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
-    private  static final int MY_REQUEST_PERMISSION_CODE = 10;
-
     FirebaseRecyclerOptions<Message> optionsMessage;
     FirebaseRecyclerAdapter<Message, MessageAdapter> messageAdapter;
 
@@ -73,8 +72,8 @@ public class ChatActivity extends AppCompatActivity {
     ImageView imageViewSendImage, imageViewSendMessage;
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
-    String userID, avatarURL, avatarBox, userName, dateTime, statusActivity;
-    String avatarUserListChat, userNameListChat, lastMessage, myName, myUserEmail;
+    String userID, avatarURL, userName, dateTime, statusActivity;
+    String lastMessage,  myAvatar, myName, myUserEmail;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     DatabaseReference mUserReference, mFriendsReference, mSmsReference, mChatReference, mHistoryCallReference;
@@ -97,8 +96,6 @@ public class ChatActivity extends AppCompatActivity {
         edtInputMessage = findViewById(R.id.edtInputMessage);
         imageViewSendImage = findViewById(R.id.imageViewSendImage);
         imageViewSendMessage = findViewById(R.id.imageViewSendMessage);
-//        btnAudioCall = findViewById(R.id.btnAudioCall);
-//        btnVideoCall = findViewById(R.id.btnVideoCall);
         rvMessage = findViewById(R.id.rvMessage);
         rvMessage.setLayoutManager(new LinearLayoutManager(this));
         tvUserNameToolChat = findViewById(R.id.tvUserNameToolChat);
@@ -121,10 +118,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private void setEvent() {
         loadInformationUserChat(userID);
-        loadAvatarBox();
-        loadBoxChat(userID);
-        loadSMS();
         loadMyProfile();
+        loadSMS();
 
         btnBackInChat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,6 +145,95 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    private void loadInformationUserChat(String userID) {
+        mUserReference.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Users users = snapshot.getValue(Users.class);
+                    avatarURL = users.getProfilePic();
+                    userName = users.getUserName();
+                    statusActivity = users.getStatusActivity();
+
+                    Picasso.get().load(avatarURL).placeholder(R.drawable.default_avatar).into(civAvatarUserChat);
+                    tvUserNameToolChat.setText(userName);
+                    tvUserOnl_OffChat.setText(statusActivity);
+
+                    if (statusActivity.trim().equals("Online")) {
+                        civOnline.setVisibility(View.VISIBLE);
+                        civOffline.setVisibility(View.GONE);
+                    } else {
+                        civOnline.setVisibility(View.GONE);
+                        civOffline.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void loadMyProfile() {
+        mUserReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Users users = snapshot.getValue(Users.class);
+                    myName = users.getUserName();
+                    myUserEmail = users.getEmail();
+                    myAvatar = users.getProfilePic();
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void loadSMS() {
+        optionsMessage = new FirebaseRecyclerOptions.Builder<Message>().setQuery(mSmsReference.child(mUser.getUid()).child(userID), Message.class).build();
+        messageAdapter = new FirebaseRecyclerAdapter<Message, MessageAdapter>(optionsMessage) {
+            @Override
+            protected void onBindViewHolder(@NonNull MessageAdapter holder, int position, @NonNull Message model) {
+                if (model.getUserID().equals(mUser.getUid())) {
+                    holder.tvSmsUserOne.setVisibility(View.GONE);
+                    holder.civAvatarUserOne.setVisibility(View.GONE);
+                    holder.tvTimeMessageUserOne.setVisibility(View.GONE);
+                    holder.tvSmsUserTwo.setVisibility(View.VISIBLE);
+                    holder.civAvatarUserTwo.setVisibility(View.VISIBLE);
+                    holder.tvTimeMessageUserTwo.setVisibility(View.VISIBLE);
+                    holder.tvSmsUserTwo.setText(model.getSms());
+                    holder.tvTimeMessageUserTwo.setText(model.getDatetime());
+                    Picasso.get().load(myAvatar).placeholder(R.drawable.default_avatar).into(holder.civAvatarUserTwo);
+
+                } else {
+                    holder.tvSmsUserOne.setVisibility(View.VISIBLE);
+                    holder.civAvatarUserOne.setVisibility(View.VISIBLE);
+                    holder.tvTimeMessageUserOne.setVisibility(View.VISIBLE);
+                    holder.tvSmsUserTwo.setVisibility(View.GONE);
+                    holder.civAvatarUserTwo.setVisibility(View.GONE);
+                    holder.tvTimeMessageUserTwo.setVisibility(View.GONE);
+                    holder.tvSmsUserOne.setText(model.getSms());
+                    holder.tvTimeMessageUserOne.setText(model.getDatetime());
+                    Picasso.get().load(avatarURL).placeholder(R.drawable.default_avatar).into(holder.civAvatarUserOne);
+
+                }
+            }
+
+            @NonNull
+            @Override
+            public MessageAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_single_sms, parent, false);
+                return new MessageAdapter(view);
+            }
+        };
+        messageAdapter.startListening();
+        rvMessage.setAdapter(messageAdapter);
+    }
+
     private void btnClickAvatar(String userID) {
         mFriendsReference.child(mUser.getUid()).child(userID).addValueEventListener(new ValueEventListener() {
             @Override
@@ -171,125 +255,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    private void loadMyProfile() {
-        mUserReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                }
-                if (snapshot.hasChild("userName")) {
-                    myName = snapshot.child("userName").getValue().toString();
-                }
-                if (snapshot.hasChild("email")) {
-                    myUserEmail = snapshot.child("email").getValue().toString();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-    }
-
-    private void loadBoxChat(String userID) {
-        mUserReference.child(userID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    if (snapshot.hasChild("profilePic")) {
-                        avatarUserListChat = snapshot.child("profilePic").getValue().toString();
-                    } else {
-                        mStorageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                avatarURL = uri.toString();
-                            }
-                        });
-                    }
-                    if (snapshot.hasChild("userName")) {
-                        userNameListChat = snapshot.child("userName").getValue().toString();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-
-    private void loadAvatarBox() {
-        mUserReference.child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    if (snapshot.hasChild("profilePic")) {
-                        avatarBox = snapshot.child("profilePic").getValue().toString();
-                    } else {
-                        mStorageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                avatarBox = uri.toString();
-                            }
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ChatActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void loadSMS() {
-        optionsMessage = new FirebaseRecyclerOptions.Builder<Message>().setQuery(mSmsReference.child(mUser.getUid()).child(userID), Message.class).build();
-        messageAdapter = new FirebaseRecyclerAdapter<Message, MessageAdapter>(optionsMessage) {
-            @Override
-            protected void onBindViewHolder(@NonNull MessageAdapter holder, int position, @NonNull Message model) {
-                if (model.getUserID().equals(mUser.getUid())) {
-                    holder.tvSmsUserOne.setVisibility(View.GONE);
-                    holder.civAvatarUserOne.setVisibility(View.GONE);
-                    holder.tvTimeMessageUserOne.setVisibility(View.GONE);
-                    holder.tvSmsUserTwo.setVisibility(View.VISIBLE);
-                    holder.civAvatarUserTwo.setVisibility(View.VISIBLE);
-                    holder.tvTimeMessageUserTwo.setVisibility(View.VISIBLE);
-
-                    holder.tvSmsUserTwo.setText(model.getSms());
-                    holder.tvTimeMessageUserTwo.setText(model.getDatetime());
-                    Picasso.get().load(avatarBox).placeholder(R.drawable.default_avatar).into(holder.civAvatarUserTwo);
-
-                } else {
-                    holder.tvSmsUserOne.setVisibility(View.VISIBLE);
-                    holder.civAvatarUserOne.setVisibility(View.VISIBLE);
-                    holder.tvTimeMessageUserOne.setVisibility(View.VISIBLE);
-                    holder.tvSmsUserTwo.setVisibility(View.GONE);
-                    holder.civAvatarUserTwo.setVisibility(View.GONE);
-                    holder.tvTimeMessageUserTwo.setVisibility(View.GONE);
-
-                    holder.tvSmsUserOne.setText(model.getSms());
-                    holder.tvTimeMessageUserOne.setText(model.getDatetime());
-                    Picasso.get().load(avatarURL).placeholder(R.drawable.default_avatar).into(holder.civAvatarUserOne);
-
-                }
-            }
-
-            @NonNull
-            @Override
-            public MessageAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_single_sms, parent, false);
-                return new MessageAdapter(view);
-            }
-        };
-        messageAdapter.startListening();
-        rvMessage.setAdapter(messageAdapter);
     }
 
     private void SendSMS() {
@@ -348,19 +313,19 @@ public class ChatActivity extends AppCompatActivity {
                             }
                         }
                         HashMap hashMap = new HashMap();
-                        hashMap.put("profilePic", avatarUserListChat);
-                        hashMap.put("userName", userNameListChat);
+                        hashMap.put("profilePic", avatarURL);
+                        hashMap.put("userName", userName);
                         hashMap.put("lastMessage", lastMessage);
-                        hashMap.put("friendID",userID);
+                        hashMap.put("friendID", userID);
                         mChatReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                             @Override
                             public void onComplete(@NonNull Task task) {
                                 if (task.isSuccessful()) {
                                     HashMap mHashMap = new HashMap();
-                                    mHashMap.put("profilePic", avatarBox);
+                                    mHashMap.put("profilePic", myAvatar);
                                     mHashMap.put("userName", myName);
                                     mHashMap.put("lastMessage", lastMessage);
-                                    mHashMap.put("friendID",mUser.getUid());
+                                    mHashMap.put("friendID", mUser.getUid());
                                     mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap);
                                 }
                             }
@@ -374,75 +339,6 @@ public class ChatActivity extends AppCompatActivity {
                 });
     }
 
-    private void loadInformationUserChat(String userID) {
-        mUserReference.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    if (snapshot.hasChild("profilePic")) {
-                        avatarURL = snapshot.child("profilePic").getValue().toString();
-                    } else {
-                        mStorageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                avatarURL = uri.toString();
-                            }
-                        });
-                    }
-                    userName = snapshot.child("userName").getValue().toString().trim();
-                    statusActivity = snapshot.child("statusActivity").getValue().toString();
-
-                    Picasso.get().load(avatarURL).placeholder(R.drawable.default_avatar).into(civAvatarUserChat);
-                    tvUserNameToolChat.setText(userName);
-                    tvUserOnl_OffChat.setText(statusActivity);
-
-                    if (statusActivity.trim().equals("Online")) {
-                        civOnline.setVisibility(View.VISIBLE);
-                        civOffline.setVisibility(View.GONE);
-                    } else {
-                        civOnline.setVisibility(View.GONE);
-                        civOffline.setVisibility(View.VISIBLE);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    private void statusActivity(String statusActivity) {
-        mUserReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("statusActivity", statusActivity);
-        mUserReference.updateChildren(hashMap);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        statusActivity("Online");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        statusActivity("Online");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        statusActivity("Offline");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        statusActivity("Offline");
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -488,56 +384,6 @@ public class ChatActivity extends AppCompatActivity {
                 break;
         }
         return true;
-    }
-
-    private void requestPermissionForVoiceCall() {
-        PermissionListener permissionlistener = new PermissionListener() {
-            @Override
-            public void onPermissionGranted() {
-                Intent intent = new Intent(ChatActivity.this,VoiceCallOutGoingActivity.class);
-                intent.putExtra("receiverID", userID);
-                startActivity(intent);
-                finish();
-                String type = "VoiceCall", status = "MakeCall";
-                HistoryCallModel historyCallModel = new HistoryCallModel(userID, avatarURL,userName, status, type,mUser.getUid());
-                historyCallModel.createHistoryCall();
-            }
-
-            @Override
-            public void onPermissionDenied(List<String> deniedPermissions) {
-                Toast.makeText(ChatActivity.this, "Quyền bị từ chối\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
-            }
-        };
-        TedPermission.create()
-                .setPermissionListener(permissionlistener)
-                .setDeniedMessage("Nếu bạn từ chối quyền, bạn không thể sử dụng dịch vụ này\n\nVui lòng bật quyền tại [Setting] > [Permission]")
-                .setPermissions(Manifest.permission.RECORD_AUDIO)
-                .check();
-    }
-
-    private void requestPermissionForVideoCall() {
-        PermissionListener permissionlistener = new PermissionListener() {
-            @Override
-            public void onPermissionGranted() {
-                Intent intent = new Intent(ChatActivity.this,VideoCallOutgoingActivity.class);
-                intent.putExtra("friendID", userID);
-                startActivity(intent);
-                finish();
-                String type = "VideoCall", status = "MakeCall";
-                HistoryCallModel historyCallModel = new HistoryCallModel(userID, avatarURL,userName, status, type,mUser.getUid());
-                historyCallModel.createHistoryCall();
-            }
-
-            @Override
-            public void onPermissionDenied(List<String> deniedPermissions) {
-                Toast.makeText(ChatActivity.this, "Quyền bị từ chối\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
-            }
-        };
-        TedPermission.create()
-                .setPermissionListener(permissionlistener)
-                .setDeniedMessage("Nếu bạn từ chối quyền, bạn không thể sử dụng dịch vụ này\n\nVui lòng bật quyền tại [Setting] > [Permission]")
-                .setPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
-                .check();
     }
 
     private void openDialogConfirmDeleteChatbox(int gravity) {
@@ -600,4 +446,56 @@ public class ChatActivity extends AppCompatActivity {
         }
         dialog.show();
     }
+
+    private void requestPermissionForVoiceCall() {
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                Intent intent = new Intent(ChatActivity.this, VoiceCallOutGoingActivity.class);
+                intent.putExtra("receiverID", userID);
+                startActivity(intent);
+                finish();
+                String type = "VoiceCall", status = "MakeCall";
+                HistoryCallModel historyCallModel = new HistoryCallModel(userID, avatarURL, userName, status, type, mUser.getUid());
+                historyCallModel.createHistoryCall();
+            }
+
+            @Override
+            public void onPermissionDenied(List<String> deniedPermissions) {
+                Toast.makeText(ChatActivity.this, "Quyền bị từ chối\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+        };
+        TedPermission.create()
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("Nếu bạn từ chối quyền, bạn không thể sử dụng dịch vụ này\n\nVui lòng bật quyền tại [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.RECORD_AUDIO)
+                .check();
+    }
+
+    private void requestPermissionForVideoCall() {
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                Intent intent = new Intent(ChatActivity.this, VideoCallOutgoingActivity.class);
+                intent.putExtra("friendID", userID);
+                startActivity(intent);
+                finish();
+                String type = "VideoCall", status = "MakeCall";
+                HistoryCallModel historyCallModel = new HistoryCallModel(userID, avatarURL, userName, status, type, mUser.getUid());
+                historyCallModel.createHistoryCall();
+            }
+
+            @Override
+            public void onPermissionDenied(List<String> deniedPermissions) {
+                Toast.makeText(ChatActivity.this, "Quyền bị từ chối\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+        };
+        TedPermission.create()
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("Nếu bạn từ chối quyền, bạn không thể sử dụng dịch vụ này\n\nVui lòng bật quyền tại [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+                .check();
+    }
+
+
 }

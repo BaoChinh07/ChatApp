@@ -1,15 +1,18 @@
 package com.example.chatapp.fragments;
 
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.example.chatapp.Adapter.ChatAdapter;
 import com.example.chatapp.Models.Chat;
 import com.example.chatapp.R;
@@ -20,6 +23,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 
 public class ChatsFragment extends Fragment {
@@ -57,6 +61,7 @@ public class ChatsFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext()); /* Khởi tạo một LinearLayout và gán vào RecycleView */
         rvListChat.setLayoutManager(layoutManager);
     }
+
     private void setEvent() {
         loadListChats();
         action_searchChat.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -65,6 +70,7 @@ public class ChatsFragment extends Fragment {
                 chatAdapter.getFilter().filter(query);
                 return false;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
                 chatAdapter.getFilter().filter(newText);
@@ -82,9 +88,10 @@ public class ChatsFragment extends Fragment {
                     Chat chat = dataSnapshot.getValue(Chat.class);
                     mAuth = FirebaseAuth.getInstance();
                     mUser = mAuth.getCurrentUser();
-                        chat.setFriendID(dataSnapshot.getKey());
-                        listChat.add(chat);
+                    chat.setFriendID(dataSnapshot.getKey());
+                    listChat.add(chat);
                 }
+
                 chatAdapter.notifyDataSetChanged();
             }
 

@@ -41,6 +41,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class CallFragment extends Fragment {
     RecyclerView rvListCallHistory;
@@ -94,6 +96,12 @@ public class CallFragment extends Fragment {
                             historyCall.setUserID(dataSnapshot.getKey());
                             listCallHistory.add(historyCall);
                     }
+                    Collections.sort(listCallHistory, new Comparator<HistoryCall>() {
+                        @Override
+                        public int compare(HistoryCall historyCall1, HistoryCall historyCall2) {
+                            return historyCall2.getCallTime().compareTo(historyCall1.getCallTime());
+                        }
+                    });
                     historyCallAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(getActivity(), "Không có cuộc gọi nào gần đây", Toast.LENGTH_SHORT).show();
