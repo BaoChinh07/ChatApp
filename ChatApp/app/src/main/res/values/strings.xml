@@ -29,6 +29,7 @@
     <string name="text_delete_chatBox">Xóa đoạn chat</string>
     <string name="text_video_call_out_going">Cuộc gọi video</string>
     <string name="text_voice_call_out_going">Cuộc gọi thoại</string>
+    <string name="text_time_history_call">01/01/2000, 00:00 PM</string>
     <!--    String Button-->
     <string name="button_signup">ĐĂNG KÝ</string>
     <string name="button_signin">ĐĂNG NHẬP</string>

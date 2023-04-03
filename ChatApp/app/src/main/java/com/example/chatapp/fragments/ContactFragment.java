@@ -74,31 +74,6 @@ public class ContactFragment extends Fragment {
 
         loadContact();
 
-
-
-        mDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                listContact.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Users users = dataSnapshot.getValue(Users.class);
-                    mAuth = FirebaseAuth.getInstance();
-                    mUser = mAuth.getCurrentUser();
-                    String userEmail = users.getEmail();
-                    if (mUser != null && !users.getEmail().equals(mUser.getEmail())) {
-                        users.setUserID(dataSnapshot.getKey());
-                        listContact.add(users);
-                    }
-                }
-                contactAdapter.notifyDataSetChanged();
-                    }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
         // Xử lý sự kiện tìm kiếm
         action_search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -116,20 +91,45 @@ public class ContactFragment extends Fragment {
     }
 
     private void loadContact() {
-        final String[] friendID = new String[100];
-        mFriendReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listContact.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Friends friends = dataSnapshot.getValue(Friends.class);
-                    friendID[0] = snapshot.getKey();
-                    System.out.println(dataSnapshot.getKey());
+                    Users users = dataSnapshot.getValue(Users.class);
+                    mAuth = FirebaseAuth.getInstance();
+                    mUser = mAuth.getCurrentUser();
+                    String userEmail = users.getEmail();
+                    if (mUser != null && !users.getEmail().equals(mUser.getEmail())) {
+                        users.setUserID(dataSnapshot.getKey());
+                        listContact.add(users);
+                    }
                 }
+                contactAdapter.notifyDataSetChanged();
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
     }
+
+//    private void loadContact() {
+//        final String[] friendID = new String[100];
+//        mFriendReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                    Friends friends = dataSnapshot.getValue(Friends.class);
+//                    friendID[0] = snapshot.getKey();
+//                    System.out.println(dataSnapshot.getKey());
+//                }
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//    }
 }

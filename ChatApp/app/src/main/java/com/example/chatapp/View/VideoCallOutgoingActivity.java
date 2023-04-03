@@ -11,8 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapp.Firebase.FcmNotificationsSender;
+import com.example.chatapp.Models.HistoryCallModel;
 import com.example.chatapp.Models.Users;
-import com.example.chatapp.Models.VideoCallModel;
 import com.example.chatapp.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,11 +24,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import org.jitsi.meet.sdk.JitsiMeet;
 import org.jitsi.meet.sdk.JitsiMeetActivity;
 import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -37,9 +39,9 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
     CircleImageView cirAvatarVideoCalOutGoing;
     TextView tvNameVideoCallOutGoing, tvEmailVideoCallOutGoing;
     FloatingActionButton fabCallEnd;
-    String receiverID, receive_token, senderID, senderName;
+    String receiverID, receive_token, senderID, senderName, senderAvatar, senderEmail, type = "VideoCall";
 
-    DatabaseReference mUserReference, mVideoCallReference;
+    DatabaseReference mUserReference, mVideoCallReference, mHistoryCallReference;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     FirebaseUser mUser;
     FirebaseAuth mAuth;
@@ -60,37 +62,44 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
 
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mVideoCallReference = FirebaseDatabase.getInstance().getReference().child("VideoCallComing");
+        mHistoryCallReference = FirebaseDatabase.getInstance().getReference().child("HistoryCall");
         firebaseDatabase = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
         receiverID = getIntent().getStringExtra("friendID");
         senderID = mUser.getUid();
-        mUserReference.child(senderID).child("userName").addListenerForSingleValueEvent(new ValueEventListener() {
+    }
+
+    private void setEvent() {
+        loadProfileFriend();
+        loadSenderProfile();
+        sendVideoCallInvitation();
+        checkResponse();
+//        autoCancel();
+
+        fabCallEnd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cancelVideoCall();
+            }
+        });
+    }
+
+    private void loadSenderProfile() {
+        mUserReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    senderName = snapshot.getValue().toString().trim();
+                    Users users = snapshot.getValue(Users.class);
+                    senderAvatar = users.getProfilePic().trim();
+                    senderName = users.getUserName();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
-    }
-
-    private void setEvent() {
-        loadProfileFriend();
-        sendVideoCallInvitation();
-        checkResponse();
-        autoCancel();
-
-        fabCallEnd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cancelVideoCall();
             }
         });
     }
@@ -105,6 +114,9 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
         intent.putExtra("userID", receiverID);
         startActivity(intent);
         finish();
+        String status = "MissedCall";
+        HistoryCallModel historyCallModel = new HistoryCallModel(senderID,senderAvatar,senderName,status,type, receiverID);
+        historyCallModel.createHistoryCall();
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -223,14 +235,30 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 Toast.makeText(VideoCallOutgoingActivity.this, "Hiện tại không thể liên lạc", Toast.LENGTH_SHORT).show();
-                                mVideoCallReference.child(senderID).child(receiverID).removeValue();
+                                HashMap hashMap = new HashMap();
+                                hashMap.put("key",senderName+receiverID);
+                                hashMap.put("response", "no");
+                                mVideoCallReference.child(senderID).child(receiverID).child("response").updateChildren(hashMap);
                                 Intent intent = new Intent(VideoCallOutgoingActivity.this, ChatActivity.class);
                                 intent.putExtra("userID", receiverID);
                                 startActivity(intent);
                                 finish();
+                                Handler mHandler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mVideoCallReference.child(senderID).child(receiverID).removeValue();
+                                    }
+                                },1000);
                             }
                         }, 30000);
                     }
+                } else {
+                    Toast.makeText(VideoCallOutgoingActivity.this, "Hiện tại không thể liên lạc", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(VideoCallOutgoingActivity.this, ChatActivity.class);
+                    intent.putExtra("userID", receiverID);
+                    startActivity(intent);
+                    finish();
                 }
             }
 

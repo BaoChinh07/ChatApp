@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapp.Firebase.FcmNotificationsSender;
+import com.example.chatapp.Models.HistoryCallModel;
 import com.example.chatapp.Models.Users;
 import com.example.chatapp.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -27,6 +28,9 @@ import org.jitsi.meet.sdk.JitsiMeetActivity;
 import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -41,7 +45,7 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
     FirebaseUser mUser;
     DatabaseReference mUserReference, mVoiceCallReference;
 
-    String senderID, receiverID, receiverToken;
+    String senderID, receiverID, receiverToken, senderName, senderAvatar, type = "VoiceCall";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,15 +73,34 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
     }
 
     private void setEvent() {
+        loadSenderProfile();
         loadReceiverProfile();
         sendVoiceCallInvitation();
         checkResponse();
-        autoCancel();
+//        autoCancel();
 
         fabVoiceCallEnd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 voiceCallEnd();
+            }
+        });
+    }
+
+    private void loadSenderProfile() {
+        mUserReference.child(senderID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Users users = snapshot.getValue(Users.class);
+                    senderAvatar = users.getProfilePic().trim();
+                    senderName = users.getUserName();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }
@@ -92,6 +115,8 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
         intent.putExtra("userID", receiverID);
         startActivity(intent);
         finish();
+        HistoryCallModel historyCallModel = new HistoryCallModel(senderID,senderAvatar,senderName,"MissedCall",type, receiverID);
+        historyCallModel.createHistoryCall();
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -127,7 +152,7 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
         mUserReference.child(receiverID).child("fcmToken").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()){
+                if (snapshot.exists()) {
                     receiverToken = snapshot.getValue().toString().trim();
                 }
             }
@@ -157,7 +182,7 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    if (snapshot.exists()){
+                    if (snapshot.exists()) {
                         String key = snapshot.child("key").getValue().toString().trim();
                         String response = snapshot.child("response").getValue().toString().trim();
 
@@ -210,14 +235,30 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 Toast.makeText(VoiceCallOutGoingActivity.this, "Hiện tại không thể liên lạc", Toast.LENGTH_SHORT).show();
-                                mVoiceCallReference.child(senderID).child(receiverID).removeValue();
+                                HashMap hashMap = new HashMap();
+                                hashMap.put("key", senderName + receiverID);
+                                hashMap.put("response", "no");
+                                mVoiceCallReference.child(senderID).child(receiverID).child("response").updateChildren(hashMap);
                                 Intent intent = new Intent(VoiceCallOutGoingActivity.this, ChatActivity.class);
                                 intent.putExtra("userID", receiverID);
                                 startActivity(intent);
                                 finish();
+                                Handler mHandler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mVoiceCallReference.child(senderID).child(receiverID).removeValue();
+                                    }
+                                }, 1000);
                             }
                         }, 30000);
                     }
+                } else {
+                    Toast.makeText(VoiceCallOutGoingActivity.this, "Hiện tại không thể liên lạc", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(VoiceCallOutGoingActivity.this, ChatActivity.class);
+                    intent.putExtra("userID", receiverID);
+                    startActivity(intent);
+                    finish();
                 }
             }
 

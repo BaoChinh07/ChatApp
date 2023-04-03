@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.chatapp.Models.HistoryCallModel;
 import com.example.chatapp.Models.Users;
 import com.example.chatapp.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -39,7 +40,7 @@ public class VoiceCallComingActivity extends AppCompatActivity {
     FirebaseUser mUser;
     DatabaseReference mUserReference, mVoiceCallReference;
 
-    String senderID, receiverID, senderName;
+    String senderID, receiverID, senderName, senderAvatar, type = "VoiceCall";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +78,8 @@ public class VoiceCallComingActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String response = "yes";
                 sendResponse(response);
+                HistoryCallModel historyCallModel =new HistoryCallModel(senderID, senderAvatar ,senderName,"ReceiveCall",type,receiverID);
+                historyCallModel.createHistoryCall();
             }
         });
 
@@ -85,6 +88,8 @@ public class VoiceCallComingActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String response = "no";
                 sendResponse(response);
+                HistoryCallModel historyCallModel =new HistoryCallModel(senderID, senderAvatar,senderName,"MissedCall",type,receiverID);
+                historyCallModel.createHistoryCall();
             }
         });
     }
@@ -147,7 +152,8 @@ public class VoiceCallComingActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     Users users = snapshot.getValue(Users.class);
                     senderName = users.getUserName().trim();
-                    Picasso.get().load(users.getProfilePic()).placeholder(R.drawable.default_avatar).into(cirAvatarVoiceCalComing);
+                    senderAvatar =users.getProfilePic();
+                    Picasso.get().load(senderAvatar).placeholder(R.drawable.default_avatar).into(cirAvatarVoiceCalComing);
                     tvNameVoiceCalComing.setText(senderName);
                     tvEmailVoiceCallComing.setText(users.getEmail());
                 }

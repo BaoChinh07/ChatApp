@@ -3,7 +3,6 @@ package com.example.chatapp.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,11 +10,9 @@ import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -33,6 +30,7 @@ import android.widget.Toast;
 
 import com.example.chatapp.Adapter.MessageAdapter;
 import com.example.chatapp.MainActivity;
+import com.example.chatapp.Models.HistoryCallModel;
 import com.example.chatapp.Models.Message;
 import com.example.chatapp.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -52,8 +50,6 @@ import com.google.firebase.storage.StorageReference;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.normal.TedPermission;
 import com.squareup.picasso.Picasso;
-
-import org.checkerframework.checker.units.qual.C;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -78,10 +74,10 @@ public class ChatActivity extends AppCompatActivity {
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
     String userID, avatarURL, avatarBox, userName, dateTime, statusActivity;
-    String avatarUserListChat, userNameListChat, lastMessage, myName, myUserID;
+    String avatarUserListChat, userNameListChat, lastMessage, myName, myUserEmail;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
-    DatabaseReference mUserReference, mFriendsReference, mSmsReference, mChatReference;
+    DatabaseReference mUserReference, mFriendsReference, mSmsReference, mChatReference, mHistoryCallReference;
     StorageReference mStorageReference;
     FirebaseStorage storage;
     Date currentTime;
@@ -116,6 +112,7 @@ public class ChatActivity extends AppCompatActivity {
         mSmsReference = FirebaseDatabase.getInstance().getReference().child("Messages");
         mFriendsReference = FirebaseDatabase.getInstance().getReference().child("Friends");
         mChatReference = FirebaseDatabase.getInstance().getReference().child("Chats");
+        mHistoryCallReference = FirebaseDatabase.getInstance().getReference().child("HistoryCall");
         storage = FirebaseStorage.getInstance();
         mStorageReference = storage.getReference().child("profilePic/default_avatar.png");
         userID = getIntent().getStringExtra("userID");
@@ -186,7 +183,7 @@ public class ChatActivity extends AppCompatActivity {
                     myName = snapshot.child("userName").getValue().toString();
                 }
                 if (snapshot.hasChild("email")) {
-                    myUserID = snapshot.child("email").getValue().toString();
+                    myUserEmail = snapshot.child("email").getValue().toString();
                 }
             }
 
@@ -482,10 +479,10 @@ public class ChatActivity extends AppCompatActivity {
                 openDialogConfirmDeleteChatbox(Gravity.CENTER);
                 break;
             case R.id.action_voiceCall:
-                requestMicrophonePermission();
+                requestPermissionForVoiceCall();
                 break;
             case R.id.action_videoCall:
-                requestPermission();
+                requestPermissionForVideoCall();
                 break;
             default:
                 break;
@@ -493,7 +490,7 @@ public class ChatActivity extends AppCompatActivity {
         return true;
     }
 
-    private void requestMicrophonePermission() {
+    private void requestPermissionForVoiceCall() {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -501,6 +498,9 @@ public class ChatActivity extends AppCompatActivity {
                 intent.putExtra("receiverID", userID);
                 startActivity(intent);
                 finish();
+                String type = "VoiceCall", status = "MakeCall";
+                HistoryCallModel historyCallModel = new HistoryCallModel(userID, avatarURL,userName, status, type,mUser.getUid());
+                historyCallModel.createHistoryCall();
             }
 
             @Override
@@ -515,7 +515,7 @@ public class ChatActivity extends AppCompatActivity {
                 .check();
     }
 
-    private void requestPermission() {
+    private void requestPermissionForVideoCall() {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -523,6 +523,9 @@ public class ChatActivity extends AppCompatActivity {
                 intent.putExtra("friendID", userID);
                 startActivity(intent);
                 finish();
+                String type = "VideoCall", status = "MakeCall";
+                HistoryCallModel historyCallModel = new HistoryCallModel(userID, avatarURL,userName, status, type,mUser.getUid());
+                historyCallModel.createHistoryCall();
             }
 
             @Override

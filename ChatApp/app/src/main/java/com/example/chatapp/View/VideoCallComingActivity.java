@@ -10,9 +10,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.chatapp.Firebase.FcmNotificationsSender;
+import com.example.chatapp.Models.HistoryCallModel;
 import com.example.chatapp.Models.Users;
-import com.example.chatapp.Models.VideoCallModel;
 import com.example.chatapp.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,6 +27,9 @@ import org.jitsi.meet.sdk.JitsiMeetActivity;
 import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -36,10 +38,10 @@ public class VideoCallComingActivity extends AppCompatActivity {
     CircleImageView cirAvatarVideoCalComing;
     TextView tvNameVideoCalComing, tvEmailVideoCallComing;
     FloatingActionButton fabDeclineCall, fabAcceptVideoCall;
-    DatabaseReference mUserReference, mVideoCallReference;
+    DatabaseReference mUserReference, mVideoCallReference, mHistoryCallReference;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    String senderName, senderID, receiveID;
+    String senderName, senderID, senderAvatar, receiveID, type="VideoCall";
     FirebaseUser mUser;
     FirebaseAuth mAuth;
 
@@ -60,6 +62,7 @@ public class VideoCallComingActivity extends AppCompatActivity {
 
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mVideoCallReference = FirebaseDatabase.getInstance().getReference().child("VideoCallComing");
+        mHistoryCallReference = FirebaseDatabase.getInstance().getReference().child("HistoryCall");
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
@@ -76,6 +79,8 @@ public class VideoCallComingActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String response = "yes";
                 sendResponse(response);
+                HistoryCallModel historyCallModel =new HistoryCallModel(senderID, senderAvatar,senderName,"ReceiveCall",type,receiveID);
+                historyCallModel.createHistoryCall();
             }
         });
 
@@ -84,6 +89,8 @@ public class VideoCallComingActivity extends AppCompatActivity {
             public void onClick(View view) {
                String response = "no";
                sendResponse(response);
+                HistoryCallModel historyCallModel =new HistoryCallModel(senderID, senderAvatar,senderName,"MissedCall",type,receiveID);
+                historyCallModel.createHistoryCall();
             }
         });
     }
@@ -131,7 +138,8 @@ public class VideoCallComingActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     Users users = snapshot.getValue(Users.class);
                     senderName = users.getUserName();
-                    Picasso.get().load(users.getProfilePic()).placeholder(R.drawable.default_avatar).into(cirAvatarVideoCalComing);
+                    senderAvatar = users.getProfilePic();
+                    Picasso.get().load(senderAvatar).placeholder(R.drawable.default_avatar).into(cirAvatarVideoCalComing);
                     tvNameVideoCalComing.setText(users.getUserName());
                     tvEmailVideoCallComing.setText(users.getEmail());
                 } else {
