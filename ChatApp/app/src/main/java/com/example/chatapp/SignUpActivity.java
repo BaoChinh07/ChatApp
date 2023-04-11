@@ -27,7 +27,7 @@ public class    SignUpActivity extends AppCompatActivity {
     Button btnSignUp;
     EditText edtUserName, edtPassword, edtEmail, edtConfirmPassword;
     TextView tvClickToSignIn;
-    private FirebaseAuth mAuth;
+     FirebaseAuth mAuth;
     FirebaseDatabase database;
 
     @Override

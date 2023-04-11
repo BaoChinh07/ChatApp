@@ -110,10 +110,6 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
         hashMap.put("response", "no");
         mVideoCallReference.child(senderID).child(receiverID).child("response").updateChildren(hashMap);
         Toast.makeText(this, "Kết thúc cuộc gọi", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(VideoCallOutgoingActivity.this, ChatActivity.class);
-        intent.putExtra("userID", receiverID);
-        startActivity(intent);
-        finish();
         String status = "MissedCall";
         HistoryCallModel historyCallModel = new HistoryCallModel(senderID,senderAvatar,senderName,status,type, receiverID);
         historyCallModel.createHistoryCall();
@@ -193,7 +189,6 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
                         Intent intent = new Intent(VideoCallOutgoingActivity.this, ChatActivity.class);
                         intent.putExtra("userID", receiverID);
                         startActivity(intent);
-                        finish();
                     } else {
                         return;
                     }

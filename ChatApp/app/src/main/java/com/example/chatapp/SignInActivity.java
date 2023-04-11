@@ -7,10 +7,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +31,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -39,11 +42,14 @@ public class SignInActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
     EditText edtEmail, edtPassword;
     TextView tvClickToSignUp;
-    Button btnSignIn, btnGoogle, btnFacebook;
+    Button btnSignIn;
+        ImageView ivGoogle, ivFacebook;
 
     ProgressDialog dialog;
     FirebaseAuth mAuth;
+    FirebaseUser mUser;
     FirebaseDatabase firebaseDatabase;
+    DatabaseReference mUserReference;
     GoogleSignInClient mGoogleSignInClient;
     GoogleSignInOptions mGoogleSignInOptions;
 
@@ -61,10 +67,12 @@ public class SignInActivity extends AppCompatActivity {
         edtPassword = findViewById(R.id.edtPassword);
         tvClickToSignUp = findViewById(R.id.tvClickToSignUp);
         btnSignIn = findViewById(R.id.btnSignIn);
-        btnGoogle = findViewById(R.id.btnGoogle);
-        btnFacebook = findViewById(R.id.btnFacebook);
+        ivGoogle = findViewById(R.id.ivGoogle);
+        ivFacebook = findViewById(R.id.ivFacebook);
         firebaseDatabase = FirebaseDatabase.getInstance();
+        mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
 
         //Cấu hình đăng nhập Google
         mGoogleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -121,7 +129,7 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
         //Đăng nhập bằng Google
-        btnGoogle.setOnClickListener(new View.OnClickListener() {
+        ivGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mGoogleSignInClient.signOut()

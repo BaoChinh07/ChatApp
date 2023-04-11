@@ -1,11 +1,9 @@
 package com.example.chatapp;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -16,10 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -35,8 +31,6 @@ import android.widget.Toast;
 import com.example.chatapp.Adapter.RequestAdapter;
 import com.example.chatapp.Models.Requests;
 import com.example.chatapp.Models.Users;
-import com.example.chatapp.View.ChatActivity;
-import com.example.chatapp.View.VideoCallOutgoingActivity;
 import com.example.chatapp.fragments.CallFragment;
 import com.example.chatapp.fragments.ChatsFragment;
 import com.example.chatapp.fragments.ContactFragment;
@@ -94,11 +88,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         setControl();
         setEvent();
-        checkPermissionNotification();
+
     }
 
 
     //Xin cấp quyền thông báo
+
+    public void setControl() {
+        toolbar = findViewById(R.id.toolbarMain);
+        drawer_layout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigationView);
+        mBottomNavigationView = findViewById(R.id.bottom_navigation);
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
+        mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");
+    }
+
+    public void setEvent() {
+        checkPermissionNotification(); //Kiểm tra quyền nhận thông báo
+        loadHeaderNavigation();  // Tải thông tin cho HeaderNavigation
+        bottomNavigation(); /* Xử lý logic cho Bottom Navigation trong MainActivity */
+        setActionDrawerToggle(); //Xử lý cho DrawerToggle
+        actionToolbar(); //Xử lý cho Toolbar
+        replaceFragment(new ChatsFragment()); //Đặt Fragment đầu tiên là ChatFragment
+        actionNavigationDrawer(); // Xử lý login cho Novigation Drawer
+        setTitleToolBar(); // Hàm xử lý đổi title cho toolbar cho các fragment khác nhau
+        updateFCMToken(); //Xử lý khi đăng nhập thành công sẽ cập nhật một token mới
+        setStatusActivity();
+    }
+
     private void checkPermissionNotification() {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
@@ -117,28 +137,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .check();
     }
 
-    public void setControl() {
-        toolbar = findViewById(R.id.toolbarMain);
-        drawer_layout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.navigationView);
-        mBottomNavigationView = findViewById(R.id.bottom_navigation);
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
-        mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");
+    private void loadHeaderNavigation() {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
+        View headerNavigation = navigationView.getHeaderView(0);
+        CircleImageView nav_header_userPhoto = (CircleImageView) headerNavigation.findViewById(R.id.nav_header_userPhoto);
+        TextView nav_header_userName = (TextView) headerNavigation.findViewById(R.id.nav_header_userName);
+        TextView nav_header_userEmail = (TextView) headerNavigation.findViewById(R.id.nav_header_userEmail);
+
+        mUserReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Users user = snapshot.getValue(Users.class);
+                    Picasso.get().load(user.getProfilePic()).placeholder(R.drawable.default_avatar).into(nav_header_userPhoto);
+                    nav_header_userName.setText(user.getUserName());
+                    nav_header_userEmail.setText(user.getEmail());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
-    public void setEvent() {
-        loadHeaderNavigation();
-        setActionDrawerToggle(); //Xử lý cho DrawerToggle
-        actionToolbar(); //Xử lý cho Toolbar
-        replaceFragment(new ChatsFragment()); //Đặt Fragment đầu tiên là ChatFragment
-        actionNavigationDrawer();
-        setTitleToolBar();
-        updateFCMToken();
-
-        /* Xử lý logic cho Bottom Navigation trong MainActivity */
+    private void bottomNavigation() {
         mBottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -168,52 +192,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             }
         });
+    }
 
+    private void setActionDrawerToggle() {
+        drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, R.string.app_name, R.string.app_name);
+        drawer_layout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+    }
+
+    private void actionToolbar() {
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationIcon(R.drawable.icon_menu_navigation);
+    }
+
+    private void actionNavigationDrawer() {
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem(R.id.nav_chat);
+        mBottomNavigationView.getMenu().findItem(R.id.action_chats).setChecked(true);
 
     }
 
-    private void updateFCMToken() {
-        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
-            @Override
-            public void onComplete(@NonNull Task<String> task) {
-                if (task.isSuccessful()) {
-                    String fcmToken = task.getResult();
-                    HashMap<String, Object> hashMap = new HashMap<>();
-                    hashMap.put("fcmToken", fcmToken);
-                    if (mUser!= null){
-                        mUserReference.child(mUser.getUid()).updateChildren(hashMap);
-                    }
-                }
-            }
-        });
-    }
-
-    private void loadHeaderNavigation() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
-        View headerNavigation = navigationView.getHeaderView(0);
-        CircleImageView nav_header_userPhoto = (CircleImageView) headerNavigation.findViewById(R.id.nav_header_userPhoto);
-        TextView nav_header_userName = (TextView) headerNavigation.findViewById(R.id.nav_header_userName);
-        TextView nav_header_userEmail = (TextView) headerNavigation.findViewById(R.id.nav_header_userEmail);
-
-        mUserReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Users user = snapshot.getValue(Users.class);
-                    Picasso.get().load(user.getProfilePic()).placeholder(R.drawable.default_avatar).into(nav_header_userPhoto);
-                    nav_header_userName.setText(user.getUserName());
-                    nav_header_userEmail.setText(user.getEmail());
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    /* Xử lý logic cho NavigationDrawer */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
@@ -241,26 +240,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return true;
     }
-
-    private void actionNavigationDrawer() {
-        navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setCheckedItem(R.id.nav_chat);
-        mBottomNavigationView.getMenu().findItem(R.id.action_chats).setChecked(true);
-
-    }
-
-    private void setActionDrawerToggle() {
-        drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, R.string.app_name, R.string.app_name);
-        drawer_layout.addDrawerListener(drawerToggle);
-        drawerToggle.syncState();
-    }
-
-    private void actionToolbar() {
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationIcon(R.drawable.icon_menu_navigation);
-    }
-
 
     // Mở Dialog xác nhận Đăng xuất
     private void openDialogConfirmLogout(int gravity) {
@@ -364,34 +343,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     /* Xét trạng thái hoạt động của CurrentUser */
     private void statusActivity(String statusActivity) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("statusActivity", statusActivity);
-        reference.updateChildren(hashMap);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        statusActivity("Online");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        statusActivity("Online");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        statusActivity("Offline");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        statusActivity("Offline");
+        mUserReference.child(mUser.getUid()).updateChildren(hashMap);
     }
 
     /* ------------------------------------------------------------------------------------------- */
@@ -468,13 +422,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    /* Thay thế fragment này bằng một fragment khác */
-    private void replaceFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.content_view, fragment);
-        transaction.commit();
-    }
-
     /* Xét lại title cho mỗi Fragment */
     private void setTitleToolBar() {
         String title = "";
@@ -498,6 +445,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(title);
         }
+    }
+
+    /* Thay thế fragment này bằng một fragment khác */
+    private void replaceFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.content_view, fragment);
+        transaction.commit();
     }
 
     @Override
@@ -552,5 +506,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void updateFCMToken() {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                if (task.isSuccessful()) {
+                    String fcmToken = task.getResult();
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put("fcmToken", fcmToken);
+                    if (mUser!= null){
+                        mUserReference.child(mUser.getUid()).updateChildren(hashMap);
+                    }
+                }
+            }
+        });
+    }
+
+    private void setStatusActivity(){
+        if (mUser == null ) {
+            statusActivity("Offline");
+        } else {
+            statusActivity("Online");
+        }
     }
 }

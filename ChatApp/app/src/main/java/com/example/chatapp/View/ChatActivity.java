@@ -124,7 +124,8 @@ public class ChatActivity extends AppCompatActivity {
         btnBackInChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onBackPressed();
+                Intent intent = new Intent(ChatActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -203,18 +204,15 @@ public class ChatActivity extends AppCompatActivity {
                     holder.civAvatarUserOne.setVisibility(View.GONE);
                     holder.tvTimeMessageUserOne.setVisibility(View.GONE);
                     holder.tvSmsUserTwo.setVisibility(View.VISIBLE);
-                    holder.civAvatarUserTwo.setVisibility(View.VISIBLE);
                     holder.tvTimeMessageUserTwo.setVisibility(View.VISIBLE);
                     holder.tvSmsUserTwo.setText(model.getSms());
                     holder.tvTimeMessageUserTwo.setText(model.getDatetime());
-                    Picasso.get().load(myAvatar).placeholder(R.drawable.default_avatar).into(holder.civAvatarUserTwo);
 
                 } else {
                     holder.tvSmsUserOne.setVisibility(View.VISIBLE);
                     holder.civAvatarUserOne.setVisibility(View.VISIBLE);
                     holder.tvTimeMessageUserOne.setVisibility(View.VISIBLE);
                     holder.tvSmsUserTwo.setVisibility(View.GONE);
-                    holder.civAvatarUserTwo.setVisibility(View.GONE);
                     holder.tvTimeMessageUserTwo.setVisibility(View.GONE);
                     holder.tvSmsUserOne.setText(model.getSms());
                     holder.tvTimeMessageUserOne.setText(model.getDatetime());
@@ -339,7 +337,6 @@ public class ChatActivity extends AppCompatActivity {
                 });
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_chat_activity, menu);
@@ -451,13 +448,13 @@ public class ChatActivity extends AppCompatActivity {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
+                String type = "VoiceCall", status = "MakeCall";
+                HistoryCallModel historyCallModel = new HistoryCallModel(userID, avatarURL, userName, status, type, mUser.getUid());
+                historyCallModel.createHistoryCall();
                 Intent intent = new Intent(ChatActivity.this, VoiceCallOutGoingActivity.class);
                 intent.putExtra("receiverID", userID);
                 startActivity(intent);
                 finish();
-                String type = "VoiceCall", status = "MakeCall";
-                HistoryCallModel historyCallModel = new HistoryCallModel(userID, avatarURL, userName, status, type, mUser.getUid());
-                historyCallModel.createHistoryCall();
             }
 
             @Override
@@ -476,13 +473,13 @@ public class ChatActivity extends AppCompatActivity {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
+                String type = "VideoCall", status = "MakeCall";
+                HistoryCallModel historyCallModel = new HistoryCallModel(userID, avatarURL, userName, status, type, mUser.getUid());
+                historyCallModel.createHistoryCall();
                 Intent intent = new Intent(ChatActivity.this, VideoCallOutgoingActivity.class);
                 intent.putExtra("friendID", userID);
                 startActivity(intent);
                 finish();
-                String type = "VideoCall", status = "MakeCall";
-                HistoryCallModel historyCallModel = new HistoryCallModel(userID, avatarURL, userName, status, type, mUser.getUid());
-                historyCallModel.createHistoryCall();
             }
 
             @Override
@@ -496,6 +493,5 @@ public class ChatActivity extends AppCompatActivity {
                 .setPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
                 .check();
     }
-
 
 }
