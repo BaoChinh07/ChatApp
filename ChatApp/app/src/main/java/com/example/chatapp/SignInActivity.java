@@ -26,9 +26,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,6 +38,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class SignInActivity extends AppCompatActivity {
     private static final String TAG = "LOGIN_OPTIONS_TAG";
@@ -43,7 +46,7 @@ public class SignInActivity extends AppCompatActivity {
     EditText edtEmail, edtPassword;
     TextView tvClickToSignUp;
     Button btnSignIn;
-        ImageView ivGoogle, ivFacebook;
+    ImageView ivGoogle, ivFacebook;
 
     ProgressDialog dialog;
     FirebaseAuth mAuth;
@@ -74,6 +77,11 @@ public class SignInActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
+        // Đặt thông tin Dialog khi đăng nhập
+        dialog = new ProgressDialog(SignInActivity.this);
+        dialog.setTitle("Đăng nhập");
+        dialog.setMessage("Đang xác thực, vui lòng đợi!");
+
         //Cấu hình đăng nhập Google
         mGoogleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -84,33 +92,16 @@ public class SignInActivity extends AppCompatActivity {
 
     //Hàm xử lý sử kiện
     public void setEvent() {
-        // Đặt thông tin Dialog khi đăng nhập
-        dialog = new ProgressDialog(SignInActivity.this);
-        dialog.setTitle("Đăng nhập");
-        dialog.setMessage("Đang xác thực, vui lòng đợi!");
-
         // Xử lý khi ấn nút đăng nhập
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!edtEmail.getText().toString().isEmpty() && !edtPassword.getText().toString().isEmpty()) {
-                    dialog.show();
-                    mAuth.signInWithEmailAndPassword(edtEmail.getText().toString(), edtPassword.getText().toString())
-                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    dialog.dismiss();
-                                    if (task.isSuccessful()) {
-                                        //Nếu đăng nhập thành công sẽ chuyển sang màn hình chính
-                                        Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-                                        startActivity(intent);
-                                    } else {
-                                        Toast.makeText(SignInActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
+                if (edtEmail.getText().toString().isEmpty()) {
+                    Toast.makeText(SignInActivity.this, "Vui lòng nhập Email", Toast.LENGTH_SHORT).show();
+                } else if (edtPassword.getText().toString().isEmpty()) {
+                    Toast.makeText(SignInActivity.this, "Vui lòng nhập Mật khẩu", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(SignInActivity.this, "Vui lòng nhập thông tin đăng nhập", Toast.LENGTH_SHORT).show();
+                    signInAction();
                 }
             }
         });
@@ -142,6 +133,42 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void signInAction() {
+        dialog.show();
+        mAuth.fetchSignInMethodsForEmail(edtEmail.getText().toString().trim())
+                .addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
+                        if (task.isSuccessful()) {
+                            SignInMethodQueryResult result = task.getResult();
+                            List<String> signInMethods = result.getSignInMethods();
+                            if (signInMethods != null && signInMethods.contains(EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD)) {
+                                mAuth.signInWithEmailAndPassword(edtEmail.getText().toString().trim(), edtPassword.getText().toString().trim())
+                                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                                if (task.isSuccessful()) {
+                                                    dialog.dismiss();
+                                                    Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+                                                    startActivity(intent);
+                                                } else {
+                                                    dialog.dismiss();
+                                                    Toast.makeText(SignInActivity.this, "Mật khẩu không đúng", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
+                            } else {
+                                dialog.dismiss();
+                                Toast.makeText(SignInActivity.this, "Email không tồn tại trên hệ thống", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            dialog.dismiss();
+                            Toast.makeText(SignInActivity.this, "Đăng nhập thất bại, vui lòng kiểm tra lại Email", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     private void signIn() {

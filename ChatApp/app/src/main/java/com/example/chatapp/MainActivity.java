@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int backPressCount = 0;
     long numberNotification;
     private boolean doubleBackToExitPressedOnce = false;
-    private BottomNavigationView mBottomNavigationView;
+    BottomNavigationView mBottomNavigationView;
 
     DrawerLayout drawer_layout;
     Toolbar toolbar;
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setActionDrawerToggle(); //Xử lý cho DrawerToggle
         actionToolbar(); //Xử lý cho Toolbar
         replaceFragment(new ChatsFragment()); //Đặt Fragment đầu tiên là ChatFragment
-        actionNavigationDrawer(); // Xử lý login cho Novigation Drawer
+        actionNavigationDrawer(); // Xử lý logic cho Novigation Drawer
         setTitleToolBar(); // Hàm xử lý đổi title cho toolbar cho các fragment khác nhau
         updateFCMToken(); //Xử lý khi đăng nhập thành công sẽ cập nhật một token mới
         setStatusActivity();
@@ -210,7 +210,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.nav_chat);
         mBottomNavigationView.getMenu().findItem(R.id.action_chats).setChecked(true);
-
     }
 
     @Override
