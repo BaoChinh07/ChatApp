@@ -6,11 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,6 +49,8 @@ public class SignInActivity extends AppCompatActivity {
     TextView tvClickToSignUp;
     Button btnSignIn;
     ImageView ivGoogle, ivFacebook;
+    CheckBox cbRememberPassword;
+    SharedPreferences sharedPreferences;
 
     ProgressDialog dialog;
     FirebaseAuth mAuth;
@@ -69,9 +73,12 @@ public class SignInActivity extends AppCompatActivity {
         edtEmail = findViewById(R.id.edtEmail);
         edtPassword = findViewById(R.id.edtPassword);
         tvClickToSignUp = findViewById(R.id.tvClickToSignUp);
+        cbRememberPassword = findViewById(R.id.cbRememberPassword);
+        sharedPreferences = getSharedPreferences("Password", MODE_PRIVATE);
         btnSignIn = findViewById(R.id.btnSignIn);
         ivGoogle = findViewById(R.id.ivGoogle);
         ivFacebook = findViewById(R.id.ivFacebook);
+
         firebaseDatabase = FirebaseDatabase.getInstance();
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mAuth = FirebaseAuth.getInstance();
@@ -92,6 +99,7 @@ public class SignInActivity extends AppCompatActivity {
 
     //Hàm xử lý sử kiện
     public void setEvent() {
+        readPassword();
         // Xử lý khi ấn nút đăng nhập
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,6 +161,12 @@ public class SignInActivity extends AppCompatActivity {
                                                     dialog.dismiss();
                                                     Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                                                     startActivity(intent);
+                                                    Toast.makeText(SignInActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                                                    if (cbRememberPassword.isChecked()) {
+                                                        writePassword();
+                                                    } else {
+                                                        removeSharedPreferences();
+                                                    }
                                                 } else {
                                                     dialog.dismiss();
                                                     Toast.makeText(SignInActivity.this, "Mật khẩu không đúng", Toast.LENGTH_SHORT).show();
@@ -169,6 +183,28 @@ public class SignInActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void writePassword() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("Email",edtEmail.getText().toString().trim());
+        editor.putString("Password",edtPassword.getText().toString().trim());
+        editor.putBoolean("Checked", true);
+        editor.commit();
+    }
+
+    private void readPassword() {
+        edtEmail.setText(sharedPreferences.getString("Email", ""));
+        edtPassword.setText(sharedPreferences.getString("Password",""));
+        cbRememberPassword.setChecked(sharedPreferences.getBoolean("Checked", false));
+    }
+
+    private void removeSharedPreferences() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("Email");
+        editor.remove("Password");
+        editor.remove("Checked");
+        editor.commit();
     }
 
     private void signIn() {

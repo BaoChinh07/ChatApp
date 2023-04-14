@@ -74,7 +74,7 @@ public class ProfileFragment extends Fragment {
     FirebaseDatabase mFirebaseDatabase;
     FirebaseUser mUser;
     DatabaseReference mUserReference, mDatabaseReference;
-    private StorageReference mStorageReference;
+    StorageReference mStorageReference;
     Button btnLogOut, btnUpdateProfile;
     ImageButton btnUpdateAvatar;
     TextView tvUserName, tvEmail, tvDescribe, tvGender;

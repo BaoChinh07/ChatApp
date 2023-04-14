@@ -29,8 +29,7 @@
             android:layout_height="36dp"
             android:layout_alignEnd="@id/civAvatar"
             android:layout_alignBottom="@id/civAvatar"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="20dp"
             android:background="@drawable/frame_circle"
             android:src="@drawable/icon_camera" />
     </RelativeLayout>
