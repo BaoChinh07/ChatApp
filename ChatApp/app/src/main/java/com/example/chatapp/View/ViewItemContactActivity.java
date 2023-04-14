@@ -11,8 +11,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -20,10 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.chatapp.MainActivity;
 import com.example.chatapp.R;
-import com.example.chatapp.SignInActivity;
-import com.example.chatapp.fragments.FriendsFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -39,7 +34,6 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicMarkableReference;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 

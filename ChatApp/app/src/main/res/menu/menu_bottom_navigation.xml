@@ -17,8 +17,4 @@
         android:id="@+id/action_calls"
         android:icon="@drawable/icon_calls"
         android:title="@string/action_calls" />
-    <item
-        android:id="@+id/action_profile"
-        android:icon="@drawable/icon_profile"
-        android:title="@string/action_profile" />
 </menu>

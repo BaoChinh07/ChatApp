@@ -29,13 +29,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapp.Adapter.RequestAdapter;
+import com.example.chatapp.Login.SignInActivity;
 import com.example.chatapp.Models.Requests;
 import com.example.chatapp.Models.Users;
+import com.example.chatapp.View.MyProfile;
 import com.example.chatapp.fragments.CallFragment;
 import com.example.chatapp.fragments.ChatsFragment;
 import com.example.chatapp.fragments.ContactFragment;
 import com.example.chatapp.fragments.FriendsFragment;
-import com.example.chatapp.fragments.ProfileFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -64,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int FRAGMENT_FRIEND = 2;
     private static final int FRAGMENT_CONTACT = 3;
     private static final int FRAGMENT_CALL = 4;
-    private static final int FRAGMENT_PROFILE = 5;
     public static final int MY_REQUEST_CODE = 10;
     private int currentFragment = FRAGMENT_CHAT;
     private int backPressCount = 0;
@@ -143,6 +143,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         CircleImageView nav_header_userPhoto = (CircleImageView) headerNavigation.findViewById(R.id.nav_header_userPhoto);
         TextView nav_header_userName = (TextView) headerNavigation.findViewById(R.id.nav_header_userName);
         TextView nav_header_userEmail = (TextView) headerNavigation.findViewById(R.id.nav_header_userEmail);
+        headerNavigation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, MyProfile.class);
+                startActivity(intent);
+            }
+        });
 
         mUserReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
@@ -182,10 +189,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     case R.id.action_calls:
                         openCallFragment();
                         navigationView.setCheckedItem(R.id.nav_call);
-                        break;
-                    case R.id.action_profile:
-                        openProfileFragment();
-                        navigationView.setCheckedItem(R.id.nav_profile);
                         break;
                 }
                 setTitleToolBar();
@@ -227,9 +230,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_call) {
             openCallFragment();
             mBottomNavigationView.getMenu().findItem(R.id.action_calls).setChecked(true);
-        } else if (id == R.id.nav_profile) {
-            openProfileFragment();
-            mBottomNavigationView.getMenu().findItem(R.id.action_profile).setChecked(true);
         } else if (id == R.id.nav_logout) {
             openDialogConfirmLogout(Gravity.CENTER);
         }
@@ -414,13 +414,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void openProfileFragment() {
-        if (currentFragment != FRAGMENT_PROFILE) {
-            replaceFragment(new ProfileFragment());
-            currentFragment = FRAGMENT_PROFILE;
-        }
-    }
-
     /* Xét lại title cho mỗi Fragment */
     private void setTitleToolBar() {
         String title = "";
@@ -436,9 +429,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case FRAGMENT_CALL:
                 title = getString(R.string.action_calls);
-                break;
-            case FRAGMENT_PROFILE:
-                title = getString(R.string.action_profile);
                 break;
         }
         if (getSupportActionBar() != null) {
@@ -515,7 +505,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     String fcmToken = task.getResult();
                     HashMap<String, Object> hashMap = new HashMap<>();
                     hashMap.put("fcmToken", fcmToken);
-                    if (mUser!= null){
+                    if (mUser != null) {
                         mUserReference.child(mUser.getUid()).updateChildren(hashMap);
                     }
                 }
@@ -523,8 +513,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void setStatusActivity(){
-        if (mUser == null ) {
+    private void setStatusActivity() {
+        if (mUser == null) {
             statusActivity("Offline");
         } else {
             statusActivity("Online");

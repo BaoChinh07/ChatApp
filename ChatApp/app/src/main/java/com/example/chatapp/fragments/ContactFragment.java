@@ -114,22 +114,4 @@ public class ContactFragment extends Fragment {
             }
         });
     }
-
-//    private void loadContact() {
-//        final String[] friendID = new String[100];
-//        mFriendReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-//                    Friends friends = dataSnapshot.getValue(Friends.class);
-//                    friendID[0] = snapshot.getKey();
-//                    System.out.println(dataSnapshot.getKey());
-//                }
-//            }
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
 }
