@@ -41,7 +41,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
     Toolbar toolbar_singleFriend;
     CircleImageView civAvatarSingleFriend, civSingleFriendOnline, civSingleFriendOffline;
     TextView tvDescribeSingleFriend, tvUserNameSingleFriend, tvEmailSingleFriend, tvGenderSingleFriend;
-    Button btnSendMessage, btnUnfriend, btnBackInViewSingleFriend;
+    Button btnSendMessage, btnUnfriend;
 
     String friendID, profilePicURL, userName, email, gender, describe, statusActivity, currentStatus = "friend";
 
@@ -75,7 +75,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
         tvGenderSingleFriend = findViewById(R.id.tvGenderSingleFriend);
         btnSendMessage = findViewById(R.id.btnSendMessage);
         btnUnfriend = findViewById(R.id.btnUnfriend);
-        btnBackInViewSingleFriend = findViewById(R.id.btnBackInViewSingleFriend);
+
 
 
         friendID = getIntent().getStringExtra("userID");
@@ -87,13 +87,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
     }
 
     private void SetEvent() {
-
-        btnBackInViewSingleFriend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        actionToolBar();
 
         btnSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,6 +100,18 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 unFriend(friendID);
+            }
+        });
+    }
+
+    private void actionToolBar() {
+        setSupportActionBar(toolbar_singleFriend);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle("Hồ sơ bạn bè");
+        toolbar_singleFriend.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
             }
         });
     }

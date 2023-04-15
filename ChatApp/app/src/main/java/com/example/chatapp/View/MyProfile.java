@@ -5,6 +5,7 @@ import static com.example.chatapp.MainActivity.MY_REQUEST_CODE;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.Dialog;
 import android.content.Intent;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MyProfile extends AppCompatActivity {
+    Toolbar toolbar_myProfile;
     CircleImageView civAvatar;
     ImageButton btnUpdateAvatar;
     Button btnUpdateProfile, btnLogOut;
@@ -65,6 +67,7 @@ public class MyProfile extends AppCompatActivity {
 
 
     private void setControl() {
+        toolbar_myProfile = findViewById(R.id.toolbar_myProfile);
         btnUpdateProfile = findViewById(R.id.btnUpdateProfile);
         btnUpdateAvatar = (ImageButton) findViewById(R.id.btnUpdateAvatar);
         btnLogOut = findViewById(R.id.btnLogOut);
@@ -80,6 +83,7 @@ public class MyProfile extends AppCompatActivity {
     }
 
     private void setEvent() {
+        actionToolbar();
         getProfileUser();
 
         btnUpdateAvatar.setOnClickListener(new View.OnClickListener() {
@@ -100,6 +104,18 @@ public class MyProfile extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 openConfirmDialog(Gravity.CENTER);
+            }
+        });
+    }
+
+    private void actionToolbar() {
+        setSupportActionBar(toolbar_myProfile);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle("Hồ sơ cá nhân");
+        toolbar_myProfile.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
             }
         });
     }

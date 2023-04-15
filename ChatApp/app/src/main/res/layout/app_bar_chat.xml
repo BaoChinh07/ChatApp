@@ -3,14 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="@color/primary">
-
-    <Button
-        android:id="@+id/btnBackInChat"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_marginEnd="15dp"
-        android:background="@drawable/icon_back" />
+    android:background="@color/primary"
+    android:theme="@style/AppTheme.Toolbar">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -68,7 +68,6 @@ public class ChatActivity extends AppCompatActivity {
     Toolbar chat_toolbar;
     RecyclerView rvMessage;
     EditText edtInputMessage;
-    Button btnBackInChat;
     ImageView imageViewSendImage, imageViewSendMessage;
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
@@ -92,7 +91,6 @@ public class ChatActivity extends AppCompatActivity {
 
     private void setControl() {
         chat_toolbar = findViewById(R.id.chat_toolbar);
-        btnBackInChat = findViewById(R.id.btnBackInChat);
         edtInputMessage = findViewById(R.id.edtInputMessage);
         imageViewSendImage = findViewById(R.id.imageViewSendImage);
         imageViewSendMessage = findViewById(R.id.imageViewSendMessage);
@@ -117,17 +115,10 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void setEvent() {
+        actionToolBar();
         loadInformationUserChat(userID);
         loadMyProfile();
         loadSMS();
-
-        btnBackInChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(ChatActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
 
         civAvatarUserChat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,6 +135,17 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void actionToolBar() {
+        setSupportActionBar(chat_toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        chat_toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
     }
 
     private void loadInformationUserChat(String userID) {

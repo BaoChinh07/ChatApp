@@ -40,7 +40,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ViewItemContactActivity extends AppCompatActivity {
     Toolbar toolbar_singleContact;
     TextView tvDescribeSingleContact, tvUserNameSingleContact, tvEmailSingleContact;
-    Button btnSendFriendRequest, btnCancelSendFriendRequest, btnBackInViewSingleContact;
+    Button btnSendFriendRequest, btnCancelSendFriendRequest;
     CircleImageView civAvatarSingleContact;
     String profilePicURL, userName, status, email, gender, describe, friendID, userID, currentState;
     String myProfilePic, myUsername, myEmail, myGender, myDescribe, myUserID;
@@ -69,7 +69,6 @@ public class ViewItemContactActivity extends AppCompatActivity {
         tvEmailSingleContact = findViewById(R.id.tvEmailSingleContact);
         btnSendFriendRequest = findViewById(R.id.btnSendFriendRequest);
         btnCancelSendFriendRequest = findViewById(R.id.btnCancelSendFriendRequest);
-        btnBackInViewSingleContact = findViewById(R.id.btnBackInViewSingleContact);
         userID = getIntent().getStringExtra("userID"); // Sử dụng put/getExtra để truyền dữ liệu từ ContactAdapter sang ViewItemContactActivity
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -85,13 +84,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
 
     private void setEvent() {
-
-        btnBackInViewSingleContact.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        setActionToolbar();
         /* Xử lý sự kiện nút GỬI kết bạn */
         btnSendFriendRequest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,6 +103,18 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
         callInformationItemContact(); // Hiển thị thông tin của người dùng khi click vào
         loadMyProfile(); //Load dữ liệu của bản thân
+    }
+
+    private void setActionToolbar() {
+        setSupportActionBar(toolbar_singleContact);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle("Hồ sơ người dùng");
+        toolbar_singleContact.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
     }
 
     private void loadMyProfile() {

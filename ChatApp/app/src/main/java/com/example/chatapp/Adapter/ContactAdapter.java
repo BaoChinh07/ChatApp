@@ -27,9 +27,9 @@ import java.util.Locale;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> implements Filterable {
-    Context context;
-    ArrayList<Users> listContacts;
-    ArrayList<Users> listFilterContacts;
+        Context context;
+        ArrayList<Users> listContacts;
+        ArrayList<Users> listFilterContacts;
 
     public ContactAdapter(Context context, ArrayList<Users> listContacts) {
         this.context = context;
