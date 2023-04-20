@@ -269,22 +269,22 @@ public class ViewItemContactActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     final HashMap hashMap = new HashMap();
                                     hashMap.put("status", "friend");
-                                    hashMap.put("friendID",friendID);
+                                    hashMap.put("friendID", friendID);
                                     hashMap.put("userName", userName);
                                     hashMap.put("profilePic", profilePicURL);
-                                    hashMap.put("email",email);
-                                    hashMap.put("describe",describe);
-                                    hashMap.put("gender",gender);
+                                    hashMap.put("email", email);
+                                    hashMap.put("describe", describe);
+                                    hashMap.put("gender", gender);
 
                                     //Thông tin của bản thân sẽ lưu trong node của bạn bè
                                     final HashMap hashMap1 = new HashMap();
                                     hashMap1.put("status", "friend");
-                                    hashMap1.put("friendID",myUserID);
+                                    hashMap1.put("friendID", myUserID);
                                     hashMap1.put("userName", myUsername);
                                     hashMap1.put("profilePic", myProfilePic);
-                                    hashMap1.put("email",myEmail);
-                                    hashMap1.put("describe",myDescribe);
-                                    hashMap1.put("gender",myGender);
+                                    hashMap1.put("email", myEmail);
+                                    hashMap1.put("describe", myDescribe);
+                                    hashMap1.put("gender", myGender);
                                     mFriendsReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                                         @Override
                                         public void onComplete(@NonNull Task task) {
@@ -415,31 +415,16 @@ public class ViewItemContactActivity extends AppCompatActivity {
     }
 
     private void cancelAction(String userID) {
-        if (currentState.equals("friend")){
-            mFriendsReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        mFriendsReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    openConfirmUnfriendDialog(Gravity.CENTER);
-                                }
-
-                            }
-                        });
-                    }
-                }
-            });
+        if (currentState.equals("friend")) {
+            openConfirmUnfriendDialog(Gravity.CENTER);
         }
         if (currentState.equals("he_sent_pending")) {
-            mRequestReference.child(userID).child(mAuth.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener() {
+            mRequestReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener() {
 
                 @Override
                 public void onComplete(@NonNull Task task) {
                     if (task.isSuccessful()) {
-                        mRequestReference.child(mAuth.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        mRequestReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
@@ -457,44 +442,63 @@ public class ViewItemContactActivity extends AppCompatActivity {
     }
 
     private void openConfirmUnfriendDialog(int gravity) {
-            final Dialog dialog = new Dialog(this);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.setContentView(R.layout.confirm_unfriend_dialog);
-            Window window = (Window) dialog.getWindow();
-            if (window == null) {
-                return;
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.confirm_unfriend_dialog);
+        Window window = (Window) dialog.getWindow();
+        if (window == null) {
+            return;
+        } else {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            WindowManager.LayoutParams windowAttributes = window.getAttributes();
+            window.setAttributes(windowAttributes);
+
+            if (Gravity.CENTER == gravity) {
+                dialog.setCancelable(true);
             } else {
-                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-                WindowManager.LayoutParams windowAttributes = window.getAttributes();
-                window.setAttributes(windowAttributes);
-
-                if (Gravity.CENTER == gravity) {
-                    dialog.setCancelable(true);
-                } else {
-                    dialog.setCancelable(false);
-                }
-                Button btnConfirm = dialog.findViewById(R.id.btnConfirmUnfriend);
-                Button btnCancelConfirm = dialog.findViewById(R.id.btnCancelConfirmUnfriend);
-
-                btnConfirm.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                        Toast.makeText(ViewItemContactActivity.this, "Đã hủy kết bạn", Toast.LENGTH_SHORT).show();
-                        currentState = "nothing_happen";
-                        btnSendFriendRequest.setText(R.string.button_send_friend_request);
-                        btnCancelSendFriendRequest.setVisibility(View.GONE);
-                    }
-                });
-                btnCancelConfirm.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                    }
-                });
+                dialog.setCancelable(false);
             }
-            dialog.show();
+            Button btnConfirm = dialog.findViewById(R.id.btnConfirmUnfriend);
+            Button btnCancelConfirm = dialog.findViewById(R.id.btnCancelConfirmUnfriend);
+
+            btnConfirm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                    deleteFriend(userID);
+                }
+            });
+            btnCancelConfirm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
         }
+        dialog.show();
+    }
+
+    private void deleteFriend(String userID) {
+        mFriendsReference.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    mFriendsReference.child(userID).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(ViewItemContactActivity.this, "Đã hủy kết bạn", Toast.LENGTH_SHORT).show();
+                                currentState = "nothing_happen";
+                                btnSendFriendRequest.setText(R.string.button_send_friend_request);
+                                btnCancelSendFriendRequest.setVisibility(View.GONE);
+                            }
+
+                        }
+                    });
+                }
+            }
+        });
+    }
 }

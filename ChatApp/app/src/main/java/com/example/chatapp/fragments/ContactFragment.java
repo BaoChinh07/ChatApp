@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ContactFragment extends Fragment {
     public ContactFragment() {
@@ -38,8 +39,8 @@ public class ContactFragment extends Fragment {
     RecyclerView rvListContact;
     SearchView action_search;
     ArrayList<Users> listContact = new ArrayList<>();
-    FirebaseDatabase mDatabase;
-    DatabaseReference mFriendReference, mDatabaseReference;
+    List<Users> tempUsers = new ArrayList<>();
+    DatabaseReference mFriendReference, mUserReference;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,7 +54,7 @@ public class ContactFragment extends Fragment {
         action_search = (SearchView) mView.findViewById(R.id.action_search);
         action_search.clearFocus();
         rvListContact = (RecyclerView) mView.findViewById(R.id.rvListContact);
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mFriendReference = FirebaseDatabase.getInstance().getReference().child("Friends");
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -91,21 +92,44 @@ public class ContactFragment extends Fragment {
     }
 
     private void loadContact() {
-        mDatabaseReference.addValueEventListener(new ValueEventListener() {
+        mUserReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                listContact.clear();
+                tempUsers.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Users users = dataSnapshot.getValue(Users.class);
-                    mAuth = FirebaseAuth.getInstance();
-                    mUser = mAuth.getCurrentUser();
-                    String userEmail = users.getEmail();
-                    if (mUser != null && !users.getEmail().equals(mUser.getEmail())) {
-                        users.setUserID(dataSnapshot.getKey());
-                        listContact.add(users);
+                    if (mUser != null && users != null && !mUser.getEmail().equals(users.getEmail())) {
+                        tempUsers.add(users);
                     }
                 }
-                contactAdapter.notifyDataSetChanged();
+                mFriendReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        listUsers.clear();
+                        if (snapshot.exists()) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                String friendID = dataSnapshot.getKey();
+
+                                for (int i = 0; i < tempUsers.size(); i++) {
+                                    Users users = tempUsers.get(i);
+
+                                    if (users.getUserID().equals(friendID)) {
+                                        tempUsers.remove(users);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        listContact.clear();
+                        listContact.addAll(tempUsers);
+                        contactAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
 
             @Override

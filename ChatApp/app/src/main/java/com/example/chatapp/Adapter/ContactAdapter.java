@@ -47,9 +47,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
         Users users = listContacts.get(position);
-        if (users == null) {
-            return;
-        } else {
+        if (users != null) {
             Picasso.get().load(users.getProfilePic()).placeholder(R.drawable.default_avatar).into(holder.civAvatarItemContact);
             holder.tvItemContactName.setText(users.getUserName());
             holder.tvItemContactEmail.setText(users.getEmail());
