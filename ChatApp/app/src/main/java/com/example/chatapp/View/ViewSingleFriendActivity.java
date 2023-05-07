@@ -77,7 +77,6 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
         btnUnfriend = findViewById(R.id.btnUnfriend);
 
 
-
         friendID = getIntent().getStringExtra("userID");
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -99,7 +98,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
         btnUnfriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                unFriend(friendID);
+                openConfirmUnfriendDialog(Gravity.CENTER);
             }
         });
     }
@@ -123,6 +122,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
     }
 
     private void unFriend(String friendID) {
+
         mFriendReference.child(mUser.getUid()).child(friendID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -131,7 +131,11 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                openConfirmUnfriendDialog(Gravity.CENTER);
+                                Toast.makeText(ViewSingleFriendActivity.this, "Hủy kết bạn thành công", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(ViewSingleFriendActivity.this, ViewItemContactActivity.class);
+                                intent.putExtra("userID", friendID);
+                                startActivity(intent);
+                                finish();
                             }
                         }
                     });
@@ -165,11 +169,9 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
             btnConfirm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    unFriend(friendID);
                     dialog.dismiss();
-                    Toast.makeText(ViewSingleFriendActivity.this, "Hủy kết bạn thành công", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(ViewSingleFriendActivity.this, ViewItemContactActivity.class);
-                    intent.putExtra("userID", friendID);
-                    startActivity(intent);
+
                 }
             });
             btnCancelConfirm.setOnClickListener(new View.OnClickListener() {

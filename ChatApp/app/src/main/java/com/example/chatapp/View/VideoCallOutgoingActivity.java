@@ -186,9 +186,7 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
                     if (response.equals("yes")) {
                         joinMeeting(key);
                     } else if (response.equals("no")) {
-                        Intent intent = new Intent(VideoCallOutgoingActivity.this, ChatActivity.class);
-                        intent.putExtra("userID", receiverID);
-                        startActivity(intent);
+                        finish();
                     } else {
                         return;
                     }

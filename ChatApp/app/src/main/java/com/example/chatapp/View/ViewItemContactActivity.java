@@ -292,11 +292,15 @@ public class ViewItemContactActivity extends AppCompatActivity {
                                                 mFriendsReference.child(userID).child(mUser.getUid()).updateChildren(hashMap1).addOnCompleteListener(new OnCompleteListener() {
                                                     @Override
                                                     public void onComplete(@NonNull Task task) {
-                                                        Toast.makeText(ViewItemContactActivity.this, "Các bạn đã là bạn bè", Toast.LENGTH_SHORT).show();
                                                         currentState = "friend";
                                                         btnSendFriendRequest.setText(R.string.button_send_message);
                                                         btnCancelSendFriendRequest.setText(R.string.button_unfriend);
                                                         btnCancelSendFriendRequest.setVisibility(View.VISIBLE);
+                                                        Toast.makeText(ViewItemContactActivity.this, "Các bạn đã là bạn bè", Toast.LENGTH_SHORT).show();
+                                                        Intent intent = new Intent(ViewItemContactActivity.this, ViewSingleFriendActivity.class);
+                                                        intent.putExtra("userID", userID);
+                                                        startActivity(intent);
+                                                        finish();
                                                     }
                                                 });
                                             }

@@ -115,9 +115,6 @@ public class VoiceCallComingActivity extends AppCompatActivity {
             hashMap.put("response","no");
             mVoiceCallReference.child(senderID).child(receiverID).child("response").updateChildren(hashMap);
             Toast.makeText(this, "Từ chối cuộc gọi", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(VoiceCallComingActivity.this, ChatActivity.class);
-            intent.putExtra("userID",senderID);
-            startActivity(intent);
             finish();
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -173,9 +170,6 @@ public class VoiceCallComingActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     String response = snapshot.child("response").getValue().toString().trim();
                     if (response.equals("no")) {
-                        Intent intent = new Intent(VoiceCallComingActivity.this, ChatActivity.class);
-                        intent.putExtra("userID",senderID);
-                        startActivity(intent);
                         finish();
                     }
                 }

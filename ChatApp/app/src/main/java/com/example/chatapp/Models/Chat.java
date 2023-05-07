@@ -1,17 +1,18 @@
 package com.example.chatapp.Models;
 
 public class Chat {
-    String userName, profilePic, lastMessage,friendID;
+    private String userName, profilePic, lastMessage,friendID;
+    private long timestamp;
 
     public Chat() {
     }
 
-    public Chat(String userName, String profilePic, String lastMessage, String friendID) {
+    public Chat(String userName, String profilePic, String lastMessage, String friendID, long timestamp) {
         this.userName = userName;
         this.profilePic = profilePic;
         this.lastMessage = lastMessage;
         this.friendID = friendID;
-
+        this.timestamp = timestamp;
     }
 
     public String getFriendID() {
@@ -44,5 +45,13 @@ public class Chat {
 
     public void setLastMessage(String lastMessage) {
         this.lastMessage = lastMessage;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

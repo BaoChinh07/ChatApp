@@ -94,8 +94,6 @@ public class FriendsFragment extends Fragment {
                 listFriends.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Friends friends = dataSnapshot.getValue(Friends.class);
-                    mAuth = FirebaseAuth.getInstance();
-                    mUser = mAuth.getCurrentUser();
                     friends.setFriendID(dataSnapshot.getKey());
                     listFriends.add(friends);
                 }

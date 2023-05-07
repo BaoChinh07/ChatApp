@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.example.chatapp.Adapter.ChatAdapter;
 import com.example.chatapp.Models.Chat;
+import com.example.chatapp.Models.HistoryCall;
 import com.example.chatapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,6 +26,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class ChatsFragment extends Fragment {
     SearchView action_searchChat;
@@ -91,7 +94,12 @@ public class ChatsFragment extends Fragment {
                     chat.setFriendID(dataSnapshot.getKey());
                     listChat.add(chat);
                 }
-
+                Collections.sort(listChat, new Comparator<Chat>() {
+                    @Override
+                    public int compare(Chat chat1, Chat chat2) {
+                        return Long.compare(chat2.getTimestamp(), chat1.getTimestamp());
+                    }
+                });
                 chatAdapter.notifyDataSetChanged();
             }
 

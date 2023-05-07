@@ -114,10 +114,6 @@ public class VideoCallComingActivity extends AppCompatActivity {
             hashMap.put("key",senderName+receiveID);
             hashMap.put("response","no");
             mVideoCallReference.child(senderID).child(receiveID).child("response").updateChildren(hashMap);
-            Toast.makeText(this, "Từ chối cuộc gọi", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(VideoCallComingActivity.this, ChatActivity.class);
-            intent.putExtra("userID",senderID);
-            startActivity(intent);
             finish();
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -176,9 +172,6 @@ public class VideoCallComingActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     String response = snapshot.child("response").getValue().toString().trim();
                     if (response.equals("no")) {
-                        Intent intent = new Intent(VideoCallComingActivity.this, ChatActivity.class);
-                        intent.putExtra("userID",senderID);
-                        startActivity(intent);
                         finish();
                     } else {
                         return;

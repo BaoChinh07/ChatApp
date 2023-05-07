@@ -111,10 +111,6 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
         hashMap.put("response", "no");
         mVoiceCallReference.child(senderID).child(receiverID).child("response").updateChildren(hashMap);
         Toast.makeText(this, "Kết thúc cuộc gọi", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(VoiceCallOutGoingActivity.this, ChatActivity.class);
-        intent.putExtra("userID", receiverID);
-        startActivity(intent);
-        finish();
         HistoryCallModel historyCallModel = new HistoryCallModel(senderID,senderAvatar,senderName,"MissedCall",type, receiverID);
         historyCallModel.createHistoryCall();
         Handler handler = new Handler();
@@ -189,9 +185,6 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
                         if (response.equals("yes")) {
                             joinMeeting(key);
                         } else if (response.equals("no")) {
-                            Intent intent = new Intent(VoiceCallOutGoingActivity.this, ChatActivity.class);
-                            intent.putExtra("userID", receiverID);
-                            startActivity(intent);
                             finish();
                         } else {
                             return;

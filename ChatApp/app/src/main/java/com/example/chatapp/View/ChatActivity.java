@@ -71,14 +71,15 @@ public class ChatActivity extends AppCompatActivity {
     ImageView imageViewSendImage, imageViewSendMessage;
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
-    String userID, avatarURL, userName, dateTime, statusActivity;
-    String lastMessage,  myAvatar, myName, myUserEmail;
+    String userID, avatarURL, userName, dateTime, statusActivity, dateTimeStamp;
+    String lastMessage, myAvatar, myName, myUserEmail;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     DatabaseReference mUserReference, mFriendsReference, mSmsReference, mChatReference, mHistoryCallReference;
     StorageReference mStorageReference;
     FirebaseStorage storage;
     Date currentTime;
+    long timestamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,9 +117,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private void setEvent() {
         actionToolBar();
+        getCurrentTime();
         loadInformationUserChat(userID);
         loadMyProfile();
         loadSMS();
+
 
         civAvatarUserChat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,6 +149,21 @@ public class ChatActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+    }
+
+    private void getCurrentTime() {
+        currentTime = Calendar.getInstance().getTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy, hh:mm a");
+        SimpleDateFormat simpleDateFormatTimestamp = new SimpleDateFormat("dd/MM/yyyy, hh:mm:ss a");
+        dateTime = simpleDateFormat.format(currentTime);
+        dateTimeStamp = simpleDateFormatTimestamp.format(currentTime);
+        Date date = null;
+        try {
+            date = simpleDateFormatTimestamp.parse(dateTimeStamp);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        timestamp = date.getTime();
     }
 
     private void loadInformationUserChat(String userID) {
@@ -259,16 +277,6 @@ public class ChatActivity extends AppCompatActivity {
 
     private void SendSMS() {
         String sms = edtInputMessage.getText().toString().trim();
-        currentTime = Calendar.getInstance().getTime();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy, hh:mm a");
-        dateTime = simpleDateFormat.format(currentTime);
-        Date date = null;
-        try {
-            date = simpleDateFormat.parse(dateTime);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        long timestamp = date.getTime();
 
         if (sms.isEmpty()) {
             Toast.makeText(this, "Tin nhắn không được để trống", Toast.LENGTH_SHORT).show();
@@ -301,42 +309,41 @@ public class ChatActivity extends AppCompatActivity {
 
 
     private void createChatBox() {
-        mSmsReference.child(mUser.getUid()).child(userID)
-                .orderByChild("timestamp")
-                .limitToLast(1)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.hasChildren()) {
-                            for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                                lastMessage = snapshot1.child("sms").getValue().toString();
-                            }
-                        }
-                        HashMap hashMap = new HashMap();
-                        hashMap.put("profilePic", avatarURL);
-                        hashMap.put("userName", userName);
-                        hashMap.put("lastMessage", lastMessage);
-                        hashMap.put("friendID", userID);
-                        mChatReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
-                            @Override
-                            public void onComplete(@NonNull Task task) {
-                                if (task.isSuccessful()) {
-                                    HashMap mHashMap = new HashMap();
-                                    mHashMap.put("profilePic", myAvatar);
-                                    mHashMap.put("userName", myName);
-                                    mHashMap.put("lastMessage", lastMessage);
-                                    mHashMap.put("friendID", mUser.getUid());
-                                    mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap);
-                                }
-                            }
-                        });
+        mSmsReference.child(mUser.getUid()).child(userID).orderByChild("timestamp").limitToLast(1).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.hasChildren()) {
+                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                        lastMessage = snapshot1.child("sms").getValue().toString();
                     }
-
+                }
+                HashMap hashMap = new HashMap();
+                hashMap.put("profilePic", avatarURL);
+                hashMap.put("userName", userName);
+                hashMap.put("lastMessage", lastMessage);
+                hashMap.put("friendID", userID);
+                hashMap.put("timestamp", timestamp);
+                mChatReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
+                    public void onComplete(@NonNull Task task) {
+                        if (task.isSuccessful()) {
+                            HashMap mHashMap = new HashMap();
+                            mHashMap.put("profilePic", myAvatar);
+                            mHashMap.put("userName", myName);
+                            mHashMap.put("lastMessage", lastMessage);
+                            mHashMap.put("timestamp", timestamp);
+                            mHashMap.put("friendID", mUser.getUid());
+                            mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap);
+                        }
                     }
                 });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override
@@ -456,7 +463,6 @@ public class ChatActivity extends AppCompatActivity {
                 Intent intent = new Intent(ChatActivity.this, VoiceCallOutGoingActivity.class);
                 intent.putExtra("receiverID", userID);
                 startActivity(intent);
-                finish();
             }
 
             @Override
@@ -464,11 +470,7 @@ public class ChatActivity extends AppCompatActivity {
                 Toast.makeText(ChatActivity.this, "Quyền bị từ chối\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
             }
         };
-        TedPermission.create()
-                .setPermissionListener(permissionlistener)
-                .setDeniedMessage("Nếu bạn từ chối quyền, bạn không thể sử dụng dịch vụ này\n\nVui lòng bật quyền tại [Setting] > [Permission]")
-                .setPermissions(Manifest.permission.RECORD_AUDIO)
-                .check();
+        TedPermission.create().setPermissionListener(permissionlistener).setDeniedMessage("Nếu bạn từ chối quyền, bạn không thể sử dụng dịch vụ này\n\nVui lòng bật quyền tại [Setting] > [Permission]").setPermissions(Manifest.permission.RECORD_AUDIO).check();
     }
 
     private void requestPermissionForVideoCall() {
@@ -481,7 +483,6 @@ public class ChatActivity extends AppCompatActivity {
                 Intent intent = new Intent(ChatActivity.this, VideoCallOutgoingActivity.class);
                 intent.putExtra("friendID", userID);
                 startActivity(intent);
-                finish();
             }
 
             @Override
@@ -489,11 +490,7 @@ public class ChatActivity extends AppCompatActivity {
                 Toast.makeText(ChatActivity.this, "Quyền bị từ chối\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
             }
         };
-        TedPermission.create()
-                .setPermissionListener(permissionlistener)
-                .setDeniedMessage("Nếu bạn từ chối quyền, bạn không thể sử dụng dịch vụ này\n\nVui lòng bật quyền tại [Setting] > [Permission]")
-                .setPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
-                .check();
+        TedPermission.create().setPermissionListener(permissionlistener).setDeniedMessage("Nếu bạn từ chối quyền, bạn không thể sử dụng dịch vụ này\n\nVui lòng bật quyền tại [Setting] > [Permission]").setPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO).check();
     }
 
 }
