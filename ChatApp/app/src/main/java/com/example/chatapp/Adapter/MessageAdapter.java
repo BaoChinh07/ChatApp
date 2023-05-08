@@ -15,10 +15,10 @@ public class MessageAdapter extends RecyclerView.ViewHolder {
     public TextView tvSmsUserOne, tvTimeMessageUserOne, tvSmsUserTwo, tvTimeMessageUserTwo;
     public MessageAdapter(@NonNull View itemView) {
         super(itemView);
-        civAvatarUserOne = (CircleImageView) itemView.findViewById(R.id.civAvatarUserOne);
-        tvSmsUserOne = (TextView) itemView.findViewById(R.id.tvSmsUserOne);
-        tvTimeMessageUserOne = (TextView) itemView.findViewById(R.id.tvTimeMessageUserOne);
-        tvSmsUserTwo = (TextView) itemView.findViewById(R.id.tvSmsUserTwo);
-        tvTimeMessageUserTwo = (TextView) itemView.findViewById(R.id.tvTimeMessageUserTwo);
+        civAvatarUserOne =  itemView.findViewById(R.id.civAvatarUserOne);
+        tvSmsUserOne =  itemView.findViewById(R.id.tvSmsUserOne);
+        tvTimeMessageUserOne =  itemView.findViewById(R.id.tvTimeMessageUserOne);
+        tvSmsUserTwo =  itemView.findViewById(R.id.tvSmsUserTwo);
+        tvTimeMessageUserTwo =  itemView.findViewById(R.id.tvTimeMessageUserTwo);
     }
 }

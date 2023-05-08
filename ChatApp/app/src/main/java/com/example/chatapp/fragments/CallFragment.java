@@ -57,9 +57,6 @@ public class CallFragment extends Fragment {
         historyCallAdapter = new HistoryCallAdapter(getContext(), listCallHistory);
         rvListCallHistory.setAdapter(historyCallAdapter);
 
-        /* Tạo ngăn cách giữa 2 đối tượng*/
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-        rvListCallHistory.addItemDecoration(itemDecoration);
         /* Khởi tạo một LinearLayout và gán vào RecycleView */
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvListCallHistory.setLayoutManager(layoutManager);

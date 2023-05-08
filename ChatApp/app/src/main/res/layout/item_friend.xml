@@ -3,86 +3,75 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="10dp"
+    android:layout_marginBottom="5dp"
     android:orientation="vertical">
 
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
-        app:cardBackgroundColor="@color/background_card"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="15dp">
+        android:layout_height="60dp"
+        android:layout_marginHorizontal="5dp"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/civAvatarItemFriend"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:src="@drawable/default_avatar" />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/civItemFriendOnline"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/icon_online"
+                android:layout_alignEnd="@id/civAvatarItemFriend"
+                android:layout_alignBottom="@id/civAvatarItemFriend"
+                android:layout_marginEnd="5dp"
+                />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/civItemFriendOffline"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/icon_offline"
+                android:layout_alignEnd="@id/civAvatarItemFriend"
+                android:layout_alignBottom="@id/civAvatarItemFriend"
+                android:layout_marginEnd="5dp"
+                />
+        </RelativeLayout>
+
+
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginHorizontal="5dp"
-            android:orientation="horizontal">
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical"
+            android:weightSum="2">
 
-            <RelativeLayout
+            <TextView
+                android:id="@+id/tvItemFriendName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center">
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/civAvatarItemFriend"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/default_avatar" />
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/civItemFriendOnline"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:background="@drawable/icon_online"
-                    android:layout_alignEnd="@id/civAvatarItemFriend"
-                    android:layout_alignBottom="@id/civAvatarItemFriend"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="2dp"
-                    />
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/civItemFriendOffline"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:background="@drawable/icon_offline"
-                    android:layout_alignEnd="@id/civAvatarItemFriend"
-                    android:layout_alignBottom="@id/civAvatarItemFriend"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="2dp"
-                    />
-            </RelativeLayout>
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:text="@string/text_username"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                />
 
-
-
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvItemFriendDescribe"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="10dp"
-                android:orientation="vertical"
-                android:weightSum="2">
-
-                <TextView
-                    android:id="@+id/tvItemFriendName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="bottom"
-                    android:text="@string/text_username"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    />
-
-                <TextView
-                    android:id="@+id/tvItemFriendDescribe"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="top"
-                    android:hint="@string/text_describe"
-                    android:maxLines="1"
-                    android:textColor="@color/grey"
-                    android:textSize="12sp" />
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="top"
+                android:hint="@string/text_describe"
+                android:maxLines="1"
+                android:textColor="@color/grey"
+                android:textSize="12sp" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
 </LinearLayout>

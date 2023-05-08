@@ -63,9 +63,6 @@ public class ContactFragment extends Fragment {
         contactAdapter = new ContactAdapter(getContext(), listContact);
         rvListContact.setAdapter(contactAdapter);
 
-        /* Tạo ngăn cách giữa 2 đối tượng*/
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-        rvListContact.addItemDecoration(itemDecoration);
         /* Khởi tạo một LinearLayout và gán vào RecycleView */
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvListContact.setLayoutManager(layoutManager);

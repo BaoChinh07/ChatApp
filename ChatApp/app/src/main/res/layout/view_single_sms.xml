@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="5dp">
+    android:layout_marginBottom="5dp"
+    android:layout_marginTop="5dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/civAvatarUserOne"
@@ -47,9 +48,11 @@
         android:text="@string/text_time"
         android:textSize="12.25sp"
         android:textColor="@color/grey"
+        android:inputType="datetime"
         app:layout_constraintStart_toStartOf="@+id/tvSmsUserOne"
         app:layout_constraintTop_toBottomOf="@+id/tvSmsUserOne"
-        app:layout_constraintWidth="wrap_content" />
+        app:layout_constraintWidth="wrap_content"
+        tools:ignore="TextViewEdits" />
 
     <TextView
         android:id="@+id/tvSmsUserTwo"
@@ -80,8 +83,10 @@
         android:text="@string/text_time"
         android:textSize="12.25sp"
         android:textColor="@color/grey"
+        android:inputType="datetime"
         app:layout_constraintEnd_toEndOf="@+id/tvSmsUserTwo"
         app:layout_constraintTop_toBottomOf="@+id/tvSmsUserTwo"
-        app:layout_constraintWidth="wrap_content" />
+        app:layout_constraintWidth="wrap_content"
+        tools:ignore="TextViewEdits" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,13 +32,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> implements Filterable {
 
-    FirebaseAuth mAuth;
-    FirebaseUser mUser;
-    DatabaseReference mUserReference;
-    String myName, myEmail;
     Context context;
     ArrayList<Chat> listChats;
     ArrayList<Chat> listFilterChatts;
+    FirebaseAuth mAuth;
+    DatabaseReference mDatabaseReference;
 
     public ChatAdapter(Context context, ArrayList<Chat> listChats) {
         this.context = context;
@@ -55,6 +53,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
         Chat chat = listChats.get(position);
         if (chat == null) {
             return;
@@ -62,6 +61,26 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             Picasso.get().load(chat.getProfilePic()).placeholder(R.drawable.default_avatar).into(holder.civAvatarItemChat);
             holder.tvItemChatName.setText(chat.getUserName());
             holder.tvLastMessage.setText(chat.getLastMessage());
+            holder.tvTimeLastMessage.setText(chat.getDateTime());
+            mDatabaseReference.child(chat.getFriendID()).child("statusActivity").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        if (snapshot.getValue().toString().equals("Online")) {
+                            holder.civItemChatOnline.setVisibility(View.VISIBLE);
+                            holder.civItemChatOffline.setVisibility(View.GONE);
+                        } else {
+                            holder.civItemChatOnline.setVisibility(View.GONE);
+                            holder.civItemChatOffline.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -81,13 +100,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     }
 
     public static class ChatViewHolder extends RecyclerView.ViewHolder {
-        public CircleImageView civAvatarItemChat;
-        public TextView tvItemChatName, tvLastMessage;
+        public CircleImageView civAvatarItemChat, civItemChatOnline, civItemChatOffline;
+        public TextView tvItemChatName, tvLastMessage, tvTimeLastMessage;
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
-            civAvatarItemChat = (CircleImageView) itemView.findViewById(R.id.civAvatarItemChat);
-            tvItemChatName = (TextView) itemView.findViewById(R.id.tvItemChatName);
-            tvLastMessage = (TextView) itemView.findViewById(R.id.tvLastMessage);
+            civAvatarItemChat = itemView.findViewById(R.id.civAvatarItemChat);
+            civItemChatOnline = itemView.findViewById(R.id.civItemChatOnline);
+            civItemChatOffline = itemView.findViewById(R.id.civItemChatOffline);
+            tvItemChatName = itemView.findViewById(R.id.tvItemChatName);
+            tvLastMessage = itemView.findViewById(R.id.tvLastMessage);
+            tvTimeLastMessage = itemView.findViewById(R.id.tvTimeLastMessage);
         }
     }
     @Override
@@ -117,23 +139,5 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 notifyDataSetChanged();
             }
         };
-    }
-
-    private void Information(){
-        mUserReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
-        mUserReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    myName = snapshot.child("userName").getValue().toString().trim();
-                    myEmail = snapshot.child("email").getValue().toString().trim();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
     }
 }

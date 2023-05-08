@@ -12,7 +12,12 @@
     <string name="action_delete">Xóa</string>
     <string name="action_share">Chia sẻ</string>
     <string name="action_feedback">Góp ý với chúng tôi</string>
-    <string name="action_call">Đang gọi ...</string>
+    <string name="action_call">Đang gọi …</string>
+    <string name="action_enterMessage">Nhập tin nhắn …</string>
+    <string name="action_sendVoice">Gửi âm thanh</string>
+    <string name="action_sendImage">Gửi hình ảnh</string>
+    <string name="action_sendEnmoji">Gửi biểu cảm</string>
+    <string name="action_sendMessage">Gửi tin nhắn</string>
 
     <!--    String TextView-->
     <string name="text_email">Email</string>

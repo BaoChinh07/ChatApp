@@ -58,9 +58,6 @@ public class FriendsFragment extends Fragment {
 
         friendAdapter = new FriendAdapter(getContext(), listFriends);
         rvListFriend.setAdapter(friendAdapter);
-        /* Tạo ngăn cách giữa 2 đối tượng*/
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-        rvListFriend.addItemDecoration(itemDecoration);
         /* Khởi tạo một LinearLayout và gán vào RecycleView */
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvListFriend.setLayoutManager(layoutManager);

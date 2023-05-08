@@ -12,12 +12,12 @@
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/action_searchChat"
-        android:layout_height="48dp"
+        android:layout_height="40.5dp"
         android:layout_width="match_parent"
         android:layout_margin="8dp"
         android:background="@drawable/search_frame"
         android:layout_gravity="center_vertical"
-        app:queryHint="Tìm kiếm đoạn chat"
+        app:queryHint="@string/action_search"
         app:searchIcon="@drawable/icon_search"
         app:searchHintIcon="@drawable/icon_search" />
 

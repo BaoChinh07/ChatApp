@@ -71,7 +71,7 @@ public class ChatActivity extends AppCompatActivity {
     ImageView imageViewSendImage, imageViewSendMessage;
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
-    String userID, avatarURL, userName, dateTime, statusActivity, dateTimeStamp;
+    String userID, avatarURL, userName, dateTime, statusActivity, dateTimeStamp, time;
     String lastMessage, myAvatar, myName, myUserEmail;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
@@ -155,8 +155,10 @@ public class ChatActivity extends AppCompatActivity {
         currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy, hh:mm a");
         SimpleDateFormat simpleDateFormatTimestamp = new SimpleDateFormat("dd/MM/yyyy, hh:mm:ss a");
+        SimpleDateFormat simpleTime = new SimpleDateFormat("HH:mm");
         dateTime = simpleDateFormat.format(currentTime);
         dateTimeStamp = simpleDateFormatTimestamp.format(currentTime);
+        time = simpleTime.format(currentTime);
         Date date = null;
         try {
             date = simpleDateFormatTimestamp.parse(dateTimeStamp);
@@ -323,6 +325,7 @@ public class ChatActivity extends AppCompatActivity {
                 hashMap.put("lastMessage", lastMessage);
                 hashMap.put("friendID", userID);
                 hashMap.put("timestamp", timestamp);
+                hashMap.put("dateTime", time);
                 mChatReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(@NonNull Task task) {
@@ -332,6 +335,7 @@ public class ChatActivity extends AppCompatActivity {
                             mHashMap.put("userName", myName);
                             mHashMap.put("lastMessage", lastMessage);
                             mHashMap.put("timestamp", timestamp);
+                            mHashMap.put("dateTime", time);
                             mHashMap.put("friendID", mUser.getUid());
                             mChatReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap);
                         }

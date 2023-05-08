@@ -17,9 +17,10 @@
         android:layout_height="48dp"
         android:layout_margin="8dp"
         android:background="@drawable/search_frame"
-        app:queryHint="Tìm người dùng"
+        app:queryHint="@string/action_search"
         app:searchIcon="@drawable/icon_search"
-        app:searchHintIcon="@drawable/icon_search"/>
+        app:searchHintIcon="@drawable/icon_search"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvListContact"

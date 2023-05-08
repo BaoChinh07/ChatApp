@@ -59,8 +59,8 @@ public class ChatsFragment extends Fragment {
 
         chatAdapter = new ChatAdapter(getContext(), listChat);
         rvListChat.setAdapter(chatAdapter);
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL); /* Tạo ngăn cách giữa 2 đối tượng*/
-        rvListChat.addItemDecoration(itemDecoration);
+//        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL); /* Tạo ngăn cách giữa 2 đối tượng*/
+//        rvListChat.addItemDecoration(itemDecoration);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext()); /* Khởi tạo một LinearLayout và gán vào RecycleView */
         rvListChat.setLayoutManager(layoutManager);
     }

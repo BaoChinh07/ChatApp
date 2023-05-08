@@ -16,7 +16,6 @@
         android:id="@+id/rvMessage"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="5dp"
         android:layout_weight="1"
         android:background="@drawable/background_chat"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
@@ -27,37 +26,65 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="43dp"
+        android:background="@color/white"
         android:layout_gravity="bottom"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:weightSum="1"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
             android:id="@+id/imageViewSendImage"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:layout_marginHorizontal="5dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="5dp"
             android:src="@drawable/icon_image"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/action_sendImage" />
+        <ImageView
+            android:id="@+id/imageViewSendVoice"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginHorizontal="5dp"
+            android:src="@drawable/icon_voice"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/action_sendVoice" />
+        <ImageView
+            android:id="@+id/imageViewSendEnmoji"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginHorizontal="5dp"
+            android:src="@drawable/icon_enmoji"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/action_sendEnmoji" />
 
         <EditText
             android:id="@+id/edtInputMessage"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:layout_marginHorizontal="5dp"
+            android:background="@drawable/frame_enter_mesage"
             android:layout_weight="1"
-            android:hint="Nhập tin nhắn" />
+            android:textSize="15sp"
+            android:hint="@string/action_enterMessage"
+            android:textColorHint="@color/light_grey"
+            tools:ignore="Autofill"
+            android:inputType="textLongMessage" />
 
         <ImageView
             android:id="@+id/imageViewSendMessage"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center_horizontal|center_vertical|end"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_marginHorizontal="5dp"
-            android:src="@drawable/icon_send" />
+            android:src="@drawable/icon_send"
+            android:contentDescription="@string/action_sendMessage" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
