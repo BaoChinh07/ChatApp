@@ -1,40 +1,41 @@
 package com.example.chatapp.Models;
 
 public class Message {
-    private String sms, status, userID, datetime;
+    private String message, senderID, receiverID, datetime, type;
 
     public Message() {
     }
 
-    public Message(String sms, String status, String userID, String datetime) {
-        this.sms = sms;
-        this.status = status;
-        this.userID = userID;
+    public Message(String message, String senderID, String receiverID, String datetime, String type) {
+        this.message = message;
+        this.senderID = senderID;
+        this.receiverID = receiverID;
         this.datetime = datetime;
+        this.type = type;
     }
 
-    public String getSms() {
-        return sms;
+    public String getMessage() {
+        return message;
     }
 
-    public void setSms(String sms) {
-        this.sms = sms;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public String getStatus() {
-        return status;
+    public String getSenderID() {
+        return senderID;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setSenderID(String senderID) {
+        this.senderID = senderID;
     }
 
-    public String getUserID() {
-        return userID;
+    public String getReceiverID() {
+        return receiverID;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public void setReceiverID(String receiverID) {
+        this.receiverID = receiverID;
     }
 
     public String getDatetime() {
@@ -43,5 +44,13 @@ public class Message {
 
     public void setDatetime(String datetime) {
         this.datetime = datetime;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

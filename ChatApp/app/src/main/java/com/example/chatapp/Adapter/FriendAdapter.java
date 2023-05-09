@@ -13,9 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatapp.Models.Friends;
-import com.example.chatapp.Models.Users;
 import com.example.chatapp.R;
-import com.example.chatapp.View.ChatActivity;
 import com.example.chatapp.View.ViewSingleFriendActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;

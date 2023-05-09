@@ -1,6 +1,7 @@
 package com.example.chatapp.Adapter;
 
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,7 +13,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MessageAdapter extends RecyclerView.ViewHolder {
     public CircleImageView civAvatarUserOne;
-    public TextView tvSmsUserOne, tvTimeMessageUserOne, tvSmsUserTwo, tvTimeMessageUserTwo;
+    public TextView tvSmsUserOne, tvTimeMessageUserOne, tvSmsUserTwo, tvTimeMessageUserTwo, tvTimeImageUserOne, tvTimeImageUserTwo;
+    public ImageView ivImageLeft, ivImageRight;
     public MessageAdapter(@NonNull View itemView) {
         super(itemView);
         civAvatarUserOne =  itemView.findViewById(R.id.civAvatarUserOne);
@@ -20,5 +22,9 @@ public class MessageAdapter extends RecyclerView.ViewHolder {
         tvTimeMessageUserOne =  itemView.findViewById(R.id.tvTimeMessageUserOne);
         tvSmsUserTwo =  itemView.findViewById(R.id.tvSmsUserTwo);
         tvTimeMessageUserTwo =  itemView.findViewById(R.id.tvTimeMessageUserTwo);
+        ivImageLeft =  itemView.findViewById(R.id.ivImageLeft);
+        ivImageRight =  itemView.findViewById(R.id.ivImageRight);
+        tvTimeImageUserOne =  itemView.findViewById(R.id.tvTimeImageUserOne);
+        tvTimeImageUserTwo =  itemView.findViewById(R.id.tvTimeImageUserTwo);
     }
 }

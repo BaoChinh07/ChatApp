@@ -1,6 +1,9 @@
 package com.example.chatapp.View;
 
+import static com.example.chatapp.MainActivity.MY_REQUEST_CODE;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -10,10 +13,12 @@ import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +42,7 @@ import com.example.chatapp.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,11 +54,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.normal.TedPermission;
 import com.squareup.picasso.Picasso;
 
-import java.text.ParseException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -71,7 +79,7 @@ public class ChatActivity extends AppCompatActivity {
     ImageView imageViewSendImage, imageViewSendMessage;
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
-    String userID, avatarURL, userName, dateTime, statusActivity, dateTimeStamp, time;
+    String userID, avatarURL, userName, dateTime, statusActivity, time;
     String lastMessage, myAvatar, myName, myUserEmail;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
@@ -80,6 +88,7 @@ public class ChatActivity extends AppCompatActivity {
     FirebaseStorage storage;
     Date currentTime;
     long timestamp;
+    Uri image_uri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +139,13 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        imageViewSendImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openGallery();
+            }
+        });
+
         imageViewSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -154,18 +170,10 @@ public class ChatActivity extends AppCompatActivity {
     private void getCurrentTime() {
         currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy, hh:mm a");
-        SimpleDateFormat simpleDateFormatTimestamp = new SimpleDateFormat("dd/MM/yyyy, hh:mm:ss a");
         SimpleDateFormat simpleTime = new SimpleDateFormat("HH:mm");
         dateTime = simpleDateFormat.format(currentTime);
-        dateTimeStamp = simpleDateFormatTimestamp.format(currentTime);
         time = simpleTime.format(currentTime);
-        Date date = null;
-        try {
-            date = simpleDateFormatTimestamp.parse(dateTimeStamp);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        timestamp = date.getTime();
+        timestamp = System.currentTimeMillis();
     }
 
     private void loadInformationUserChat(String userID) {
@@ -210,6 +218,7 @@ public class ChatActivity extends AppCompatActivity {
                     myAvatar = users.getProfilePic();
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
@@ -221,25 +230,55 @@ public class ChatActivity extends AppCompatActivity {
         messageAdapter = new FirebaseRecyclerAdapter<Message, MessageAdapter>(optionsMessage) {
             @Override
             protected void onBindViewHolder(@NonNull MessageAdapter holder, int position, @NonNull Message model) {
-                if (model.getUserID().equals(mUser.getUid())) {
+                if (model.getSenderID().equals(mUser.getUid()) && model.getType().equals("text")) {
                     holder.tvSmsUserOne.setVisibility(View.GONE);
                     holder.civAvatarUserOne.setVisibility(View.GONE);
                     holder.tvTimeMessageUserOne.setVisibility(View.GONE);
                     holder.tvSmsUserTwo.setVisibility(View.VISIBLE);
                     holder.tvTimeMessageUserTwo.setVisibility(View.VISIBLE);
-                    holder.tvSmsUserTwo.setText(model.getSms());
+                    holder.tvSmsUserTwo.setText(model.getMessage());
                     holder.tvTimeMessageUserTwo.setText(model.getDatetime());
-
-                } else {
+                    holder.ivImageLeft.setVisibility(View.GONE);
+                    holder.ivImageRight.setVisibility(View.GONE);
+                    holder.tvTimeImageUserOne.setVisibility(View.GONE);
+                    holder.tvTimeImageUserTwo.setVisibility(View.GONE);
+                } else if(model.getSenderID().equals(mUser.getUid()) && model.getType().equals("image")) {
+                    holder.tvSmsUserOne.setVisibility(View.GONE);
+                    holder.civAvatarUserOne.setVisibility(View.GONE);
+                    holder.tvTimeMessageUserOne.setVisibility(View.GONE);
+                    holder.tvSmsUserTwo.setVisibility(View.GONE);
+                    holder.tvTimeMessageUserTwo.setVisibility(View.GONE);
+                    holder.ivImageLeft.setVisibility(View.GONE);
+                    holder.ivImageRight.setVisibility(View.VISIBLE);
+                    holder.tvTimeImageUserOne.setVisibility(View.GONE);
+                    holder.tvTimeImageUserTwo.setText(model.getDatetime());
+                    Picasso.get().load(model.getMessage()).placeholder(R.drawable.ic_image_black).into(holder.ivImageRight);
+                } else if (model.getSenderID().equals(userID) && model.getType().equals("text")) {
                     holder.tvSmsUserOne.setVisibility(View.VISIBLE);
+//                    holder.civAvatarUserOne.setVisibility(View.VISIBLE);
+                    holder.tvTimeMessageUserOne.setVisibility(View.VISIBLE);
+                    holder.tvSmsUserTwo.setVisibility(View.GONE);
+                    holder.tvTimeMessageUserTwo.setVisibility(View.GONE);
+                    holder.tvSmsUserOne.setText(model.getMessage());
+                    holder.tvTimeMessageUserOne.setText(model.getDatetime());
+                    holder.ivImageLeft.setVisibility(View.GONE);
+                    holder.ivImageRight.setVisibility(View.GONE);
+                    holder.tvTimeImageUserOne.setVisibility(View.GONE);
+                    holder.tvTimeImageUserTwo.setVisibility(View.GONE);
+                    Picasso.get().load(avatarURL).placeholder(R.drawable.default_avatar).into(holder.civAvatarUserOne);
+                } else if (model.getSenderID().equals(userID) && model.getType().equals("image")) {
+                    holder.tvSmsUserOne.setVisibility(View.GONE);
                     holder.civAvatarUserOne.setVisibility(View.VISIBLE);
                     holder.tvTimeMessageUserOne.setVisibility(View.VISIBLE);
                     holder.tvSmsUserTwo.setVisibility(View.GONE);
                     holder.tvTimeMessageUserTwo.setVisibility(View.GONE);
-                    holder.tvSmsUserOne.setText(model.getSms());
-                    holder.tvTimeMessageUserOne.setText(model.getDatetime());
+                    holder.tvTimeMessageUserOne.setVisibility(View.GONE);
+                    holder.ivImageLeft.setVisibility(View.VISIBLE);
+                    holder.ivImageRight.setVisibility(View.GONE);
+                    holder.tvTimeImageUserOne.setText(model.getDatetime());
+                    holder.tvTimeImageUserTwo.setVisibility(View.GONE);
+                    Picasso.get().load(model.getMessage()).placeholder(R.drawable.ic_image_black).into(holder.ivImageLeft);
                     Picasso.get().load(avatarURL).placeholder(R.drawable.default_avatar).into(holder.civAvatarUserOne);
-
                 }
             }
 
@@ -276,6 +315,85 @@ public class ChatActivity extends AppCompatActivity {
         });
 
     }
+    private void openGallery() {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent, MY_REQUEST_CODE);
+    }
+    //Xử lý kết quả trả về từ hành động startActivityForResult
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MY_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            if (data.getData() != null) {
+                 image_uri = data.getData();
+                try {
+                    sendImageMessage(image_uri);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        }
+    }
+
+    private void sendImageMessage(Uri image_uri) throws IOException {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Đang gửi");
+        progressDialog.show();
+        String fileName = "post_"+timestamp;
+
+        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),image_uri);
+        ByteArrayOutputStream bitmapOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100,bitmapOutputStream);
+        byte[] data = bitmapOutputStream.toByteArray();
+        StorageReference myStorageReference = FirebaseStorage.getInstance().getReference().child("ChatImages").child(mUser.getUid()).child(userID).child(fileName);
+        StorageReference userStorageReference = FirebaseStorage.getInstance().getReference().child("ChatImages").child(userID).child(mUser.getUid()).child(fileName);
+        myStorageReference.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                userStorageReference.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        //imageUpload
+                        progressDialog.dismiss();
+                        //getUrl of upload image
+                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                        while (!uriTask.isSuccessful());
+                        String downloadUri = uriTask.getResult().toString();
+
+                        if (uriTask.isSuccessful()) {
+
+                            HashMap<String,Object> hashMap = new HashMap<>();
+                            hashMap.put("message", downloadUri);
+                            hashMap.put("senderID", mUser.getUid());
+                            hashMap.put("receiverID", userID);
+                            hashMap.put("datetime", dateTime);
+                            hashMap.put("timestamp", timestamp);
+                            hashMap.put("type", "image");
+                            mSmsReference.child(mUser.getUid()).child(userID).push().updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        mSmsReference.child(userID).child(mUser.getUid()).push().updateChildren(hashMap);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        //Failure
+                        progressDialog.dismiss();
+                    }
+                });
+    }
 
     private void SendSMS() {
         String sms = edtInputMessage.getText().toString().trim();
@@ -283,12 +401,13 @@ public class ChatActivity extends AppCompatActivity {
         if (sms.isEmpty()) {
             Toast.makeText(this, "Tin nhắn không được để trống", Toast.LENGTH_SHORT).show();
         } else {
-            HashMap hashMap = new HashMap();
-            hashMap.put("sms", sms);
-            hashMap.put("status", "Đã gửi");
-            hashMap.put("userID", mUser.getUid());
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("message", sms);
+            hashMap.put("senderID", mUser.getUid());
+            hashMap.put("receiverID", userID);
             hashMap.put("datetime", dateTime);
             hashMap.put("timestamp", timestamp);
+            hashMap.put("type", "text");
             mSmsReference.child(userID).child(mUser.getUid()).push().updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
@@ -316,10 +435,14 @@ public class ChatActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.hasChildren()) {
                     for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                        lastMessage = snapshot1.child("sms").getValue().toString();
+                            if (snapshot1.child("type").getValue(String.class).equals("text")) {
+                                lastMessage = snapshot1.child("message").getValue().toString();
+                            } else {
+                                lastMessage = "Đã gửi một ảnh";
+                            }
                     }
                 }
-                HashMap hashMap = new HashMap();
+                HashMap<String,Object> hashMap = new HashMap<>();
                 hashMap.put("profilePic", avatarURL);
                 hashMap.put("userName", userName);
                 hashMap.put("lastMessage", lastMessage);
@@ -330,7 +453,7 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
-                            HashMap mHashMap = new HashMap();
+                            HashMap<String,Object> mHashMap = new HashMap();
                             mHashMap.put("profilePic", myAvatar);
                             mHashMap.put("userName", myName);
                             mHashMap.put("lastMessage", lastMessage);
