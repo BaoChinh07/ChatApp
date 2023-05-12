@@ -16,11 +16,14 @@
     <string name="action_enterMessage">Nhập tin nhắn …</string>
     <string name="action_sendVoice">Gửi âm thanh</string>
     <string name="action_sendImage">Gửi hình ảnh</string>
+    <string name="action_sendedImage">\u0020đã gửi một ảnh.</string>
     <string name="action_sendEnmoji">Gửi biểu cảm</string>
     <string name="action_sendMessage">Gửi tin nhắn</string>
 
     <!--    String TextView-->
     <string name="text_email">Email</string>
+    <string name="text_man">Nam</string>
+    <string name="text_woman">Nữ</string>
     <string name="text_password">Mật khẩu</string>
     <string name="text_describe">Mô tả bản thân</string>
     <string name="text_username">Tên người dùng</string>
@@ -52,6 +55,7 @@
     <!--    String Button-->
     <string name="menu_voice_call">Gọi thoại</string>
     <string name="menu_video_call">Gọi hình</string>
+    <string name="menu_deleteOnlyCall">Xóa cuộc gọi khỏi nhật ký</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

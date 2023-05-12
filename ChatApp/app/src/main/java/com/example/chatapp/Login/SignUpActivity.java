@@ -5,30 +5,41 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.chatapp.Models.Users;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class    SignUpActivity extends AppCompatActivity {
     Button btnSignUp;
+    RadioButton signUpRadMan, signUpRadWoman;
     EditText edtUserName, edtPassword, edtEmail, edtConfirmPassword;
     TextView tvClickToSignIn;
     ProgressDialog dialog;
      FirebaseAuth mAuth;
     DatabaseReference mUserReference;
+    FirebaseStorage storage;
+    StorageReference mStorageReference;
+    String profilePic, describe="", statusActivity = "Offline", gender;
+    String userID, userName, email, password;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +50,8 @@ public class    SignUpActivity extends AppCompatActivity {
     }
     public void setControl(){
         btnSignUp = findViewById(R.id.btnSignUp);
+        signUpRadMan = findViewById(R.id.signUpRadMan);
+        signUpRadWoman = findViewById(R.id.signUpRadWoman);
         tvClickToSignIn = findViewById(R.id.tvClickToSignIn);
         mAuth = FirebaseAuth.getInstance();
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -46,6 +59,8 @@ public class    SignUpActivity extends AppCompatActivity {
         edtEmail = findViewById(R.id.edtEmail);
         edtPassword = findViewById(R.id.edtPassword);
         edtConfirmPassword = findViewById(R.id.edtConfirmPassword);
+        storage = FirebaseStorage.getInstance();
+        mStorageReference = storage.getReference().child("profilePic/default_avatar.png");
 
         dialog = new ProgressDialog(SignUpActivity.this);
         dialog.setTitle("Đang tạo tài khoản");
@@ -59,6 +74,8 @@ public class    SignUpActivity extends AppCompatActivity {
                     Toast.makeText(SignUpActivity.this, "Vui lòng nhập Tên người dùng", Toast.LENGTH_SHORT).show();
                 } else if (edtEmail.getText().toString().isEmpty()) {
                     Toast.makeText(SignUpActivity.this, "Vui lòng nhập Email", Toast.LENGTH_SHORT).show();
+                } else if (!signUpRadMan.isChecked() && !signUpRadWoman.isChecked()) {
+                    Toast.makeText(SignUpActivity.this, "Vui lòng chọn Giới tính của bạn", Toast.LENGTH_SHORT).show();
                 } else if (edtPassword.getText().toString().isEmpty()) {
                     Toast.makeText(SignUpActivity.this, "Vui lòng nhập Mật khẩu", Toast.LENGTH_SHORT).show();
                 } else if (edtConfirmPassword.getText().toString().isEmpty()) {
@@ -84,9 +101,22 @@ public class    SignUpActivity extends AppCompatActivity {
                                                         public void onComplete(@NonNull Task<AuthResult> task) {
                                                             dialog.dismiss();
                                                             if (task.isSuccessful()) {
-                                                                String userID = task.getResult().getUser().getUid();
-                                                                Users users = new Users(edtUserName.getText().toString().trim(), edtEmail.getText().toString().trim(), edtPassword.getText().toString().trim(), userID, "Offline");
-                                                                mUserReference.child(userID).setValue(users);
+                                                                userID = task.getResult().getUser().getUid();
+                                                                userName = edtUserName.getText().toString().trim();
+                                                                email = edtEmail.getText().toString().trim();
+                                                                password = edtPassword.getText().toString().trim();
+
+                                                                mStorageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                                    @Override
+                                                                    public void onSuccess(Uri uri) {
+                                                                        profilePic = uri.toString();
+                                                                        if (signUpRadMan.isChecked())
+                                                                            gender = signUpRadMan.getText().toString();
+                                                                        else gender = signUpRadWoman.getText().toString();
+                                                                        User user = new User(profilePic,userName,email,password,userID,describe,gender, statusActivity);
+                                                                        mUserReference.child(userID).setValue(user);
+                                                                    }
+                                                                });
                                                                 Toast.makeText(SignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
                                                                 Intent intent = new Intent(SignUpActivity.this, SignInActivity.class);
                                                                 startActivity(intent);

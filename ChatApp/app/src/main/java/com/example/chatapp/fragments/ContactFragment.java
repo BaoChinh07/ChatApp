@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.chatapp.Adapter.ContactAdapter;
-import com.example.chatapp.Models.Users;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,8 +36,8 @@ public class ContactFragment extends Fragment {
     ContactAdapter contactAdapter;
     RecyclerView rvListContact;
     SearchView action_search;
-    ArrayList<Users> listContact = new ArrayList<>();
-    List<Users> tempUsers = new ArrayList<>();
+    ArrayList<User> listContact = new ArrayList<>();
+    List<User> tempUsers = new ArrayList<>();
     DatabaseReference mFriendReference, mUserReference;
 
     @Override
@@ -92,9 +92,9 @@ public class ContactFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 tempUsers.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Users users = dataSnapshot.getValue(Users.class);
-                    if (mUser != null && users != null && !mUser.getEmail().equals(users.getEmail())) {
-                        tempUsers.add(users);
+                    User user = dataSnapshot.getValue(User.class);
+                    if (mUser != null && user != null && !mUser.getEmail().equals(user.getEmail())) {
+                        tempUsers.add(user);
                     }
                 }
                 mFriendReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
@@ -106,10 +106,10 @@ public class ContactFragment extends Fragment {
                                 String friendID = dataSnapshot.getKey();
 
                                 for (int i = 0; i < tempUsers.size(); i++) {
-                                    Users users = tempUsers.get(i);
+                                    User user = tempUsers.get(i);
 
-                                    if (users.getUserID().equals(friendID)) {
-                                        tempUsers.remove(users);
+                                    if (user.getUserID().equals(friendID)) {
+                                        tempUsers.remove(user);
                                         break;
                                     }
                                 }

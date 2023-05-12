@@ -25,8 +25,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapp.Login.SignInActivity;
-import com.example.chatapp.Models.Users;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
+import com.example.chatapp.Utilities.Utilities;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -55,7 +56,8 @@ public class MyProfile extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     DatabaseReference mUserReference;
-    StorageReference mStorageReference;
+    FirebaseStorage storage;
+    StorageReference mStorageReference, mDefaultAvatarReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +81,9 @@ public class MyProfile extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        storage = FirebaseStorage.getInstance();
         mStorageReference = FirebaseStorage.getInstance().getReference();
+        mDefaultAvatarReference = storage.getReference().child("profilePic/default_avatar.png");
     }
 
     private void setEvent() {
@@ -126,13 +130,13 @@ public class MyProfile extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Users users = snapshot.getValue(Users.class);
-                    if (users != null) {
-                        Picasso.get().load(users.getProfilePic()).placeholder(R.drawable.default_avatar).into(civAvatar);
-                        tvDescribe.setText(users.getDescribe());
-                        tvUserName.setText(users.getUserName());
-                        tvEmail.setText(users.getEmail());
-                        tvGender.setText(users.getGender());
+                    User user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        Picasso.get().load(user.getProfilePic()).placeholder(R.drawable.default_avatar).into(civAvatar);
+                        tvDescribe.setText(user.getDescribe());
+                        tvUserName.setText(user.getUserName());
+                        tvEmail.setText(user.getEmail());
+                        tvGender.setText(user.getGender());
                     }
                 }
             }
@@ -157,9 +161,11 @@ public class MyProfile extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == MY_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             if (data.getData() != null) {
+                long timestamp = System.currentTimeMillis();
+                String fileName = "avatar_" + timestamp;
                 Uri uri = data.getData();
                 civAvatar.setImageURI(uri);
-                final StorageReference reference = mStorageReference.child("profilePic").child(mUser.getUid());
+                final StorageReference reference = mStorageReference.child("profilePic").child(mUser.getUid()).child(fileName);
                 reference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -179,7 +185,7 @@ public class MyProfile extends AppCompatActivity {
 
         final Dialog dialog = new Dialog(MyProfile.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.update_profile_dialog);
+        dialog.setContentView(R.layout.dialog_update_profile);
         Window window = (Window) dialog.getWindow();
         if (window == null) {
             return;
@@ -227,7 +233,7 @@ public class MyProfile extends AppCompatActivity {
                     } else {
                         String userName = edtUpdateUserName.getText().toString().trim();
                         String describe = edtDescribe.getText().toString().trim();
-                        String gender = "";
+                        String gender;
                         if (radMan.isChecked()) {
                             gender = radMan.getText().toString().trim();
                         } else

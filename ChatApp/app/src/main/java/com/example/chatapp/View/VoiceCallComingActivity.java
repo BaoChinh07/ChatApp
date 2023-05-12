@@ -3,16 +3,16 @@ package com.example.chatapp.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.chatapp.Models.HistoryCallModel;
-import com.example.chatapp.Models.Users;
+import com.example.chatapp.Models.HistoryCall;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
+import com.example.chatapp.Utilities.Utilities;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,7 +38,7 @@ public class VoiceCallComingActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
-    DatabaseReference mUserReference, mVoiceCallReference;
+    DatabaseReference mUserReference, mVoiceCallReference, mHistoryCallReference;
 
     String senderID, receiverID, senderName, senderAvatar, type = "VoiceCall";
 
@@ -63,6 +63,7 @@ public class VoiceCallComingActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mVoiceCallReference = FirebaseDatabase.getInstance().getReference().child("VoiceCallComing");
+        mHistoryCallReference = FirebaseDatabase.getInstance().getReference().child("HistoryCall");
 
         senderID = getIntent().getStringExtra("senderID");
         receiverID = mUser.getUid();
@@ -76,30 +77,30 @@ public class VoiceCallComingActivity extends AppCompatActivity {
         fabAcceptVoiceCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String response = "yes";
+                String response = "yes", status = "ReceiveCall", callTime = Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
                 sendResponse(response);
-                HistoryCallModel historyCallModel =new HistoryCallModel(senderID, senderAvatar ,senderName,"ReceiveCall",type,receiverID);
-                historyCallModel.createHistoryCall();
+                HistoryCall historyCall = new HistoryCall(senderAvatar, senderID, senderName, status, type, callTime);
+                historyCall.updateHistoryCall(mHistoryCallReference, historyCall, receiverID);
             }
         });
 
         fabDeclineVoiceCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String response = "no";
+                String response = "no", status = "MissedCall", callTime = Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
                 sendResponse(response);
-                HistoryCallModel historyCallModel =new HistoryCallModel(senderID, senderAvatar,senderName,"MissedCall",type,receiverID);
-                historyCallModel.createHistoryCall();
+                HistoryCall historyCall = new HistoryCall(senderAvatar, senderID, senderName, status, type, callTime);
+                historyCall.updateHistoryCall(mHistoryCallReference, historyCall, receiverID);
             }
         });
     }
 
     private void sendResponse(String response) {
 
-        if (response.equals("yes")){
+        if (response.equals("yes")) {
             HashMap hashMap = new HashMap();
-            hashMap.put("key",senderName+receiverID);
-            hashMap.put("response","yes");
+            hashMap.put("key", senderName + receiverID);
+            hashMap.put("response", "yes");
             mVoiceCallReference.child(senderID).child(receiverID).child("response").updateChildren(hashMap);
             joinMeeting();
             Handler handler = new Handler();
@@ -108,11 +109,11 @@ public class VoiceCallComingActivity extends AppCompatActivity {
                 public void run() {
                     mVoiceCallReference.child(senderID).child(receiverID).removeValue();
                 }
-            },3000);
-        } else if (response.equals("no")){
+            }, 3000);
+        } else if (response.equals("no")) {
             HashMap hashMap = new HashMap();
-            hashMap.put("key",senderName+receiverID);
-            hashMap.put("response","no");
+            hashMap.put("key", senderName + receiverID);
+            hashMap.put("response", "no");
             mVoiceCallReference.child(senderID).child(receiverID).child("response").updateChildren(hashMap);
             Toast.makeText(this, "Từ chối cuộc gọi", Toast.LENGTH_SHORT).show();
             finish();
@@ -122,7 +123,7 @@ public class VoiceCallComingActivity extends AppCompatActivity {
                 public void run() {
                     mVoiceCallReference.child(senderID).child(receiverID).removeValue();
                 }
-            },1000);
+            }, 1000);
         }
     }
 
@@ -130,7 +131,7 @@ public class VoiceCallComingActivity extends AppCompatActivity {
         try {
             JitsiMeetConferenceOptions options = new JitsiMeetConferenceOptions.Builder()
                     .setServerURL(new URL("https://meet.jit.si"))
-                    .setRoom(senderName+receiverID)
+                    .setRoom(senderName + receiverID)
                     .setFeatureFlag("welcomepage.enabled", false)
                     .setFeatureFlag("prejoinpage.enabled", false)
                     .setVideoMuted(true)
@@ -147,12 +148,14 @@ public class VoiceCallComingActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Users users = snapshot.getValue(Users.class);
-                    senderName = users.getUserName().trim();
-                    senderAvatar =users.getProfilePic();
-                    Picasso.get().load(senderAvatar).placeholder(R.drawable.default_avatar).into(cirAvatarVoiceCalComing);
-                    tvNameVoiceCalComing.setText(senderName);
-                    tvEmailVoiceCallComing.setText(users.getEmail());
+                    User user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        senderName = user.getUserName().trim();
+                        senderAvatar = user.getProfilePic();
+                        Picasso.get().load(senderAvatar).placeholder(R.drawable.default_avatar).into(cirAvatarVoiceCalComing);
+                        tvNameVoiceCalComing.setText(senderName);
+                        tvEmailVoiceCallComing.setText(user.getEmail());
+                    }
                 }
             }
 

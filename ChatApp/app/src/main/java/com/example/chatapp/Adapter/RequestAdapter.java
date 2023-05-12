@@ -5,14 +5,26 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chatapp.Models.Requests;
+import com.example.chatapp.Models.Friend;
+import com.example.chatapp.Models.Request;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
 import com.example.chatapp.View.ViewItemContactActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -20,9 +32,35 @@ import java.util.ArrayList;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
+    String profilePicURL, userName, email, describe, gender, userId;
     Context context;
-    ArrayList<Requests> requestsList;
-    public RequestAdapter(Context context, ArrayList<Requests> requestsList) {
+    ArrayList<Request> requestsList;
+
+    private Object setValueFriend(String userID) {
+        DatabaseReference mUser = FirebaseDatabase.getInstance().getReference().child("Users");
+        mUser.child(userID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    User user = snapshot.getValue(User.class);
+                    profilePicURL = user.getProfilePic();
+                    userName = user.getUserName();
+                    email = user.getEmail();
+                    describe = user.getDescribe();
+                    gender = user.getGender();
+                    userId = userID;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        return new Friend(profilePicURL, userName, email, describe, gender, userID);
+    }
+
+    public RequestAdapter(Context context, ArrayList<Request> requestsList) {
         this.context = context;
         this.requestsList = requestsList;
     }
@@ -30,24 +68,68 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     @NonNull
     @Override
     public RequestViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View mView = LayoutInflater.from(context).inflate(R.layout.item_notification,parent,false);
+        View mView = LayoutInflater.from(context).inflate(R.layout.item_notification, parent, false);
         return new RequestViewHolder(mView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RequestViewHolder holder, int position) {
-        Requests requests = requestsList.get(position);
+        String myId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");
+        DatabaseReference mFriendsReference = FirebaseDatabase.getInstance().getReference().child("Friends");
+        Request requests = requestsList.get(position);
         if (requests == null) {
             return;
         } else {
             holder.tvItemRequest.setText(requests.getUserName());
             Picasso.get().load(requests.getProfilePic()).placeholder(R.drawable.default_avatar).into(holder.civAvatarItemRequest);
+
+            // Ấn nút đồng ý kết bạn
+            holder.btnConfirmRequest.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mRequestReference.child(myId).child(requests.getUserID()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            mRequestReference.child(requests.getUserID()).removeValue();
+                        }
+                    });
+                    mFriendsReference.child(myId).child(requests.getUserID()).setValue(setValueFriend(requests.getUserID())).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                mFriendsReference.child(requests.getUserID()).child(myId).setValue(setValueFriend(myId)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if ((task.isSuccessful())) {
+                                            Toast.makeText(view.getContext(), "Các bạn đã trở thành bạn bè", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+
+            //Ấn nút hủy
+            holder.btnRefuseRequest.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mRequestReference.child(myId).child(requests.getUserID()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            mRequestReference.child(requests.getUserID()).removeValue();
+                        }
+                    });
+                }
+            });
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     String userID = requestsList.get(holder.getAdapterPosition()).getUserID();
                     Intent intent = new Intent(holder.itemView.getContext(), ViewItemContactActivity.class);
-                    intent.putExtra("userID",userID);
+                    intent.putExtra("userID", userID);
                     context.startActivity(intent);
                 }
             });
@@ -62,10 +144,14 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     public static class RequestViewHolder extends RecyclerView.ViewHolder {
         CircleImageView civAvatarItemRequest;
         TextView tvItemRequest;
+        Button btnConfirmRequest, btnRefuseRequest;
+
         public RequestViewHolder(@NonNull View itemView) {
             super(itemView);
-            civAvatarItemRequest = (CircleImageView) itemView.findViewById(R.id.civAvatarItemRequest);
-            tvItemRequest = (TextView) itemView.findViewById(R.id.tvItemRequest);
+            civAvatarItemRequest = itemView.findViewById(R.id.civAvatarItemRequest);
+            tvItemRequest = itemView.findViewById(R.id.tvItemRequest);
+            btnConfirmRequest = itemView.findViewById(R.id.btnConfirmRequest);
+            btnRefuseRequest = itemView.findViewById(R.id.btnRefuseRequest);
         }
     }
 }

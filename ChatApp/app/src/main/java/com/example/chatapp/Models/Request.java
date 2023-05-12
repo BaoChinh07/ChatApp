@@ -1,12 +1,12 @@
 package com.example.chatapp.Models;
 
-public class Requests {
+public class Request {
     String userName, profilePic, userID, status;
 
-    public Requests() {
+    public Request() {
     }
 
-    public Requests(String userName, String profilePic, String userID, String status) {
+    public Request(String userName, String profilePic, String userID, String status) {
         this.userName = userName;
         this.profilePic = profilePic;
         this.userID = userID;

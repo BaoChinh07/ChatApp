@@ -11,9 +11,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapp.Firebase.FcmNotificationsSender;
-import com.example.chatapp.Models.HistoryCallModel;
-import com.example.chatapp.Models.Users;
+import com.example.chatapp.Models.HistoryCall;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
+import com.example.chatapp.Utilities.Utilities;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,9 +29,6 @@ import org.jitsi.meet.sdk.JitsiMeetActivity;
 import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -91,9 +89,9 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Users users = snapshot.getValue(Users.class);
-                    senderAvatar = users.getProfilePic().trim();
-                    senderName = users.getUserName();
+                    User user = snapshot.getValue(User.class);
+                    senderAvatar = user.getProfilePic().trim();
+                    senderName = user.getUserName();
                 }
             }
 
@@ -105,14 +103,14 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
     }
 
     private void cancelVideoCall() {
+        String status = "MissedCall",callTime =  Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
         HashMap hashMap = new HashMap();
         hashMap.put("key", receiverID);
         hashMap.put("response", "no");
         mVideoCallReference.child(senderID).child(receiverID).child("response").updateChildren(hashMap);
         Toast.makeText(this, "Kết thúc cuộc gọi", Toast.LENGTH_SHORT).show();
-        String status = "MissedCall";
-        HistoryCallModel historyCallModel = new HistoryCallModel(senderID,senderAvatar,senderName,status,type, receiverID);
-        historyCallModel.createHistoryCall();
+        HistoryCall historyCall = new HistoryCall(senderAvatar,senderID,senderName,status,type,callTime);
+        historyCall.updateHistoryCall(mHistoryCallReference,historyCall,receiverID);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -128,10 +126,10 @@ public class VideoCallOutgoingActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Users users = snapshot.getValue(Users.class);
-                    Picasso.get().load(users.getProfilePic()).placeholder(R.drawable.default_avatar).into(cirAvatarVideoCalOutGoing);
-                    tvNameVideoCallOutGoing.setText(users.getUserName());
-                    tvEmailVideoCallOutGoing.setText(users.getEmail());
+                    User user = snapshot.getValue(User.class);
+                    Picasso.get().load(user.getProfilePic()).placeholder(R.drawable.default_avatar).into(cirAvatarVideoCalOutGoing);
+                    tvNameVideoCallOutGoing.setText(user.getUserName());
+                    tvEmailVideoCallOutGoing.setText(user.getEmail());
                 } else {
                     Toast.makeText(VideoCallOutgoingActivity.this, "Không tìm thấy dữ liệu", Toast.LENGTH_SHORT).show();
                 }

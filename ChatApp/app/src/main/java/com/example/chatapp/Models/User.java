@@ -1,13 +1,13 @@
 package com.example.chatapp.Models;
 
-public class Users {
+public class User {
     String profilePic, userName, email, password, userID,  describe , gender, statusActivity;
 
-    public Users() {
+    public User() {
 
     }
 
-    public Users(String profilePic, String userName, String email, String password, String userID, String describe, String gender, String statusActivity) {
+    public User(String profilePic, String userName, String email, String password, String userID, String describe, String gender, String statusActivity) {
         this.profilePic = profilePic;
         this.userName = userName;
         this.email = email;
@@ -16,14 +16,6 @@ public class Users {
         this.describe = describe;
         this.gender = gender;
         this.statusActivity = statusActivity;
-    }
-
-    public Users(String userName, String email, String password, String userID, String statusActivity) {
-        this.userName = userName;
-        this.email = email;
-        this.password = password;
-        this.userID = userID;
-        this.statusActivity=statusActivity;
     }
 
     public String getStatusActivity() {

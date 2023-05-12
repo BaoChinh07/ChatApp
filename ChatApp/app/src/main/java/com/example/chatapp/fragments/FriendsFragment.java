@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.chatapp.Adapter.FriendAdapter;
-import com.example.chatapp.Models.Friends;
+import com.example.chatapp.Models.Friend;
 import com.example.chatapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,7 +30,7 @@ public class FriendsFragment extends Fragment {
     }
 
     FriendAdapter friendAdapter;
-    ArrayList<Friends> listFriends = new ArrayList<>();
+    ArrayList<Friend> listFriends = new ArrayList<>();
     SearchView action_searchFriend;
     RecyclerView rvListFriend;
     FirebaseAuth mAuth;
@@ -89,9 +89,9 @@ public class FriendsFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listFriends.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Friends friends = dataSnapshot.getValue(Friends.class);
-                    friends.setFriendID(dataSnapshot.getKey());
-                    listFriends.add(friends);
+                    Friend friend = dataSnapshot.getValue(Friend.class);
+                    friend.setFriendID(dataSnapshot.getKey());
+                    listFriends.add(friend);
                 }
                 friendAdapter.notifyDataSetChanged();
             }

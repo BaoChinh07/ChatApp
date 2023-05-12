@@ -18,8 +18,8 @@
             android:layout_gravity="center">
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/civAvatarItemFriend"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
                 android:src="@drawable/default_avatar" />
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/civItemFriendOnline"
@@ -29,6 +29,7 @@
                 android:layout_alignEnd="@id/civAvatarItemFriend"
                 android:layout_alignBottom="@id/civAvatarItemFriend"
                 android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 />
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/civItemFriendOffline"
@@ -38,6 +39,7 @@
                 android:layout_alignEnd="@id/civAvatarItemFriend"
                 android:layout_alignBottom="@id/civAvatarItemFriend"
                 android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 />
         </RelativeLayout>
 
@@ -55,23 +57,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="bottom"
+                android:gravity="center_vertical"
                 android:text="@string/text_username"
                 android:textColor="@color/black"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvItemFriendDescribe"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="top"
+                android:gravity="center_vertical"
                 android:hint="@string/text_describe"
                 android:maxLines="1"
-                android:textColor="@color/grey"
-                android:textSize="12sp" />
+                android:textColor="@color/black"
+                android:textSize="13sp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

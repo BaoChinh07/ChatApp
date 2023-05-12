@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapp.MainActivity;
-import com.example.chatapp.Models.Users;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -242,13 +242,18 @@ public class SignInActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     if (!snapshot.exists()) {
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        Users users = new Users();
-                                        users.setUserID(mAuth.getUid());
-                                        users.setUserName(user.getDisplayName());
-                                        users.setEmail(user.getEmail());
-                                        users.setProfilePic(user.getPhotoUrl().toString());
-                                        firebaseDatabase.getReference().child("Users").child(mAuth.getUid()).setValue(users);
+                                        FirebaseUser mUser = mAuth.getCurrentUser();
+                                        User user = new User();
+                                        String profilePic = "", describe="", statusActivity = "Offline", gender ;
+                                        user.setUserID(mAuth.getUid());
+                                        user.setUserName(mUser.getDisplayName());
+                                        user.setEmail(mUser.getEmail());
+                                        user.setProfilePic(mUser.getPhotoUrl().toString());
+                                        user.setPassword("");
+                                        user.setDescribe("");
+                                        user.setGender("");
+                                        user.setStatusActivity("Online");
+                                        firebaseDatabase.getReference().child("Users").child(mAuth.getUid()).setValue(user);
                                     }
                                 }
 

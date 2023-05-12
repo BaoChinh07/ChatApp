@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import com.example.chatapp.Models.Chat;
 import com.example.chatapp.R;
 import com.example.chatapp.View.ChatActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,8 +34,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     Context context;
     ArrayList<Chat> listChats;
     ArrayList<Chat> listFilterChatts;
-    FirebaseAuth mAuth;
-    DatabaseReference mDatabaseReference;
+    FirebaseUser mUser;
+    DatabaseReference mDatabaseReference, mChatReference;
 
     public ChatAdapter(Context context, ArrayList<Chat> listChats) {
         this.context = context;
@@ -51,14 +53,49 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        mChatReference = FirebaseDatabase.getInstance().getReference().child("Chats");
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
         Chat chat = listChats.get(position);
         if (chat == null) {
             return;
         } else {
             Picasso.get().load(chat.getProfilePic()).placeholder(R.drawable.default_avatar).into(holder.civAvatarItemChat);
             holder.tvItemChatName.setText(chat.getUserName());
-            holder.tvLastMessage.setText(chat.getLastMessage());
             holder.tvTimeLastMessage.setText(chat.getDateTime());
+            mChatReference.child(mUser.getUid()).child(chat.getFriendID()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        Chat chat1 = snapshot.getValue(Chat.class);
+                        String empty = " ";
+                        if (chat1 != null) {
+                            if (chat1.getType().equals("text") && chat1.getSenderID().equals(mUser.getUid())) {
+                                holder.tvPersonSend.setVisibility(View.VISIBLE);
+                                holder.tvPersonSend.setText("Bạn: ");
+                                holder.tvLastMessage.setText(chat1.getMessage());
+                            } else if (chat1.getType().equals("image") && chat1.getSenderID().equals(mUser.getUid())) {
+                                holder.tvPersonSend.setVisibility(View.VISIBLE);
+                                holder.tvPersonSend.setText("Bạn");
+                                holder.tvLastMessage.setText(R.string.action_sendedImage);
+                            } else if (chat1.getType().equals("text") && chat1.getSenderID().equals(chat.getFriendID())) {
+                                holder.tvPersonSend.setVisibility(View.GONE);
+                                holder.tvLastMessage.setText(chat1.getMessage());
+                            } else if (chat1.getType().equals("image") && chat1.getSenderID().equals(chat.getFriendID())) {
+                                holder.tvPersonSend.setVisibility(View.VISIBLE);
+                                holder.tvPersonSend.setText(chat.getUserName());
+                                holder.tvLastMessage.setText(R.string.action_sendedImage);
+                            }
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
             mDatabaseReference.child(chat.getFriendID()).child("statusActivity").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -98,7 +135,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     public static class ChatViewHolder extends RecyclerView.ViewHolder {
         public CircleImageView civAvatarItemChat, civItemChatOnline, civItemChatOffline;
-        public TextView tvItemChatName, tvLastMessage, tvTimeLastMessage;
+        public TextView tvItemChatName, tvLastMessage, tvTimeLastMessage, tvPersonSend;
+
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
             civAvatarItemChat = itemView.findViewById(R.id.civAvatarItemChat);
@@ -107,8 +145,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             tvItemChatName = itemView.findViewById(R.id.tvItemChatName);
             tvLastMessage = itemView.findViewById(R.id.tvLastMessage);
             tvTimeLastMessage = itemView.findViewById(R.id.tvTimeLastMessage);
+            tvPersonSend = itemView.findViewById(R.id.tvPersonSend);
         }
     }
+
     @Override
     public Filter getFilter() {
         return new Filter() {
@@ -130,6 +170,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                 filterResults.values = listChats;
                 return filterResults;
             }
+
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 listChats = (ArrayList<Chat>) filterResults.values;
@@ -137,4 +178,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             }
         };
     }
+
+    public void updateData(ArrayList<Chat> listChats) {
+        listChats.clear();
+        listChats.addAll(listChats);
+        notifyDataSetChanged();
+    };
+// ...
 }

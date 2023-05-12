@@ -8,7 +8,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -18,9 +17,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.chatapp.Models.Friend;
 import com.example.chatapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -82,7 +81,6 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         mFriendReference = FirebaseDatabase.getInstance().getReference().child("Friends");
         mDataReference = FirebaseDatabase.getInstance().getReference().child("Users");
-
     }
 
     private void SetEvent() {
@@ -190,39 +188,12 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    userName = snapshot.child("userName").getValue().toString();
-                    email = snapshot.child("email").getValue().toString();
-
-                    //Thông tin ảnh đại diện
-                    if (snapshot.hasChild("profilePic")) {
-                        profilePicURL = snapshot.child("profilePic").getValue().toString();
-                    } else {
-                        mStorageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                profilePicURL = uri.toString();
-                            }
-                        });
-                    }
-                    //Thông tin mô tả
-                    if (snapshot.hasChild("describe")) {
-                        describe = snapshot.child("describe").getValue().toString();
-                    } else {
-                        describe = "";
-                    }
-                    //Thông tin giới tính
-                    if (snapshot.hasChild("gender")) {
-                        gender = snapshot.child("gender").getValue().toString();
-                    } else {
-                        gender = "";
-                    }
-
-                    Picasso.get().load(profilePicURL).placeholder(R.drawable.default_avatar).into(civAvatarSingleFriend);
-                    tvDescribeSingleFriend.setText(describe);
-                    tvUserNameSingleFriend.setText(userName);
-                    tvEmailSingleFriend.setText(email);
-                    tvGenderSingleFriend.setText(gender);
-
+                    Friend friend = snapshot.getValue(Friend.class);
+                    Picasso.get().load(friend.getProfilePic()).placeholder(R.drawable.default_avatar).into(civAvatarSingleFriend);
+                    tvDescribeSingleFriend.setText(friend.getDescribe());
+                    tvUserNameSingleFriend.setText(friend.getUserName());
+                    tvEmailSingleFriend.setText(friend.getEmail());
+                    tvGenderSingleFriend.setText(friend.getGender());
                 }
             }
 

@@ -3,16 +3,16 @@ package com.example.chatapp.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.chatapp.Models.HistoryCallModel;
-import com.example.chatapp.Models.Users;
+import com.example.chatapp.Models.HistoryCall;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
+import com.example.chatapp.Utilities.Utilities;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,9 +27,6 @@ import org.jitsi.meet.sdk.JitsiMeetActivity;
 import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
 
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -77,20 +74,20 @@ public class VideoCallComingActivity extends AppCompatActivity {
         fabAcceptVideoCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String response = "yes";
+                String response = "yes", callTime =  Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
                 sendResponse(response);
-                HistoryCallModel historyCallModel =new HistoryCallModel(senderID, senderAvatar,senderName,"ReceiveCall",type,receiveID);
-                historyCallModel.createHistoryCall();
+                HistoryCall historyCall = new HistoryCall(senderAvatar,senderID,senderName,"ReceiveCall",type,callTime);
+                historyCall.updateHistoryCall(mHistoryCallReference,historyCall,receiveID);;
             }
         });
 
         fabDeclineCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               String response = "no";
+               String response = "no", callTime =  Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
                sendResponse(response);
-                HistoryCallModel historyCallModel =new HistoryCallModel(senderID, senderAvatar,senderName,"MissedCall",type,receiveID);
-                historyCallModel.createHistoryCall();
+                HistoryCall historyCall = new HistoryCall(senderAvatar,senderID,senderName,"ReceiveCall",type,callTime);
+                historyCall.updateHistoryCall(mHistoryCallReference,historyCall,receiveID);;
             }
         });
     }
@@ -132,12 +129,12 @@ public class VideoCallComingActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Users users = snapshot.getValue(Users.class);
-                    senderName = users.getUserName();
-                    senderAvatar = users.getProfilePic();
+                    User user = snapshot.getValue(User.class);
+                    senderName = user.getUserName();
+                    senderAvatar = user.getProfilePic();
                     Picasso.get().load(senderAvatar).placeholder(R.drawable.default_avatar).into(cirAvatarVideoCalComing);
-                    tvNameVideoCalComing.setText(users.getUserName());
-                    tvEmailVideoCallComing.setText(users.getEmail());
+                    tvNameVideoCalComing.setText(user.getUserName());
+                    tvEmailVideoCallComing.setText(user.getEmail());
                 } else {
                     Toast.makeText(VideoCallComingActivity.this, "Không tìm thấy dữ liệu", Toast.LENGTH_SHORT).show();
                 }

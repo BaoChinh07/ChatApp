@@ -12,7 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chatapp.Models.Friends;
+import com.example.chatapp.Models.Friend;
 import com.example.chatapp.R;
 import com.example.chatapp.View.ViewSingleFriendActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,12 +29,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> implements Filterable {
     Context context;
-    ArrayList<Friends> listFriends;
-    ArrayList<Friends> listFilterContacts;
+    ArrayList<Friend> listFriends;
+    ArrayList<Friend> listFilterContacts;
     FirebaseAuth mAuth;
     DatabaseReference mDatabaseReference;
 
-    public FriendAdapter(Context context, ArrayList<Friends> listFriends) {
+    public FriendAdapter(Context context, ArrayList<Friend> listFriends) {
         this.context = context;
         this.listFriends = listFriends;
         this.listFilterContacts = listFriends;
@@ -48,16 +48,16 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     @Override
     public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
-        Friends friends = listFriends.get(position);
+        Friend friend = listFriends.get(position);
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
-        if (friends ==null) {
+        if (friend ==null) {
             return;
         } else {
-            Picasso.get().load(friends.getProfilePic()).into(holder.civAvatarItemFriend);
-            holder.tvItemFriendName.setText(friends.getUserName());
-            holder.tvItemFriendDescribe.setText(friends.getDescribe());
+            Picasso.get().load(friend.getProfilePic()).into(holder.civAvatarItemFriend);
+            holder.tvItemFriendName.setText(friend.getUserName());
+            holder.tvItemFriendDescribe.setText(friend.getDescribe());
 
-            mDatabaseReference.child(friends.getFriendID()).child("statusActivity").addListenerForSingleValueEvent(new ValueEventListener() {
+            mDatabaseReference.child(friend.getFriendID()).child("statusActivity").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
@@ -116,10 +116,10 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
                 if (strSearch.isEmpty()) {
                     listFriends = listFilterContacts;
                 } else {
-                    ArrayList<Friends> list = new ArrayList<>();
-                    for (Friends friends : listFilterContacts) {
-                        if (friends.getUserName().toString().toLowerCase().trim().contains(strSearch.toLowerCase().trim())) {
-                            list.add(friends);
+                    ArrayList<Friend> list = new ArrayList<>();
+                    for (Friend friend : listFilterContacts) {
+                        if (friend.getUserName().toString().toLowerCase().trim().contains(strSearch.toLowerCase().trim())) {
+                            list.add(friend);
                         }
                     }
                     listFriends = list;
@@ -130,7 +130,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
             }
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                listFriends = (ArrayList<Friends>) filterResults.values;
+                listFriends = (ArrayList<Friend>) filterResults.values;
                 notifyDataSetChanged();
             }
         };

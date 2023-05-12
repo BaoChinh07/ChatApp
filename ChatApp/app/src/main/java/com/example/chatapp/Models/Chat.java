@@ -1,27 +1,33 @@
 package com.example.chatapp.Models;
 
 public class Chat {
-    private String userName, profilePic, lastMessage,friendID, dateTime;
+    private String userName, profilePic, message, friendID, senderID, receiverID, dateTime, type;
     private long timestamp;
 
     public Chat() {
     }
 
-    public Chat(String userName, String profilePic, String lastMessage, String friendID, String dateTime, long timestamp) {
+    public Chat(String userName, String profilePic, String message, String friendID, String senderID, String receiverID, String dateTime, String type, long timestamp) {
         this.userName = userName;
         this.profilePic = profilePic;
-        this.lastMessage = lastMessage;
+        this.message = message;
         this.friendID = friendID;
-        this.timestamp = timestamp;
+        this.senderID = senderID;
+        this.receiverID = receiverID;
         this.dateTime = dateTime;
+        this.type = type;
+        this.timestamp = timestamp;
     }
 
-    public String getFriendID() {
-        return friendID;
-    }
-
-    public void setFriendID(String friendID) {
-        this.friendID = friendID;
+    public Chat(String userName, String profilePic, String message, String senderID, String receiverID, String dateTime, long timestamp, String type) {
+        this.userName = userName;
+        this.profilePic = profilePic;
+        this.message = message;
+        this.senderID = senderID;
+        this.receiverID = receiverID;
+        this.dateTime = dateTime;
+        this.timestamp = timestamp;
+        this.type = type;
     }
 
     public String getUserName() {
@@ -40,20 +46,36 @@ public class Chat {
         this.profilePic = profilePic;
     }
 
-    public String getLastMessage() {
-        return lastMessage;
+    public String getMessage() {
+        return message;
     }
 
-    public void setLastMessage(String lastMessage) {
-        this.lastMessage = lastMessage;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public String getFriendID() {
+        return friendID;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setFriendID(String friendID) {
+        this.friendID = friendID;
+    }
+
+    public String getSenderID() {
+        return senderID;
+    }
+
+    public void setSenderID(String senderID) {
+        this.senderID = senderID;
+    }
+
+    public String getReceiverID() {
+        return receiverID;
+    }
+
+    public void setReceiverID(String receiverID) {
+        this.receiverID = receiverID;
     }
 
     public String getDateTime() {
@@ -62,5 +84,21 @@ public class Chat {
 
     public void setDateTime(String dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

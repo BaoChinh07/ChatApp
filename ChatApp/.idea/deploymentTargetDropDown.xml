@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="deploymentTargetDropDown">
-    <runningDeviceTargetSelectedWithDropDown>
+    <runningDeviceTargetsSelectedWithDialog>
       <Target>
         <type value="RUNNING_DEVICE_TARGET" />
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\tezca\.android\avd\Pixel_4_XL_API_33.avd" />
+            <value value="C:\Users\tezca\.android\avd\MyPhoneAPI332.avd" />
           </Key>
         </deviceKey>
       </Target>
-    </runningDeviceTargetSelectedWithDropDown>
-    <timeTargetWasSelectedWithDropDown value="2023-05-09T10:34:12.657694600Z" />
-    <multipleDevicesSelectedInDropDown value="true" />
+      <Target>
+        <type value="RUNNING_DEVICE_TARGET" />
+        <deviceKey>
+          <Key>
+            <type value="VIRTUAL_DEVICE_PATH" />
+            <value value="C:\Users\tezca\.android\avd\MyPhoneAPI331.avd" />
+          </Key>
+        </deviceKey>
+      </Target>
+    </runningDeviceTargetsSelectedWithDialog>
     <targetsSelectedWithDialog>
       <Target>
         <type value="QUICK_BOOT_TARGET" />
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\tezca\.android\avd\Pixel_6_Pro_API_33.avd" />
+            <value value="C:\Users\tezca\.android\avd\MyPhoneAPI332.avd" />
           </Key>
         </deviceKey>
       </Target>
@@ -29,7 +36,7 @@
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\tezca\.android\avd\Pixel_4_XL_API_33.avd" />
+            <value value="C:\Users\tezca\.android\avd\MyPhoneAPI331.avd" />
           </Key>
         </deviceKey>
       </Target>

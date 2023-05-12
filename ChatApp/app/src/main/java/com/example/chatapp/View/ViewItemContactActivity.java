@@ -8,7 +8,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -18,9 +17,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.chatapp.Models.Friend;
+import com.example.chatapp.Models.Request;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -47,7 +48,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseDatabase mFirebaseDatabase;
-    DatabaseReference mUserReference, mRequestReference, mFriendsReference, mDataReference;
+    DatabaseReference mUserReference, mRequestReference, mFriendsReference;
     FirebaseStorage storage;
     StorageReference mStorageReference;
 
@@ -73,8 +74,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mDataReference = FirebaseDatabase.getInstance().getReference().child("Users");
-        mUserReference = FirebaseDatabase.getInstance().getReference().child("Users").child(userID);
+        mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");
         mFriendsReference = FirebaseDatabase.getInstance().getReference().child("Friends");
         storage = FirebaseStorage.getInstance();
@@ -118,33 +118,19 @@ public class ViewItemContactActivity extends AppCompatActivity {
     }
 
     private void loadMyProfile() {
-        mDataReference.child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        mUserReference.child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    myUserID = snapshot.child("userID").getValue().toString();
-                    myUsername = snapshot.child("userName").getValue().toString();
-                    myEmail = snapshot.child("email").getValue().toString();
-                    // Lấy thông tin ảnh đại diện của User
-                    if (snapshot.hasChild("profilePic")) {
-                        myProfilePic = snapshot.child("profilePic").getValue().toString();
-                    } else {
-                        mStorageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                myProfilePic = uri.toString();
-                            }
-                        });
-                    }
-                    if (snapshot.hasChild("describe")) {
-                        myDescribe = snapshot.child("describe").getValue().toString();
-                    } else {
-                        myDescribe = "";
-                    }
-                    if (snapshot.hasChild("gender")) {
-                        myGender = snapshot.child("gender").getValue().toString();
-                    } else {
-                        myGender = "";
+                    User user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        myProfilePic = user.getProfilePic();
+                        myUserID = user.getUserID();
+                        myUsername = user.getUserName();
+                        myEmail = user.getEmail();
+                        myDescribe = user.getDescribe();
+                        myGender = user.getGender();
+
                     }
                 } else {
                     Toast.makeText(ViewItemContactActivity.this, "Không tìm thấy dữ liệu", Toast.LENGTH_SHORT).show();
@@ -160,38 +146,17 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
 
     private void callInformationItemContact() {
-        mUserReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mUserReference.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    friendID = snapshot.child("userID").getValue().toString();
-                    userName = snapshot.child("userName").getValue().toString();
-                    email = snapshot.child("email").getValue().toString();
-                    // Lấy thông tin ảnh đại diện của User
-                    if (snapshot.hasChild("profilePic")) {
-                        profilePicURL = snapshot.child("profilePic").getValue().toString();
-                    } else {
-                        mStorageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                profilePicURL = uri.toString();
-                            }
-                        });
+                    User user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        Picasso.get().load(user.getProfilePic()).placeholder(R.drawable.default_avatar).into(civAvatarSingleContact);
+                        tvDescribeSingleContact.setText(user.getDescribe());
+                        tvUserNameSingleContact.setText(user.getUserName());
+                        tvEmailSingleContact.setText(user.getEmail());
                     }
-                    if (snapshot.hasChild("describe")) {
-                        describe = snapshot.child("describe").getValue().toString();
-                    } else {
-                        describe = "";
-                    }
-                    if (snapshot.hasChild("gender")) {
-                        gender = snapshot.child("gender").getValue().toString();
-                    } else {
-                        gender = "";
-                    }
-                    Picasso.get().load(profilePicURL).placeholder(R.drawable.default_avatar).into(civAvatarSingleContact);
-                    tvDescribeSingleContact.setText(describe);
-                    tvUserNameSingleContact.setText(userName);
-                    tvEmailSingleContact.setText(email);
                 } else {
                     Toast.makeText(ViewItemContactActivity.this, "Không tìm thấy dữ liệu", Toast.LENGTH_SHORT).show();
                 }
@@ -208,18 +173,14 @@ public class ViewItemContactActivity extends AppCompatActivity {
     private void sendAction(String userID) {
 
         if (currentState.equals("nothing_happen")) {
-            HashMap hashMap = new HashMap();
+            HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put("status", "pending");
             mRequestReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
                     if (task.isSuccessful()) {
-                        HashMap mHashMap = new HashMap();
-                        mHashMap.put("status", "wait_confirm");
-                        mHashMap.put("userName", myUsername);
-                        mHashMap.put("profilePic", myProfilePic);
-                        mHashMap.put("userID", myUserID);
-                        mRequestReference.child(userID).child(mUser.getUid()).updateChildren(mHashMap).addOnCompleteListener(new OnCompleteListener() {
+                        Request request = new Request(myUsername, myProfilePic, myUserID, "wait_confirm");
+                        mRequestReference.child(userID).child(mUser.getUid()).setValue(request).addOnCompleteListener(new OnCompleteListener() {
                             @Override
                             public void onComplete(@NonNull Task task) {
                                 if (task.isSuccessful()) {
@@ -267,29 +228,13 @@ public class ViewItemContactActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    final HashMap hashMap = new HashMap();
-                                    hashMap.put("status", "friend");
-                                    hashMap.put("friendID", friendID);
-                                    hashMap.put("userName", userName);
-                                    hashMap.put("profilePic", profilePicURL);
-                                    hashMap.put("email", email);
-                                    hashMap.put("describe", describe);
-                                    hashMap.put("gender", gender);
-
-                                    //Thông tin của bản thân sẽ lưu trong node của bạn bè
-                                    final HashMap hashMap1 = new HashMap();
-                                    hashMap1.put("status", "friend");
-                                    hashMap1.put("friendID", myUserID);
-                                    hashMap1.put("userName", myUsername);
-                                    hashMap1.put("profilePic", myProfilePic);
-                                    hashMap1.put("email", myEmail);
-                                    hashMap1.put("describe", myDescribe);
-                                    hashMap1.put("gender", myGender);
-                                    mFriendsReference.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                                    Friend friend = new Friend(profilePicURL, userName, email, describe, gender, friendID);
+                                    Friend me = new Friend(myProfilePic, myUsername, myEmail, myDescribe, myGender, myUserID);
+                                    mFriendsReference.child(mUser.getUid()).child(userID).setValue(friend).addOnCompleteListener(new OnCompleteListener() {
                                         @Override
                                         public void onComplete(@NonNull Task task) {
                                             if (task.isSuccessful()) {
-                                                mFriendsReference.child(userID).child(mUser.getUid()).updateChildren(hashMap1).addOnCompleteListener(new OnCompleteListener() {
+                                                mFriendsReference.child(userID).child(mUser.getUid()).setValue(me).addOnCompleteListener(new OnCompleteListener() {
                                                     @Override
                                                     public void onComplete(@NonNull Task task) {
                                                         currentState = "friend";

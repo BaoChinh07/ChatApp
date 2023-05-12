@@ -1,5 +1,7 @@
 package com.example.chatapp.Models;
 
+import com.google.firebase.database.DatabaseReference;
+
 import java.text.SimpleDateFormat;
 
 public class HistoryCall {
@@ -64,5 +66,9 @@ public class HistoryCall {
 
     public void setCallTime(String callTime) {
         this.callTime = callTime;
+    }
+
+    public void updateHistoryCall(DatabaseReference reference, HistoryCall value, String id) {
+        reference.child(id).push().setValue(value);
     }
 }

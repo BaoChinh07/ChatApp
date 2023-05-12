@@ -8,32 +8,31 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="5dp"
         android:orientation="horizontal">
 
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/civAvatarItemRequest"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_gravity="center"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:src="@drawable/default_avatar" />
 
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:orientation="vertical"
-            android:weightSum="2">
+            >
 
             <TextView
                 android:id="@+id/tvItemRequest"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:gravity="bottom"
+                android:layout_marginTop="5dp"
                 android:text="@string/text_username"
                 android:textColor="@color/black"
                 android:textSize="16sp"
@@ -43,13 +42,38 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="0dp"
+                android:layout_marginTop="5dp"
                 android:gravity="top"
                 android:text="đã gửi lời mời kết bạn"
                 android:maxLines="1"
                 android:textColor="@color/grey"
                 android:textSize="12sp" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+                <Button
+                    android:id="@+id/btnConfirmRequest"
+                    android:layout_width="70dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/custom_button_confirm"
+                    android:text="@string/button_accept_friend_request"
+                    android:textAllCaps="false"
+                    android:layout_marginEnd="5dp"
+                    android:textSize="12sp"
+                    android:maxLines="1"
+                    android:textColor="@color/white"/>
+                <Button
+                    android:id="@+id/btnRefuseRequest"
+                    android:layout_width="70dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/custom_button_refuse"
+                    android:text="@string/action_delete"
+                    android:layout_marginStart="5dp"
+                    android:textAllCaps="false"
+                    android:textSize="12sp"
+                    android:maxLines="1"/>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

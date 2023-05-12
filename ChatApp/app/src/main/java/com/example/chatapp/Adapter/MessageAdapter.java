@@ -23,8 +23,8 @@ public class MessageAdapter extends RecyclerView.ViewHolder {
         tvSmsUserTwo =  itemView.findViewById(R.id.tvSmsUserTwo);
         tvTimeMessageUserTwo =  itemView.findViewById(R.id.tvTimeMessageUserTwo);
         ivImageLeft =  itemView.findViewById(R.id.ivImageLeft);
-        ivImageRight =  itemView.findViewById(R.id.ivImageRight);
         tvTimeImageUserOne =  itemView.findViewById(R.id.tvTimeImageUserOne);
+        ivImageRight =  itemView.findViewById(R.id.ivImageRight);
         tvTimeImageUserTwo =  itemView.findViewById(R.id.tvTimeImageUserTwo);
     }
 }

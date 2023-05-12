@@ -1,9 +1,9 @@
 package com.example.chatapp.Models;
 
-public class Friends {
+public class Friend {
     private String profilePic, userName, email, describe, gender, friendID;
 
-    public Friends(String profilePic, String userName, String email, String password, String userID, String describe, String gender, String friendID) {
+    public Friend(String profilePic, String userName, String email, String describe, String gender, String friendID) {
         this.profilePic = profilePic;
         this.userName = userName;
         this.email = email;
@@ -11,7 +11,7 @@ public class Friends {
         this.gender = gender;
         this.friendID = friendID;
     }
-    public Friends () {
+    public Friend() {
     }
 
     public String getFriendID() {

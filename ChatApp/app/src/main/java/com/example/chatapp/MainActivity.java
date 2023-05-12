@@ -16,6 +16,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -30,8 +31,8 @@ import android.widget.Toast;
 
 import com.example.chatapp.Adapter.RequestAdapter;
 import com.example.chatapp.Login.SignInActivity;
-import com.example.chatapp.Models.Requests;
-import com.example.chatapp.Models.Users;
+import com.example.chatapp.Models.Request;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.View.MyProfile;
 import com.example.chatapp.fragments.CallFragment;
 import com.example.chatapp.fragments.ChatsFragment;
@@ -49,6 +50,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.normal.TedPermission;
 import com.squareup.picasso.Picasso;
@@ -81,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     DatabaseReference mUserReference, mRequestReference, mDatabaseReference;
+    FirebaseStorage storage;
+    StorageReference mStorageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +109,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
         mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");
+        storage = FirebaseStorage.getInstance();
+        mStorageReference = storage.getReference().child("profilePic/default_avatar.png");
     }
 
     public void setEvent() {
@@ -133,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         TedPermission.create()
                 .setPermissionListener(permissionlistener)
-                .setPermissions(Manifest.permission.POST_NOTIFICATIONS)
+                .setPermissions(Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA)
                 .check();
     }
 
@@ -155,10 +162,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Users user = snapshot.getValue(Users.class);
-                    Picasso.get().load(user.getProfilePic()).placeholder(R.drawable.default_avatar).into(nav_header_userPhoto);
-                    nav_header_userName.setText(user.getUserName());
-                    nav_header_userEmail.setText(user.getEmail());
+                    User user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        Picasso.get().load(user.getProfilePic()).placeholder(R.drawable.default_avatar).into(nav_header_userPhoto);
+                        nav_header_userName.setText(user.getUserName());
+                        nav_header_userEmail.setText(user.getEmail());
+                    }
                 }
             }
 
@@ -309,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             RecyclerView rvListRequests = dialog.findViewById(R.id.rvListRequests);
             RequestAdapter requestAdapter;
-            ArrayList<Requests> listRequests = new ArrayList<>();
+            ArrayList<Request> listRequests = new ArrayList<>();
             requestAdapter = new RequestAdapter(this, listRequests);
             rvListRequests.setAdapter(requestAdapter);
             LinearLayoutManager layoutManager1 = new LinearLayoutManager(this); /* Khởi tạo một LinearLayout và gán vào RecycleView */
@@ -319,11 +328,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     listRequests.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        Requests requests = dataSnapshot.getValue(Requests.class);
-                        String check = requests.getStatus().trim();
+                        Request request = dataSnapshot.getValue(Request.class);
+                        String check = request.getStatus().trim();
                         if (mUser != null && !check.equals("pending")) {
-                            requests.setUserID(dataSnapshot.getKey());
-                            listRequests.add(requests);
+                            request.setUserID(dataSnapshot.getKey());
+                            listRequests.add(request);
                         }
                     }
                     requestAdapter.notifyDataSetChanged();
@@ -455,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    /* -------------------------------- Xử lý logic cho Notifications Badge -------------------------------- */
+    /* -------------------------------- Đếm số lượng cho Notifications Badge -------------------------------- */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_toolbar_main_activity, menu);
