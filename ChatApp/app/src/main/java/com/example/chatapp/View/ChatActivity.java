@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -75,7 +74,7 @@ public class ChatActivity extends AppCompatActivity {
     LinearLayout userChat;
     RecyclerView rvMessage;
     EditText edtInputMessage;
-    ImageView imageViewSendImage, imageViewSendMessage;
+    ImageView imageViewSendImage, imageViewSendMessage, imageViewSendEnmoji;
     CircleImageView civAvatarUserChat, civOnline, civOffline;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
     String userID, avatarURL, userName, dateTime, statusActivity, time;
@@ -101,6 +100,7 @@ public class ChatActivity extends AppCompatActivity {
         userChat = findViewById(R.id.userChat);
         edtInputMessage = findViewById(R.id.edtInputMessage);
         imageViewSendImage = findViewById(R.id.imageViewSendImage);
+        imageViewSendEnmoji = findViewById(R.id.imageViewSendEnmoji);
         imageViewSendMessage = findViewById(R.id.imageViewSendMessage);
         rvMessage = findViewById(R.id.rvMessage);
         rvMessage.setLayoutManager(new LinearLayoutManager(this));
@@ -161,6 +161,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 onBackPressed();
+                finish();
             }
         });
     }
@@ -362,7 +363,7 @@ public class ChatActivity extends AppCompatActivity {
                                     String type = "image";
                                     Chat message01 = new Chat(userName, avatarURL, downloadUri, myId, userID, dateTime, timestamp, type);
                                     Chat message02 = new Chat(myName, myAvatar, downloadUri, myId, userID, dateTime, timestamp, type);
-                                    Utilities.updateDataWithPush(mSmsReference,myId,userID,message01, message02);
+                                    Utilities.updateDataWithPush(mSmsReference, myId, userID, message01, message02);
                                     createChatBox(downloadUri, timestamp, type);
                                 }
                             }
@@ -389,7 +390,7 @@ public class ChatActivity extends AppCompatActivity {
             String type = "text";
             Chat message01 = new Chat(userName, avatarURL, sms, myId, userID, dateTime, timestamp, type);
             Chat message02 = new Chat(myName, myAvatar, sms, myId, userID, dateTime, timestamp, type);
-            Utilities.updateDataWithPush(mSmsReference, myId, userID,message01,message02);
+            Utilities.updateDataWithPush(mSmsReference, myId, userID, message01, message02);
             edtInputMessage.setText(null);
             createChatBox(sms, timestamp, type);
         }
@@ -399,8 +400,8 @@ public class ChatActivity extends AppCompatActivity {
         String dateTime = Utilities.getCurrentTime("HH:mm");
         Chat chat = new Chat(userName, avatarURL, sms, userID, myId, userID, dateTime, type, timestamp);
         Chat chat1 = new Chat(myName, myAvatar, sms, myId, myId, userID, dateTime, type, timestamp);
-        Utilities.updateDataWithoutNotify(mChatReference,myId,userID,chat);
-        Utilities.updateDataWithoutNotify(mChatReference,userID,myId,chat1);
+        Utilities.updateDataWithoutNotify(mChatReference, myId, userID, chat);
+        Utilities.updateDataWithoutNotify(mChatReference, userID, myId, chat1);
     }
 
     @Override
@@ -452,7 +453,7 @@ public class ChatActivity extends AppCompatActivity {
     private void openDialogConfirmDeleteChatbox(int gravity) {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.confirm_delete_chatbox_dialog);
+        dialog.setContentView(R.layout.dialog_confirm_delete_chatbox);
         Window window = (Window) dialog.getWindow();
         if (window == null) {
             return;
@@ -490,6 +491,7 @@ public class ChatActivity extends AppCompatActivity {
                                             dialog.dismiss();
                                             Intent intent = new Intent(ChatActivity.this, MainActivity.class);
                                             startActivity(intent);
+                                            finish();
                                         }
 
                                     }
@@ -514,9 +516,11 @@ public class ChatActivity extends AppCompatActivity {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                String type = "VoiceCall", status = "MakeCall", callTime =  Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
-                HistoryCall historyCall = new HistoryCall(avatarURL,userID, userName, status,type, callTime);
-                historyCall.updateHistoryCall(mHistoryCallReference,historyCall,myId);
+                String type = "VoiceCall", status = "MakeCall", callTime = Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
+                String historyCallId = Utilities.getHistoryCallId();
+                long timestamp = System.currentTimeMillis();
+                HistoryCall historyCall = new HistoryCall(historyCallId, avatarURL, userID, userName, status, type, callTime, timestamp);
+                historyCall.updateHistoryCall(mHistoryCallReference, historyCall, myId, historyCallId);
                 Intent intent = new Intent(ChatActivity.this, VoiceCallOutGoingActivity.class);
                 intent.putExtra("receiverID", userID);
                 startActivity(intent);
@@ -538,9 +542,11 @@ public class ChatActivity extends AppCompatActivity {
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                String type = "VideoCall", status = "MakeCall", callTime =  Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");;
-                HistoryCall historyCall = new HistoryCall(avatarURL,userID, userName, status,type, callTime);
-                historyCall.updateHistoryCall(mHistoryCallReference,historyCall,myId);
+                String type = "VideoCall", status = "MakeCall", callTime = Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
+                String historyCallId = Utilities.getHistoryCallId();
+                long timestamp = System.currentTimeMillis();
+                HistoryCall historyCall = new HistoryCall(historyCallId, avatarURL, userID, userName, status, type, callTime, timestamp);
+                historyCall.updateHistoryCall(mHistoryCallReference, historyCall, myId, historyCallId);
                 Intent intent = new Intent(ChatActivity.this, VideoCallOutgoingActivity.class);
                 intent.putExtra("friendID", userID);
                 startActivity(intent);
@@ -557,5 +563,21 @@ public class ChatActivity extends AppCompatActivity {
                 .setPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
                 .check();
     }
+    /* Xét trạng thái hoạt động của CurrentUser */
+    @Override
+    protected void onStart(){
+        Utilities.statusActivity("Online");
+        super.onStart();
+    }
 
+    @Override
+    protected void onResume() {
+        Utilities.statusActivity("Online");
+        super.onResume();
+    }
+    @Override
+    protected void onRestart() {
+        Utilities.statusActivity("Online");
+        super.onRestart();
+    }
 }

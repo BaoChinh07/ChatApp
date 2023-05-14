@@ -78,9 +78,11 @@ public class VoiceCallComingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String response = "yes", status = "ReceiveCall", callTime = Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
+                String historyCallId = Utilities.getHistoryCallId();
+                long timestamp = System.currentTimeMillis();
                 sendResponse(response);
-                HistoryCall historyCall = new HistoryCall(senderAvatar, senderID, senderName, status, type, callTime);
-                historyCall.updateHistoryCall(mHistoryCallReference, historyCall, receiverID);
+                HistoryCall historyCall = new HistoryCall(historyCallId, senderAvatar, senderID, senderName, status, type, callTime, timestamp);
+                historyCall.updateHistoryCall(mHistoryCallReference, historyCall, receiverID, historyCallId);
             }
         });
 
@@ -88,9 +90,11 @@ public class VoiceCallComingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String response = "no", status = "MissedCall", callTime = Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
+                String historyCallId = Utilities.getHistoryCallId();
+                long timestamp = System.currentTimeMillis();
                 sendResponse(response);
-                HistoryCall historyCall = new HistoryCall(senderAvatar, senderID, senderName, status, type, callTime);
-                historyCall.updateHistoryCall(mHistoryCallReference, historyCall, receiverID);
+                HistoryCall historyCall = new HistoryCall(historyCallId, senderAvatar, senderID, senderName, status, type, callTime, timestamp);
+                historyCall.updateHistoryCall(mHistoryCallReference, historyCall, receiverID, historyCallId);
             }
         });
     }
@@ -183,5 +187,22 @@ public class VoiceCallComingActivity extends AppCompatActivity {
 
             }
         });
+    }
+    /* Xét trạng thái hoạt động của CurrentUser */
+    @Override
+    protected void onStart(){
+        Utilities.statusActivity("Online");
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        Utilities.statusActivity("Online");
+        super.onResume();
+    }
+    @Override
+    protected void onRestart() {
+        Utilities.statusActivity("Online");
+        super.onRestart();
     }
 }

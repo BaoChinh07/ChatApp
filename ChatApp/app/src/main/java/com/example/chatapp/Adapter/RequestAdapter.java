@@ -18,6 +18,8 @@ import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
 import com.example.chatapp.View.ViewItemContactActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -36,20 +38,20 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     Context context;
     ArrayList<Request> requestsList;
 
-    private Object setValueFriend(String userID) {
+    private void setValueFriend(String userID, final OnFriendValueListener listener) {
         DatabaseReference mUser = FirebaseDatabase.getInstance().getReference().child("Users");
-        mUser.child(userID).addValueEventListener(new ValueEventListener() {
+        mUser.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    User user = snapshot.getValue(User.class);
-                    profilePicURL = user.getProfilePic();
-                    userName = user.getUserName();
-                    email = user.getEmail();
-                    describe = user.getDescribe();
-                    gender = user.getGender();
-                    userId = userID;
-                }
+                User user = snapshot.getValue(User.class);
+                profilePicURL = user.getProfilePic();
+                userName = user.getUserName();
+                email = user.getEmail();
+                describe = user.getDescribe();
+                gender = user.getGender();
+                userId = userID;
+                Friend friend = new Friend(profilePicURL, userName, email, describe, gender, userID);
+                listener.onFriendValue(friend);
             }
 
             @Override
@@ -57,7 +59,10 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
             }
         });
-        return new Friend(profilePicURL, userName, email, describe, gender, userID);
+    }
+
+    interface OnFriendValueListener {
+        void onFriendValue(Friend friend);
     }
 
     public RequestAdapter(Context context, ArrayList<Request> requestsList) {
@@ -88,25 +93,35 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             holder.btnConfirmRequest.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mRequestReference.child(myId).child(requests.getUserID()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    setValueFriend(myId, new OnFriendValueListener() {
                         @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            mRequestReference.child(requests.getUserID()).removeValue();
-                        }
-                    });
-                    mFriendsReference.child(myId).child(requests.getUserID()).setValue(setValueFriend(requests.getUserID())).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                mFriendsReference.child(requests.getUserID()).child(myId).setValue(setValueFriend(myId)).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if ((task.isSuccessful())) {
-                                            Toast.makeText(view.getContext(), "Các bạn đã trở thành bạn bè", Toast.LENGTH_SHORT).show();
+                        public void onFriendValue(Friend me) {
+                            setValueFriend(requests.getUserID(), new OnFriendValueListener() {
+                                @Override
+                                public void onFriendValue(Friend friend) {
+                                    mRequestReference.child(myId).child(requests.getUserID()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            mRequestReference.child(requests.getUserID()).removeValue();
                                         }
-                                    }
-                                });
-                            }
+                                    });
+                                    mFriendsReference.child(myId).child(requests.getUserID()).setValue(friend).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                mFriendsReference.child(requests.getUserID()).child(myId).setValue(me).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if ((task.isSuccessful())) {
+                                                            Toast.makeText(view.getContext(), "Các bạn đã trở thành bạn bè", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            });
                         }
                     });
                 }

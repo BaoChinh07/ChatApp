@@ -18,7 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapp.Models.Friend;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
+import com.example.chatapp.Utilities.Utilities;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -74,8 +76,6 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
         tvGenderSingleFriend = findViewById(R.id.tvGenderSingleFriend);
         btnSendMessage = findViewById(R.id.btnSendMessage);
         btnUnfriend = findViewById(R.id.btnUnfriend);
-
-
         friendID = getIntent().getStringExtra("userID");
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -109,6 +109,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 onBackPressed();
+                finish();
             }
         });
     }
@@ -145,7 +146,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
     private void openConfirmUnfriendDialog(int gravity) {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.confirm_unfriend_dialog);
+        dialog.setContentView(R.layout.dialog_confirm_unfriend);
         Window window = (Window) dialog.getWindow();
         if (window == null) {
             return;
@@ -207,14 +208,16 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    statusActivity = snapshot.child("statusActivity").getValue().toString();
-                }
-                if (statusActivity.trim().equals("Online")) {
-                    civSingleFriendOnline.setVisibility(View.VISIBLE);
-                    civSingleFriendOffline.setVisibility(View.GONE);
-                } else {
-                    civSingleFriendOnline.setVisibility(View.GONE);
-                    civSingleFriendOffline.setVisibility(View.VISIBLE);
+                    User user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        if (user.getStatusActivity().equals("Online")) {
+                            civSingleFriendOnline.setVisibility(View.VISIBLE);
+                            civSingleFriendOffline.setVisibility(View.GONE);
+                        } else {
+                            civSingleFriendOnline.setVisibility(View.GONE);
+                            civSingleFriendOffline.setVisibility(View.VISIBLE);
+                        }
+                    }
                 }
             }
 
@@ -224,29 +227,28 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
             }
         });
     }
-
-    private void statusActivity(String statusActivity) {
-        mDataReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("statusActivity", statusActivity);
-        mDataReference.updateChildren(hashMap);
+    /* Xét trạng thái hoạt động của CurrentUser */
+    /* Xét trạng thái hoạt động của CurrentUser */
+    @Override
+    protected void onStart(){
+        Utilities.statusActivity("Online");
+        super.onStart();
     }
 
     @Override
     protected void onResume() {
+        Utilities.statusActivity("Online");
         super.onResume();
-        statusActivity("Online");
     }
-
     @Override
-    protected void onPause() {
-        super.onPause();
-        statusActivity("Offline");
+    protected void onRestart() {
+        Utilities.statusActivity("Online");
+        super.onRestart();
     }
 
     @Override
     protected void onDestroy() {
+        Utilities.statusActivity("Offline");
         super.onDestroy();
-        statusActivity("Offline");
     }
 }

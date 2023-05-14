@@ -16,7 +16,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -33,6 +32,7 @@ import com.example.chatapp.Adapter.RequestAdapter;
 import com.example.chatapp.Login.SignInActivity;
 import com.example.chatapp.Models.Request;
 import com.example.chatapp.Models.User;
+import com.example.chatapp.Utilities.Utilities;
 import com.example.chatapp.View.MyProfile;
 import com.example.chatapp.fragments.CallFragment;
 import com.example.chatapp.fragments.ChatsFragment;
@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     DatabaseReference mUserReference, mRequestReference, mDatabaseReference;
     FirebaseStorage storage;
     StorageReference mStorageReference;
+    String myId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mBottomNavigationView = findViewById(R.id.bottom_navigation);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
+        myId = mUser.getUid();
         mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
         mRequestReference = FirebaseDatabase.getInstance().getReference().child("Requests");
@@ -123,7 +125,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionNavigationDrawer(); // Xử lý logic cho Novigation Drawer
         setTitleToolBar(); // Hàm xử lý đổi title cho toolbar cho các fragment khác nhau
         updateFCMToken(); //Xử lý khi đăng nhập thành công sẽ cập nhật một token mới
-        setStatusActivity();
     }
 
     private void checkPermissionNotification() {
@@ -253,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void openDialogConfirmLogout(int gravity) {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.confirm_dialog);
+        dialog.setContentView(R.layout.dialog_confirm_logout);
         Window window = (Window) dialog.getWindow();
         if (window == null) {
             return;
@@ -279,11 +280,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (mUser != null) {
                         mUserReference.child(mUser.getUid()).child("fcmToken").removeValue();
                     }
+                    Utilities.statusActivity("Offline");
                     mAuth.signOut();
                     Intent intent = new Intent(MainActivity.this, SignInActivity.class);
                     startActivity(intent);
                     Toast.makeText(MainActivity.this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
-                    statusActivity("Offline");
                 }
             });
             btnCancelConfirm.setOnClickListener(new View.OnClickListener() {
@@ -350,12 +351,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     /* Xét trạng thái hoạt động của CurrentUser */
-    private void statusActivity(String statusActivity) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("statusActivity", statusActivity);
-        mUserReference.child(mUser.getUid()).updateChildren(hashMap);
+    @Override
+    protected void onStart(){
+        Utilities.statusActivity("Online");
+        super.onStart();
     }
 
+    @Override
+    protected void onResume() {
+        Utilities.statusActivity("Online");
+        super.onResume();
+    }
+    @Override
+    protected void onRestart() {
+        Utilities.statusActivity("Online");
+        super.onRestart();
+    }
     /* ------------------------------------------------------------------------------------------- */
 
     //Xử lý khi ấn back 2 lần
@@ -520,13 +531,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
-    }
-
-    private void setStatusActivity() {
-        if (mUser == null) {
-            statusActivity("Offline");
-        } else {
-            statusActivity("Online");
-        }
     }
 }

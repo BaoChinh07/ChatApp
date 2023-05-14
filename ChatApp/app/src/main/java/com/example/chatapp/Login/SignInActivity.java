@@ -40,6 +40,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class SignInActivity extends AppCompatActivity {
@@ -244,7 +245,7 @@ public class SignInActivity extends AppCompatActivity {
                                     if (!snapshot.exists()) {
                                         FirebaseUser mUser = mAuth.getCurrentUser();
                                         User user = new User();
-                                        String profilePic = "", describe="", statusActivity = "Offline", gender ;
+                                        String profilePic = "", describe="", statusActivity = "Online", gender ;
                                         user.setUserID(mAuth.getUid());
                                         user.setUserName(mUser.getDisplayName());
                                         user.setEmail(mUser.getEmail());

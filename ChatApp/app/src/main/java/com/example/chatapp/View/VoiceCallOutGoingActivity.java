@@ -104,13 +104,15 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
 
     private void voiceCallEnd() {
         String status = "MissedCall", callTime =  Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
+        String historyCallId = Utilities.getHistoryCallId();
+        long timestamp = System.currentTimeMillis();
         HashMap hashMap = new HashMap();
         hashMap.put("key", receiverID);
         hashMap.put("response", "no");
         mVoiceCallReference.child(senderID).child(receiverID).child("response").updateChildren(hashMap);
         Toast.makeText(this, "Kết thúc cuộc gọi", Toast.LENGTH_SHORT).show();
-        HistoryCall historyCall = new HistoryCall(senderAvatar,senderID,senderName,status,type,callTime);
-        historyCall.updateHistoryCall(mHistoryCallReference,historyCall,receiverID);
+        HistoryCall historyCall = new HistoryCall(historyCallId, senderAvatar,senderID,senderName,status,type,callTime, timestamp);
+        historyCall.updateHistoryCall(mHistoryCallReference,historyCall,receiverID, historyCallId);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -260,5 +262,22 @@ public class VoiceCallOutGoingActivity extends AppCompatActivity {
 
             }
         });
+    }
+    /* Xét trạng thái hoạt động của CurrentUser */
+    @Override
+    protected void onStart(){
+        Utilities.statusActivity("Online");
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        Utilities.statusActivity("Online");
+        super.onResume();
+    }
+    @Override
+    protected void onRestart() {
+        Utilities.statusActivity("Online");
+        super.onRestart();
     }
 }

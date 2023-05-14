@@ -13,7 +13,7 @@
         android:layout_marginBottom="12dp"
         android:layout_marginTop="15dp"
         android:layout_gravity="center"
-        android:text="Xóa toàn bộ cuộc trò chuyện này?"
+        android:text="Xóa danh sách lịch sử cuộc gọi?"
         android:textColor="@color/black"
         android:textSize="18sp" />
 
@@ -27,7 +27,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btnCancelConfirmDeleteChat"
+            android:id="@+id/btnCancelConfirmDeleteCall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -40,7 +40,7 @@
             app:backgroundTint="@color/grey" />
 
         <Button
-            android:id="@+id/btnConfirmDeleteChat"
+            android:id="@+id/btnConfirmDeleteCall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

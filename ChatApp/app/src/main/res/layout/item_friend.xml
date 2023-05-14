@@ -9,8 +9,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_weight="1"
         android:layout_marginHorizontal="5dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:weightSum="2">
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -74,5 +77,18 @@
                 android:textColor="@color/black"
                 android:textSize="13sp" />
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="2"
+            android:gravity="center_vertical|end"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btnMoreVertFriend"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:background="@drawable/icon_more_vert" />
+        </LinearLayout>
+
     </LinearLayout>
 </LinearLayout>

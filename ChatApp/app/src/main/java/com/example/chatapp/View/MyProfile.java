@@ -261,7 +261,7 @@ public class MyProfile extends AppCompatActivity {
     private void openConfirmDialog(int gravity) {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.confirm_dialog);
+        dialog.setContentView(R.layout.dialog_confirm_logout);
         Window window = (Window) dialog.getWindow();
         if (window == null) {
             return;
@@ -285,12 +285,13 @@ public class MyProfile extends AppCompatActivity {
                 public void onClick(View view) {
                     if (mUser != null) {
                         mUserReference.child(mUser.getUid()).child("fcmToken").removeValue();
+                        Utilities.statusActivity("Offline");
                     }
                     mAuth.signOut();
                     Intent intent = new Intent(MyProfile.this, SignInActivity.class);
                     startActivity(intent);
                     Toast.makeText(MyProfile.this, "Đã đăng xuất", Toast.LENGTH_SHORT).show();
-                    statusActivity("Offline", mUserReference.child(mUser.getUid()));
+
                 }
             });
             btnCancelConfirm.setOnClickListener(new View.OnClickListener() {
@@ -302,12 +303,27 @@ public class MyProfile extends AppCompatActivity {
         }
         dialog.show();
     }
-
-    public void statusActivity(String statusActivity, DatabaseReference reference) {
-        reference = mUserReference.child(mUser.getUid());
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("statusActivity", statusActivity);
-        reference.updateChildren(hashMap);
+    /* Xét trạng thái hoạt động của CurrentUser */
+    @Override
+    protected void onStart(){
+        Utilities.statusActivity("Online");
+        super.onStart();
     }
 
+    @Override
+    protected void onResume() {
+        Utilities.statusActivity("Online");
+        super.onResume();
+    }
+    @Override
+    protected void onRestart() {
+        Utilities.statusActivity("Online");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Utilities.statusActivity("Offline");
+        super.onDestroy();
+    }
 }

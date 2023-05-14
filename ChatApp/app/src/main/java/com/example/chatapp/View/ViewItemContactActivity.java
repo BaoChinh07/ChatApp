@@ -21,6 +21,7 @@ import com.example.chatapp.Models.Friend;
 import com.example.chatapp.Models.Request;
 import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
+import com.example.chatapp.Utilities.Utilities;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,8 +44,8 @@ public class ViewItemContactActivity extends AppCompatActivity {
     TextView tvDescribeSingleContact, tvUserNameSingleContact, tvEmailSingleContact;
     Button btnSendFriendRequest, btnCancelSendFriendRequest;
     CircleImageView civAvatarSingleContact;
-    String profilePicURL, userName, status, email, gender, describe, friendID, userID, currentState;
-    String myProfilePic, myUsername, myEmail, myGender, myDescribe, myUserID;
+    String userAvatar, userName, status, userEmail, userGender, userDescribe, userID, currentState;
+    String myAvatar, myUsername, myEmail, myGender, myDescribe, myUserID;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     FirebaseDatabase mFirebaseDatabase;
@@ -103,6 +104,32 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
         callInformationItemContact(); // Hiển thị thông tin của người dùng khi click vào
         loadMyProfile(); //Load dữ liệu của bản thân
+        loadOtherContactProfile();
+    }
+
+    private void loadOtherContactProfile() {
+        mUserReference.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    User user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        userAvatar = user.getProfilePic();
+                        userName = user.getUserName();
+                        userEmail = user.getEmail();
+                        userDescribe = user.getDescribe();
+                        userGender = user.getGender();
+                    }
+                } else {
+                    Toast.makeText(ViewItemContactActivity.this, "Không tìm thấy dữ liệu", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ViewItemContactActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setActionToolbar() {
@@ -113,6 +140,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 onBackPressed();
+                finish();
             }
         });
     }
@@ -124,7 +152,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     User user = snapshot.getValue(User.class);
                     if (user != null) {
-                        myProfilePic = user.getProfilePic();
+                        myAvatar = user.getProfilePic();
                         myUserID = user.getUserID();
                         myUsername = user.getUserName();
                         myEmail = user.getEmail();
@@ -139,7 +167,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ViewItemContactActivity.this, "" + error.getMessage().toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewItemContactActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -179,7 +207,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task task) {
                     if (task.isSuccessful()) {
-                        Request request = new Request(myUsername, myProfilePic, myUserID, "wait_confirm");
+                        Request request = new Request(myUsername, myAvatar, myUserID, "wait_confirm");
                         mRequestReference.child(userID).child(mUser.getUid()).setValue(request).addOnCompleteListener(new OnCompleteListener() {
                             @Override
                             public void onComplete(@NonNull Task task) {
@@ -228,8 +256,8 @@ public class ViewItemContactActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Friend friend = new Friend(profilePicURL, userName, email, describe, gender, friendID);
-                                    Friend me = new Friend(myProfilePic, myUsername, myEmail, myDescribe, myGender, myUserID);
+                                    Friend friend = new Friend(userAvatar, userName, userEmail, userDescribe, userGender, userID);
+                                    Friend me = new Friend(myAvatar, myUsername, myEmail, myDescribe, myGender, myUserID);
                                     mFriendsReference.child(mUser.getUid()).child(userID).setValue(friend).addOnCompleteListener(new OnCompleteListener() {
                                         @Override
                                         public void onComplete(@NonNull Task task) {
@@ -393,7 +421,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
     private void openConfirmUnfriendDialog(int gravity) {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.confirm_unfriend_dialog);
+        dialog.setContentView(R.layout.dialog_confirm_unfriend);
         Window window = (Window) dialog.getWindow();
         if (window == null) {
             return;
@@ -449,5 +477,23 @@ public class ViewItemContactActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    /* Xét trạng thái hoạt động của CurrentUser */
+    @Override
+    protected void onStart(){
+        Utilities.statusActivity("Online");
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        Utilities.statusActivity("Online");
+        super.onResume();
+    }
+    @Override
+    protected void onRestart() {
+        Utilities.statusActivity("Online");
+        super.onRestart();
     }
 }

@@ -1,30 +1,55 @@
 package com.example.chatapp.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.chatapp.Models.Friend;
 import com.example.chatapp.Models.HistoryCall;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
+import com.example.chatapp.Utilities.Utilities;
+import com.example.chatapp.View.ChatActivity;
+import com.example.chatapp.View.VideoCallOutgoingActivity;
+import com.example.chatapp.View.ViewSingleFriendActivity;
+import com.example.chatapp.View.VoiceCallOutGoingActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class HistoryCallAdapter extends RecyclerView.Adapter<HistoryCallAdapter.HistoryCallViewHolder> {
+public class HistoryCallAdapter extends RecyclerView.Adapter<HistoryCallAdapter.HistoryCallViewHolder> implements Filterable {
     Context context;
     ArrayList<HistoryCall> listHistoryCall;
+    ArrayList<HistoryCall> listFilterHistoryCall;
 
     public HistoryCallAdapter(Context context, ArrayList<HistoryCall> listHistoryCall) {
         this.context = context;
         this.listHistoryCall = listHistoryCall;
+        this.listFilterHistoryCall = listHistoryCall;
     }
 
     @NonNull
@@ -35,44 +60,109 @@ public class HistoryCallAdapter extends RecyclerView.Adapter<HistoryCallAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HistoryCallAdapter.HistoryCallViewHolder holder, int position) {
-        HistoryCall historyCall = listHistoryCall.get(position);
-        if (historyCall == null){
-            return;
-        } else {
-            Picasso.get().load(historyCall.getUserAvatarURL()).placeholder(R.drawable.default_avatar).into(holder.civAvatarItemHistoryCall);
-            holder.tvItemHistoryCallName.setText(historyCall.getUserName());
-            holder.tvCallTime.setText(historyCall.getCallTime().toString().trim());
-            if (historyCall.getStatusCall().equals("MakeCall")) {
-                holder.imageViewCallMake.setVisibility(View.VISIBLE);
-                holder.imageViewCallReceive.setVisibility(View.GONE);
-                holder.imageViewCallMissed.setVisibility(View.GONE);
-            } else if (historyCall.getStatusCall().equals("ReceiveCall")) {
-                holder.imageViewCallMake.setVisibility(View.GONE);
-                holder.imageViewCallReceive.setVisibility(View.VISIBLE);
-                holder.imageViewCallMissed.setVisibility(View.GONE);
-            } else if (historyCall.getStatusCall().equals("MissedCall")) {
-                holder.imageViewCallMake.setVisibility(View.GONE);
-                holder.imageViewCallReceive.setVisibility(View.GONE);
-                holder.imageViewCallMissed.setVisibility(View.VISIBLE);
+        public void onBindViewHolder(@NonNull HistoryCallAdapter.HistoryCallViewHolder holder, int position) {
+            HistoryCall historyCall = listHistoryCall.get(position);
+            if (historyCall == null){
+                return;
             } else {
-                holder.imageViewCallMake.setVisibility(View.GONE);
-                holder.imageViewCallReceive.setVisibility(View.GONE);
-                holder.imageViewCallMissed.setVisibility(View.GONE);
+                Picasso.get().load(historyCall.getUserAvatarURL()).placeholder(R.drawable.default_avatar).into(holder.civAvatarItemHistoryCall);
+                holder.tvItemHistoryCallName.setText(historyCall.getUserName());
+                holder.tvCallTime.setText(historyCall.getCallTime().trim());
+                if (historyCall.getStatusCall().equals("MakeCall")) {
+                    holder.imageViewCallMake.setVisibility(View.VISIBLE);
+                    holder.imageViewCallReceive.setVisibility(View.GONE);
+                    holder.imageViewCallMissed.setVisibility(View.GONE);
+                } else if (historyCall.getStatusCall().equals("ReceiveCall")) {
+                    holder.imageViewCallMake.setVisibility(View.GONE);
+                    holder.imageViewCallReceive.setVisibility(View.VISIBLE);
+                    holder.imageViewCallMissed.setVisibility(View.GONE);
+                } else if (historyCall.getStatusCall().equals("MissedCall")) {
+                    holder.imageViewCallMake.setVisibility(View.GONE);
+                    holder.imageViewCallReceive.setVisibility(View.GONE);
+                    holder.imageViewCallMissed.setVisibility(View.VISIBLE);
+                } else {
+                    holder.imageViewCallMake.setVisibility(View.GONE);
+                    holder.imageViewCallReceive.setVisibility(View.GONE);
+                    holder.imageViewCallMissed.setVisibility(View.GONE);
+                }
+                if (historyCall.getTypeCall().equals("VideoCall")) {
+                    holder.imageViewVideoCall.setVisibility(View.VISIBLE);
+                    holder.imageViewVoiceCall.setVisibility(View.GONE);
+                } else if (historyCall.getTypeCall().equals("VoiceCall")) {
+                    holder.imageViewVideoCall.setVisibility(View.GONE);
+                    holder.imageViewVoiceCall.setVisibility(View.VISIBLE);
+                } else {
+                    holder.imageViewVideoCall.setVisibility(View.GONE);
+                    holder.imageViewVoiceCall.setVisibility(View.GONE);
+                }
+                holder.btnMoreVertHistoryCall.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                       DatabaseReference mHistoryCallReference = FirebaseDatabase.getInstance().getReference().child("HistoryCall");
+                        String userID = listHistoryCall.get(holder.getAdapterPosition()).getUserCallID();
+                        String avatarURL = listHistoryCall.get(holder.getAdapterPosition()).getUserAvatarURL();
+                        String userName = listHistoryCall.get(holder.getAdapterPosition()).getUserName();
+                        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+                        PopupMenu popupMenu = new PopupMenu(holder.itemView.getContext(), holder.btnMoreVertHistoryCall);
+                        popupMenu.getMenuInflater().inflate(R.menu.menu_history_call,popupMenu.getMenu());
+                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem menuItem) {
+                                switch (menuItem.getItemId()) {
+                                    case R.id.historyCallMenu_viewProfile:
+                                        String friendID = listHistoryCall.get(holder.getAdapterPosition()).getUserCallID();
+                                        Intent intent = new Intent(holder.itemView.getContext(), ViewSingleFriendActivity.class);
+                                        intent.putExtra("userID", friendID);
+                                        context.startActivity(intent);
+                                        break;
+                                    case R.id.historyCallMenu_chat:
+                                        Intent intent02 = new Intent(context, ChatActivity.class);
+                                        intent02.putExtra("userID", userID);
+                                        context.startActivity(intent02);
+                                        break;
+                                    case R.id.historyCallMenu_voiceCall:
+                                        String typeVoiceCall = "VoiceCall", statustypeVoiceCall = "MakeCall", callTimetypeVoiceCall = Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
+                                        String historyCallID = Utilities.getHistoryCallId();
+                                        long timestampVoiceCall = System.currentTimeMillis();
+                                        HistoryCall historyCall = new HistoryCall(historyCallID, avatarURL, userID, userName, statustypeVoiceCall, typeVoiceCall, callTimetypeVoiceCall,timestampVoiceCall);
+                                        historyCall.updateHistoryCall(mHistoryCallReference, historyCall, mUser.getUid(), historyCallID);
+                                        Intent intentVoiceCall = new Intent(holder.itemView.getContext(), VoiceCallOutGoingActivity.class);
+                                        intentVoiceCall.putExtra("receiverID", userID);
+                                        context.startActivity(intentVoiceCall);
+                                        break;
+                                    case R.id.historyCallMenu_videoCall:
+                                        String typeVideoCall = "VideoCall", statusVideoCall = "MakeCall", callTimeVideoCall = Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
+                                        String historyCallId = Utilities.getHistoryCallId();
+                                        long timestampVideoCall = System.currentTimeMillis();
+                                        HistoryCall historyCallVideoCall = new HistoryCall(historyCallId, avatarURL, userID, userName, statusVideoCall, typeVideoCall, callTimeVideoCall, timestampVideoCall);
+                                        historyCallVideoCall.updateHistoryCall(mHistoryCallReference, historyCallVideoCall, mUser.getUid(), historyCallId);
+                                        Intent intentVideoCall = new Intent(holder.itemView.getContext(), VideoCallOutgoingActivity.class);
+                                        intentVideoCall.putExtra("friendID", userID);
+                                        context.startActivity(intentVideoCall);
+                                        break;
+                                    case R.id.historyCallMenu_delete:
+                                        DatabaseReference historyCallReference = FirebaseDatabase.getInstance().getReference().child("HistoryCall").child(mUser.getUid());
+                                        String historyCallDelete = listHistoryCall.get(holder.getAdapterPosition()).getHistoryCallId();
+                                        historyCallReference.child(historyCallDelete).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful())
+                                                    Toast.makeText(context, "Xóa thành công", Toast.LENGTH_SHORT).show();
+                                                listHistoryCall.remove(holder.getAdapterPosition());
+                                                notifyDataSetChanged();
+                                            }
+                                        });
+                                        break;
+                                }
+                                return false;
+                            }
+                        });
+                        popupMenu.show();
+                    }
+                });
             }
-            if (historyCall.getTypeCall().equals("VideoCall")) {
-                holder.imageViewVideoCall.setVisibility(View.VISIBLE);
-                holder.imageViewVoiceCall.setVisibility(View.GONE);
-            } else if (historyCall.getTypeCall().equals("VoiceCall")) {
-                holder.imageViewVideoCall.setVisibility(View.GONE);
-                holder.imageViewVoiceCall.setVisibility(View.VISIBLE);
-            } else {
-                holder.imageViewVideoCall.setVisibility(View.GONE);
-                holder.imageViewVoiceCall.setVisibility(View.GONE);
-            }
-        }
 
-    }
+        }
 
     @Override
     public int getItemCount() {
@@ -84,6 +174,7 @@ public class HistoryCallAdapter extends RecyclerView.Adapter<HistoryCallAdapter.
         CircleImageView civAvatarItemHistoryCall;
         TextView tvItemHistoryCallName, tvCallTime;
         ImageView imageViewCallMake, imageViewCallReceive, imageViewCallMissed, imageViewVideoCall, imageViewVoiceCall;
+        Button btnMoreVertHistoryCall;
         public HistoryCallViewHolder(@NonNull View itemView) {
             super(itemView);
             civAvatarItemHistoryCall = itemView.findViewById(R.id.civAvatarItemHistoryCall);
@@ -94,6 +185,35 @@ public class HistoryCallAdapter extends RecyclerView.Adapter<HistoryCallAdapter.
             imageViewCallMissed = itemView.findViewById(R.id.imageViewCallMissed);
             imageViewVideoCall = itemView.findViewById(R.id.imageViewVideoCall);
             imageViewVoiceCall = itemView.findViewById(R.id.imageViewVoiceCall);
+            btnMoreVertHistoryCall = itemView.findViewById(R.id.btnMoreVertHistoryCall);
         }
+    }
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String strSearch = charSequence.toString();
+                if (strSearch.isEmpty()) {
+                    listHistoryCall = listFilterHistoryCall;
+                } else {
+                    ArrayList<HistoryCall> list = new ArrayList<>();
+                    for (HistoryCall historyCall : listHistoryCall) {
+                        if (historyCall.getUserName().toLowerCase().trim().contains(strSearch.toLowerCase().trim())) {
+                            list.add(historyCall);
+                        }
+                    }
+                    listHistoryCall = list;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = listHistoryCall;
+                return filterResults;
+            }
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                listHistoryCall = (ArrayList<HistoryCall>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 }

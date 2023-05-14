@@ -76,8 +76,10 @@ public class VideoCallComingActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String response = "yes", callTime =  Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
                 sendResponse(response);
-                HistoryCall historyCall = new HistoryCall(senderAvatar,senderID,senderName,"ReceiveCall",type,callTime);
-                historyCall.updateHistoryCall(mHistoryCallReference,historyCall,receiveID);;
+                String historyCallId = Utilities.getHistoryCallId();
+                long timestamp = System.currentTimeMillis();
+                HistoryCall historyCall = new HistoryCall(historyCallId,senderAvatar,senderID,senderName,"ReceiveCall",type,callTime, timestamp);
+                historyCall.updateHistoryCall(mHistoryCallReference,historyCall,receiveID, historyCallId);
             }
         });
 
@@ -86,8 +88,10 @@ public class VideoCallComingActivity extends AppCompatActivity {
             public void onClick(View view) {
                String response = "no", callTime =  Utilities.getCurrentTime("dd/MM/yyyy, hh:mm a");
                sendResponse(response);
-                HistoryCall historyCall = new HistoryCall(senderAvatar,senderID,senderName,"ReceiveCall",type,callTime);
-                historyCall.updateHistoryCall(mHistoryCallReference,historyCall,receiveID);;
+                long timestamp = System.currentTimeMillis();
+                String historyCallId = Utilities.getHistoryCallId();
+                HistoryCall historyCall = new HistoryCall(historyCallId,senderAvatar,senderID,senderName,"ReceiveCall",type,callTime, timestamp);
+                historyCall.updateHistoryCall(mHistoryCallReference,historyCall,receiveID, historyCallId);
             }
         });
     }
@@ -181,5 +185,22 @@ public class VideoCallComingActivity extends AppCompatActivity {
 
             }
         });
+    }
+    /* Xét trạng thái hoạt động của CurrentUser */
+    @Override
+    protected void onStart(){
+        Utilities.statusActivity("Online");
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        Utilities.statusActivity("Online");
+        super.onResume();
+    }
+    @Override
+    protected void onRestart() {
+        Utilities.statusActivity("Online");
+        super.onRestart();
     }
 }
