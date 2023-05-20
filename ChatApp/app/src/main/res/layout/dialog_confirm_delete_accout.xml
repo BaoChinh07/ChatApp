@@ -13,7 +13,7 @@
         android:layout_marginBottom="12dp"
         android:layout_marginTop="15dp"
         android:layout_gravity="center"
-        android:text="@string/clearAllHistoryCall"
+        android:text="@string/confirmDeleteAccout"
         android:textColor="@color/black"
         android:textSize="18sp" />
 
@@ -27,7 +27,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/btnCancelConfirmDeleteCall"
+            android:id="@+id/btnCancelDeleteAccout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -40,12 +40,12 @@
             app:backgroundTint="@color/grey" />
 
         <Button
-            android:id="@+id/btnConfirmDeleteCall"
+            android:id="@+id/btnConfirmDeleteAccout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginHorizontal="5dp"
-            android:text="@string/delete"
+            android:text="@string/confirm"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textStyle="bold"

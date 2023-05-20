@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -37,33 +38,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     String profilePicURL, userName, email, describe, gender, userId;
     Context context;
     ArrayList<Request> requestsList;
-
-    private void setValueFriend(String userID, final OnFriendValueListener listener) {
-        DatabaseReference mUser = FirebaseDatabase.getInstance().getReference().child("Users");
-        mUser.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);
-                profilePicURL = user.getProfilePic();
-                userName = user.getUserName();
-                email = user.getEmail();
-                describe = user.getDescribe();
-                gender = user.getGender();
-                userId = userID;
-                Friend friend = new Friend(profilePicURL, userName, email, describe, gender, userID);
-                listener.onFriendValue(friend);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    interface OnFriendValueListener {
-        void onFriendValue(Friend friend);
-    }
 
     public RequestAdapter(Context context, ArrayList<Request> requestsList) {
         this.context = context;
@@ -93,35 +67,25 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             holder.btnConfirmRequest.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    setValueFriend(myId, new OnFriendValueListener() {
+                    mRequestReference.child(myId).child(requests.getUserID()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        public void onFriendValue(Friend me) {
-                            setValueFriend(requests.getUserID(), new OnFriendValueListener() {
-                                @Override
-                                public void onFriendValue(Friend friend) {
-                                    mRequestReference.child(myId).child(requests.getUserID()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            mRequestReference.child(requests.getUserID()).removeValue();
+                        public void onComplete(@NonNull Task<Void> task) {
+                            mRequestReference.child(requests.getUserID()).removeValue();
+                        }
+                    });
+                    mFriendsReference.child(myId).child(requests.getUserID()).setValue(requests.getUserID()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                mFriendsReference.child(requests.getUserID()).child(myId).setValue(myId).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if ((task.isSuccessful())) {
+                                            Toast.makeText(view.getContext(), "Các bạn đã trở thành bạn bè", Toast.LENGTH_SHORT).show();
                                         }
-                                    });
-                                    mFriendsReference.child(myId).child(requests.getUserID()).setValue(friend).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                mFriendsReference.child(requests.getUserID()).child(myId).setValue(me).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if ((task.isSuccessful())) {
-                                                            Toast.makeText(view.getContext(), "Các bạn đã trở thành bạn bè", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    });
-                                }
-                            });
+                                    }
+                                });
+                            }
                         }
                     });
                 }

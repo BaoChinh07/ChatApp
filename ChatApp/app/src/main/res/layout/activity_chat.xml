@@ -43,7 +43,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/action_sendImage" />
+            android:contentDescription="@string/send_image" />
         <ImageView
             android:id="@+id/imageViewSendVoice"
             android:layout_width="24dp"
@@ -53,7 +53,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/action_sendVoice" />
+            android:contentDescription="@string/send_voice" />
         <ImageView
             android:id="@+id/imageViewSendEnmoji"
             android:layout_width="24dp"
@@ -63,7 +63,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/action_sendEnmoji" />
+            android:contentDescription="@string/send_enmoji" />
 
         <EditText
             android:id="@+id/edtInputMessage"
@@ -74,7 +74,7 @@
             android:background="@drawable/frame_enter_mesage"
             android:layout_weight="1"
             android:textSize="15sp"
-            android:hint="@string/action_enterMessage"
+            android:hint="@string/enter_message"
             android:textColorHint="@color/light_grey"
             tools:ignore="Autofill"
             android:inputType="textLongMessage" />
@@ -85,6 +85,6 @@
             android:layout_height="24dp"
             android:layout_marginHorizontal="5dp"
             android:src="@drawable/icon_send"
-            android:contentDescription="@string/action_sendMessage" />
+            android:contentDescription="@string/send_message" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

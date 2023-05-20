@@ -439,16 +439,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String title = "";
         switch (currentFragment) {
             case FRAGMENT_CHAT:
-                title = getString(R.string.action_chats);
+                title = getString(R.string.message);
                 break;
             case FRAGMENT_FRIEND:
-                title = getString(R.string.action_friends);
+                title = getString(R.string.friend);
                 break;
             case FRAGMENT_CONTACT:
-                title = getString(R.string.action_contacts);
+                title = getString(R.string.user);
                 break;
             case FRAGMENT_CALL:
-                title = getString(R.string.action_calls);
+                title = getString(R.string.call);
                 break;
         }
         if (getSupportActionBar() != null) {

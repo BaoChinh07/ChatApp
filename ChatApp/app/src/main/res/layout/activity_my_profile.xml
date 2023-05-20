@@ -44,7 +44,7 @@
         android:layout_marginHorizontal="60dp"
         android:layout_marginVertical="20dp"
         android:gravity="center"
-        android:hint="@string/text_describe"
+        android:hint="@string/describe_yourself"
         android:textSize="15sp" />
 
     <LinearLayout
@@ -60,7 +60,7 @@
             android:layout_marginStart="37dp"
             android:layout_marginBottom="3dp"
             android:gravity="center"
-            android:text="@string/text_username"
+            android:text="@string/username"
             android:textColor="@color/grey"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -103,7 +103,7 @@
             android:layout_marginStart="37dp"
             android:layout_marginBottom="3dp"
             android:gravity="center"
-            android:text="@string/text_email"
+            android:text="@string/email"
             android:textColor="@color/grey"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -146,7 +146,7 @@
             android:layout_marginStart="37dp"
             android:layout_marginBottom="3dp"
             android:gravity="center"
-            android:text="@string/text_gender"
+            android:text="@string/gender"
             android:textColor="@color/grey"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -183,7 +183,7 @@
         android:layout_gravity="center"
         android:layout_marginHorizontal="80dp"
         android:layout_marginBottom="0dp"
-        android:text="@string/button_update"
+        android:text="@string/UPDATE"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textStyle="bold"
@@ -196,7 +196,19 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginHorizontal="80dp"
-        android:text="@string/button_logout"
+        android:text="@string/LOGOUT"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        app:backgroundTint="@color/primary"
+        app:cornerRadius="15dp" />
+    <Button
+        android:id="@+id/btnDeleteAccout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="80dp"
+        android:text="@string/DELETEACCOUNT"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textStyle="bold"

@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:text="@string/text_username"
+                android:text="@string/username"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:hint="@string/text_describe"
+                android:hint="@string/describe_yourself"
                 android:maxLines="1"
                 android:textColor="@color/black"
                 android:textSize="13sp" />

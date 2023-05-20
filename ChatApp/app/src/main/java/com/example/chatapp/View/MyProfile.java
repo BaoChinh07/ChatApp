@@ -51,7 +51,7 @@ public class MyProfile extends AppCompatActivity {
     Toolbar toolbar_myProfile;
     CircleImageView civAvatar;
     ImageButton btnUpdateAvatar;
-    Button btnUpdateProfile, btnLogOut;
+    Button btnUpdateProfile, btnLogOut, btnDeleteAccout;
     TextView tvUserName, tvEmail, tvDescribe, tvGender;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
@@ -71,6 +71,7 @@ public class MyProfile extends AppCompatActivity {
     private void setControl() {
         toolbar_myProfile = findViewById(R.id.toolbar_myProfile);
         btnUpdateProfile = findViewById(R.id.btnUpdateProfile);
+        btnDeleteAccout = findViewById(R.id.btnDeleteAccout);
         btnUpdateAvatar = (ImageButton) findViewById(R.id.btnUpdateAvatar);
         btnLogOut = findViewById(R.id.btnLogOut);
         tvDescribe = findViewById(R.id.tvDescribe);
@@ -107,10 +108,17 @@ public class MyProfile extends AppCompatActivity {
         btnLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openConfirmDialog(Gravity.CENTER);
+                openConfirmLogOutDialog(Gravity.CENTER);
+            }
+        });
+        btnDeleteAccout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openConfirmDeleteAccoutDialog(Gravity.CENTER);
             }
         });
     }
+
 
     private void actionToolbar() {
         setSupportActionBar(toolbar_myProfile);
@@ -258,7 +266,7 @@ public class MyProfile extends AppCompatActivity {
         dialog.show();
     }
 
-    private void openConfirmDialog(int gravity) {
+    private void openConfirmLogOutDialog(int gravity) {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_confirm_logout);
@@ -303,9 +311,66 @@ public class MyProfile extends AppCompatActivity {
         }
         dialog.show();
     }
+
+    private void openConfirmDeleteAccoutDialog(int gravity) {
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_confirm_delete_accout);
+        Window window = (Window) dialog.getWindow();
+        if (window == null) {
+            return;
+        } else {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+            WindowManager.LayoutParams windowAttributes = window.getAttributes();
+            window.setAttributes(windowAttributes);
+
+            if (Gravity.CENTER == gravity) {
+                dialog.setCancelable(true);
+            } else {
+                dialog.setCancelable(false);
+            }
+            Button btnCancelDeleteAccout = dialog.findViewById(R.id.btnCancelDeleteAccout);
+            Button btnConfirmDeleteAccout = dialog.findViewById(R.id.btnConfirmDeleteAccout);
+
+            btnConfirmDeleteAccout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mUserReference.child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                mUser.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        mAuth.signOut();
+                                        Intent intent = new Intent(MyProfile.this, SignInActivity.class);
+                                        startActivity(intent);
+                                        Toast.makeText(MyProfile.this, "Xóa tài khoản thành công", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(MyProfile.this, "Xóa thất bại", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+                }
+            });
+            btnCancelDeleteAccout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+        }
+        dialog.show();
+    }
+
     /* Xét trạng thái hoạt động của CurrentUser */
     @Override
-    protected void onStart(){
+    protected void onStart() {
         Utilities.statusActivity("Online");
         super.onStart();
     }
@@ -315,6 +380,7 @@ public class MyProfile extends AppCompatActivity {
         Utilities.statusActivity("Online");
         super.onResume();
     }
+
     @Override
     protected void onRestart() {
         Utilities.statusActivity("Online");

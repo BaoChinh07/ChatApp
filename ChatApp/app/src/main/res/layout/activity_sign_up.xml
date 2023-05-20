@@ -25,13 +25,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="30dp"
-            android:contentDescription="LOGO"
+            android:contentDescription="@string/LOGO"
             android:src="@drawable/baseline_message_24" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/text_username"
+            android:text="@string/username"
             android:textColor="@color/grey"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -43,7 +43,7 @@
             android:layout_gravity="center"
             android:layout_marginVertical="8dp"
             android:background="@drawable/box_border"
-            android:hint="Nhập tên đăng nhập"
+            android:hint="@string/enter_userName"
             android:inputType="textPersonName"
             android:textColorHint="@color/light_grey" />
         <LinearLayout
@@ -54,7 +54,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/text_gender"
+                android:text="@string/gender"
                 android:textColor="@color/grey"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -69,7 +69,7 @@
                     android:id="@+id/signUpRadMan"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/text_man"
+                    android:text="@string/man"
                     android:textColor="@color/grey"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -78,7 +78,7 @@
                     android:id="@+id/signUpRadWoman"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/text_woman"
+                    android:text="@string/woman"
                     android:textColor="@color/grey"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -88,7 +88,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/text_email"
+            android:text="@string/email"
             android:textColor="@color/grey"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -100,14 +100,14 @@
             android:layout_gravity="center"
             android:layout_marginVertical="8dp"
             android:background="@drawable/box_border"
-            android:hint="Nhập email"
+            android:hint="@string/enter_email"
             android:inputType="textEmailAddress"
             android:textColorHint="@color/light_grey" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/text_password"
+            android:text="@string/password"
             android:textColor="@color/grey"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -119,14 +119,14 @@
             android:layout_gravity="center"
             android:layout_marginVertical="8dp"
             android:background="@drawable/box_border"
-            android:hint="Nhập mật khẩu"
+            android:hint="@string/enter_password"
             android:inputType="textPassword"
             android:textColorHint="@color/light_grey" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Xác nhận mật khẩu"
+            android:text="@string/confirm_password"
             android:textColor="@color/grey"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -138,7 +138,7 @@
             android:layout_gravity="center"
             android:layout_marginVertical="8dp"
             android:background="@drawable/box_border"
-            android:hint="Nhập lại mật khẩu"
+            android:hint="@string/enterConfirmPassword"
             android:inputType="textPassword"
             android:textColorHint="@color/light_grey" />
 
@@ -164,7 +164,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="3dp"
                 android:clickable="true"
-                android:text="@string/button_signin"
+                android:text="@string/SIGNIN"
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 android:textStyle="bold|italic" />
@@ -184,7 +184,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="10dp"
-            android:text="@string/button_signup"
+            android:text="@string/SIGNUP"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="18sp"

@@ -22,7 +22,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chatapp.Models.Friend;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
 import com.example.chatapp.View.ChatActivity;
 import com.example.chatapp.View.ViewSingleFriendActivity;
@@ -41,14 +41,14 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> implements Filterable {
+public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> implements Filterable  {
     Context context;
-    ArrayList<Friend> listFriends;
-    ArrayList<Friend> listFilterContacts;
+    ArrayList<User> listFriends;
+    ArrayList<User> listFilterContacts;
     FirebaseAuth mAuth;
     DatabaseReference mDatabaseReference;
 
-    public FriendAdapter(Context context, ArrayList<Friend> listFriends) {
+    public FriendAdapter(Context context, ArrayList<User> listFriends) {
         this.context = context;
         this.listFriends = listFriends;
         this.listFilterContacts = listFriends;
@@ -62,7 +62,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     @Override
     public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
-        Friend friend = listFriends.get(position);
+        User friend = listFriends.get(position);
         mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
         if (friend ==null) {
             return;
@@ -71,7 +71,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
             holder.tvItemFriendName.setText(friend.getUserName());
             holder.tvItemFriendDescribe.setText(friend.getDescribe());
 
-            mDatabaseReference.child(friend.getFriendID()).child("statusActivity").addListenerForSingleValueEvent(new ValueEventListener() {
+            mDatabaseReference.child(friend.getUserID()).child("statusActivity").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
@@ -94,14 +94,14 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
             holder.btnMoreVertFriend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    showMenuPopup(listFriends.get(holder.getAdapterPosition()).getFriendID(), holder.itemView.getContext(), holder.btnMoreVertFriend);
+                    showMenuPopup(listFriends.get(holder.getAdapterPosition()).getUserID(), holder.itemView.getContext(), holder.btnMoreVertFriend);
                 }
             });
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String friendID = listFriends.get(holder.getAdapterPosition()).getFriendID();
+                    String friendID = listFriends.get(holder.getAdapterPosition()).getUserID();
                     Intent intent = new Intent(holder.itemView.getContext(), ViewSingleFriendActivity.class);
                     intent.putExtra("userID", friendID);
                     context.startActivity(intent);
@@ -221,8 +221,8 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
                 if (strSearch.isEmpty()) {
                     listFriends = listFilterContacts;
                 } else {
-                    ArrayList<Friend> list = new ArrayList<>();
-                    for (Friend friend : listFilterContacts) {
+                    ArrayList<User> list = new ArrayList<>();
+                    for (User friend : listFilterContacts) {
                         if (friend.getUserName().toString().toLowerCase().trim().contains(strSearch.toLowerCase().trim())) {
                             list.add(friend);
                         }
@@ -235,7 +235,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
             }
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                listFriends = (ArrayList<Friend>) filterResults.values;
+                listFriends = (ArrayList<User>) filterResults.values;
                 notifyDataSetChanged();
             }
         };

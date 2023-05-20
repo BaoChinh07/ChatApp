@@ -53,7 +53,7 @@
         android:layout_marginHorizontal="60dp"
         android:layout_marginVertical="20dp"
         android:gravity="center"
-        android:hint="@string/text_describe"
+        android:hint="@string/describe_yourself"
         android:textSize="15sp" />
 
     <LinearLayout
@@ -136,7 +136,7 @@
         android:layout_gravity="center"
         android:layout_marginHorizontal="80dp"
         android:layout_marginBottom="0dp"
-        android:text="@string/button_send_message"
+        android:text="@string/send_message"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textStyle="bold"
@@ -149,7 +149,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginHorizontal="80dp"
-        android:text="@string/button_unfriend"
+        android:text="@string/unfriend"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textStyle="bold"

@@ -48,10 +48,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
-    FirebaseDatabase mFirebaseDatabase;
-    FirebaseStorage storage;
-    StorageReference mStorageReference;
-    DatabaseReference mFriendReference, mDataReference;
+    DatabaseReference mFriendReference, mUserReference;
 
 
     @Override
@@ -80,7 +77,7 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mFriendReference = FirebaseDatabase.getInstance().getReference().child("Friends");
-        mDataReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        mUserReference = FirebaseDatabase.getInstance().getReference().child("Users");
     }
 
     private void SetEvent() {
@@ -183,50 +180,94 @@ public class ViewSingleFriendActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void callInformationFriend(String friendID) {
+//    private void callInformationFriend(String friendID) {
+//
+//        mFriendReference.child(mUser.getUid()).child(friendID).addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()) {
+//                    User friend = snapshot.getValue(User.class);
+//                    Picasso.get().load(friend.getProfilePic()).placeholder(R.drawable.default_avatar).into(civAvatarSingleFriend);
+//                    tvDescribeSingleFriend.setText(friend.getDescribe());
+//                    tvUserNameSingleFriend.setText(friend.getUserName());
+//                    tvEmailSingleFriend.setText(friend.getEmail());
+//                    tvGenderSingleFriend.setText(friend.getGender());
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//
+//        mDataReference.child(friendID).addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()) {
+//                    User user = snapshot.getValue(User.class);
+//                    if (user != null) {
+//                        if (user.getStatusActivity().equals("Online")) {
+//                            civSingleFriendOnline.setVisibility(View.VISIBLE);
+//                            civSingleFriendOffline.setVisibility(View.GONE);
+//                        } else {
+//                            civSingleFriendOnline.setVisibility(View.GONE);
+//                            civSingleFriendOffline.setVisibility(View.VISIBLE);
+//                        }
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//    }
+private void callInformationFriend(String friendID) {
 
-        mFriendReference.child(mUser.getUid()).child(friendID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Friend friend = snapshot.getValue(Friend.class);
-                    Picasso.get().load(friend.getProfilePic()).placeholder(R.drawable.default_avatar).into(civAvatarSingleFriend);
-                    tvDescribeSingleFriend.setText(friend.getDescribe());
-                    tvUserNameSingleFriend.setText(friend.getUserName());
-                    tvEmailSingleFriend.setText(friend.getEmail());
-                    tvGenderSingleFriend.setText(friend.getGender());
-                }
+    mUserReference.child(friendID).addListenerForSingleValueEvent(new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            if (snapshot.exists()) {
+                User friend = snapshot.getValue(User.class);
+                Picasso.get().load(friend.getProfilePic()).placeholder(R.drawable.default_avatar).into(civAvatarSingleFriend);
+                tvDescribeSingleFriend.setText(friend.getDescribe());
+                tvUserNameSingleFriend.setText(friend.getUserName());
+                tvEmailSingleFriend.setText(friend.getEmail());
+                tvGenderSingleFriend.setText(friend.getGender());
             }
+        }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+        }
+    });
 
-        mDataReference.child(friendID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    User user = snapshot.getValue(User.class);
-                    if (user != null) {
-                        if (user.getStatusActivity().equals("Online")) {
-                            civSingleFriendOnline.setVisibility(View.VISIBLE);
-                            civSingleFriendOffline.setVisibility(View.GONE);
-                        } else {
-                            civSingleFriendOnline.setVisibility(View.GONE);
-                            civSingleFriendOffline.setVisibility(View.VISIBLE);
-                        }
+    mUserReference.child(friendID).addListenerForSingleValueEvent(new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            if (snapshot.exists()) {
+                User user = snapshot.getValue(User.class);
+                if (user != null) {
+                    if (user.getStatusActivity().equals("Online")) {
+                        civSingleFriendOnline.setVisibility(View.VISIBLE);
+                        civSingleFriendOffline.setVisibility(View.GONE);
+                    } else {
+                        civSingleFriendOnline.setVisibility(View.GONE);
+                        civSingleFriendOffline.setVisibility(View.VISIBLE);
                     }
                 }
             }
+        }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
-    }
+        }
+    });
+}
     /* Xét trạng thái hoạt động của CurrentUser */
     /* Xét trạng thái hoạt động của CurrentUser */
     @Override

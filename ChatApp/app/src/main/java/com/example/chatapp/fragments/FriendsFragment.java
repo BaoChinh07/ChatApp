@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.chatapp.Adapter.FriendAdapter;
-import com.example.chatapp.Models.Friend;
+import com.example.chatapp.Models.User;
 import com.example.chatapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,13 +24,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FriendsFragment extends Fragment {
     public FriendsFragment() {
     }
 
     FriendAdapter friendAdapter;
-    ArrayList<Friend> listFriends = new ArrayList<>();
+    ArrayList<User> listFriends = new ArrayList<>();
+    List<User> tempUsers = new ArrayList<>();
     SearchView action_searchFriend;
     RecyclerView rvListFriend;
     FirebaseAuth mAuth;
@@ -64,8 +66,8 @@ public class FriendsFragment extends Fragment {
 
     private void setEvent() {
 
+//        loadFriend();
         loadFriend();
-
         action_searchFriend.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -82,18 +84,43 @@ public class FriendsFragment extends Fragment {
 
 
     }
-
     private void loadFriend() {
-        mFriendReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                listFriends.clear();
+                tempUsers.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Friend friend = dataSnapshot.getValue(Friend.class);
-                    friend.setFriendID(dataSnapshot.getKey());
-                    listFriends.add(friend);
+                    User user = dataSnapshot.getValue(User.class);
+                    if (mUser != null && !mUser.getEmail().equals(user.getEmail())) {
+                        tempUsers.add(user);
+                    }
                 }
-                friendAdapter.notifyDataSetChanged();
+                mFriendReference.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        List<User> friendList = new ArrayList<>();
+                        if (snapshot.exists()) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                String friendID = dataSnapshot.getKey();
+
+                                for (User user : tempUsers) {
+                                    if (user.getUserID().equals(friendID)) {
+                                        friendList.add(user);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        listFriends.clear();
+                        listFriends.addAll(friendList);
+                        friendAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
 
             @Override

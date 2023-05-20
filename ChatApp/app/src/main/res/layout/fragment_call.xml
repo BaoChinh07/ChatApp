@@ -24,7 +24,7 @@
             android:layout_weight="1"
             android:layout_margin="8dp"
             android:background="@drawable/search_frame"
-            app:queryHint="@string/action_search"
+            app:queryHint="@string/search"
             app:searchHintIcon="@drawable/icon_search"
             app:searchIcon="@drawable/icon_search" />
         <Button

@@ -9,8 +9,8 @@
         android:id="@+id/userChat"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:weightSum="2">
 
         <RelativeLayout
@@ -58,7 +58,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="bottom"
-                android:text="@string/text_username"
+                android:text="@string/username"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -69,38 +69,9 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:text="@string/text_online"
+                android:text="@string/online"
                 android:textColor="@color/white"
                 android:textSize="12sp" />
         </LinearLayout>
-
-<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent">-->
-
-<!--            <ImageView-->
-<!--                android:id="@+id/btnAudioCall"-->
-<!--                android:layout_width="24dp"-->
-<!--                android:layout_height="24dp"-->
-<!--                android:src="@drawable/icon_call2"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintHorizontal_bias="0.65"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent" />-->
-
-<!--            <ImageView-->
-<!--                android:id="@+id/btnVideoCall"-->
-<!--                android:layout_width="24dp"-->
-<!--                android:layout_height="24dp"-->
-<!--                android:src="@drawable/icon_video"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintHorizontal_bias="0.7"-->
-<!--                app:layout_constraintStart_toEndOf="@+id/btnAudioCall"-->
-<!--                app:layout_constraintTop_toTopOf="parent" />-->
-<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
     </LinearLayout>
-
-
 </androidx.appcompat.widget.Toolbar>

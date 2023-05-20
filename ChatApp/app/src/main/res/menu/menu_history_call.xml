@@ -3,17 +3,17 @@
     <item
         android:id="@+id/historyCallMenu_viewProfile"
         android:icon="@drawable/icon_username"
-        android:title="@string/text_view_profile" />
+        android:title="@string/view_profile" />
     <item android:id="@+id/historyCallMenu_chat"
-        android:title="@string/button_send_message"/>
+        android:title="@string/send_message"/>
     <item
         android:id="@+id/historyCallMenu_voiceCall"
-        android:title="@string/menu_voice_call" />
+        android:title="@string/voiceCall" />
     <item
         android:id="@+id/historyCallMenu_videoCall"
-        android:title="@string/menu_video_call" />
+        android:title="@string/videoCall" />
     <item
         android:id="@+id/historyCallMenu_delete"
-        android:title="@string/menu_deleteOnlyCall" />
+        android:title="@string/clear_history_call" />
 
 </menu>

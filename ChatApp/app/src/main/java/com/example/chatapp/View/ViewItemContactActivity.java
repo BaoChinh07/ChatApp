@@ -215,7 +215,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
                                     Toast.makeText(ViewItemContactActivity.this, "Bạn đã gửi lời mời kết bạn", Toast.LENGTH_SHORT).show();
                                     btnCancelSendFriendRequest.setVisibility(View.GONE);
                                     currentState = "i_sent_pending";
-                                    btnSendFriendRequest.setText(R.string.button_cancel_send);
+                                    btnSendFriendRequest.setText(R.string.cancel_request);
                                 } else {
                                     Toast.makeText(ViewItemContactActivity.this, "" + task.getException().toString(), Toast.LENGTH_SHORT).show();
                                 }
@@ -236,7 +236,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(ViewItemContactActivity.this, "Bạn đã hủy yêu cầu kết bạn", Toast.LENGTH_SHORT).show();
                                     currentState = "nothing_happen";
-                                    btnSendFriendRequest.setText(R.string.button_send_friend_request);
+                                    btnSendFriendRequest.setText(R.string.add_friend);
                                     btnCancelSendFriendRequest.setVisibility(View.GONE);
                                 } else {
                                     Toast.makeText(ViewItemContactActivity.this, "" + task.getException().toString(), Toast.LENGTH_SHORT).show();
@@ -256,18 +256,19 @@ public class ViewItemContactActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Friend friend = new Friend(userAvatar, userName, userEmail, userDescribe, userGender, userID);
-                                    Friend me = new Friend(myAvatar, myUsername, myEmail, myDescribe, myGender, myUserID);
-                                    mFriendsReference.child(mUser.getUid()).child(userID).setValue(friend).addOnCompleteListener(new OnCompleteListener() {
+//                                    Friend friend = new Friend(userAvatar, userName, userEmail, userDescribe, userGender, userID);
+//                                    Friend me = new Friend(myAvatar, myUsername, myEmail, myDescribe, myGender, myUserID);
+
+                                    mFriendsReference.child(mUser.getUid()).child(userID).setValue(userID).addOnCompleteListener(new OnCompleteListener() {
                                         @Override
                                         public void onComplete(@NonNull Task task) {
                                             if (task.isSuccessful()) {
-                                                mFriendsReference.child(userID).child(mUser.getUid()).setValue(me).addOnCompleteListener(new OnCompleteListener() {
+                                                mFriendsReference.child(userID).child(mUser.getUid()).setValue(myUserID).addOnCompleteListener(new OnCompleteListener() {
                                                     @Override
                                                     public void onComplete(@NonNull Task task) {
                                                         currentState = "friend";
-                                                        btnSendFriendRequest.setText(R.string.button_send_message);
-                                                        btnCancelSendFriendRequest.setText(R.string.button_unfriend);
+                                                        btnSendFriendRequest.setText(R.string.send_message);
+                                                        btnCancelSendFriendRequest.setText(R.string.unfriend);
                                                         btnCancelSendFriendRequest.setVisibility(View.VISIBLE);
                                                         Toast.makeText(ViewItemContactActivity.this, "Các bạn đã là bạn bè", Toast.LENGTH_SHORT).show();
                                                         Intent intent = new Intent(ViewItemContactActivity.this, ViewSingleFriendActivity.class);
@@ -300,8 +301,8 @@ public class ViewItemContactActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     currentState = "friend";
-                    btnSendFriendRequest.setText(R.string.button_send_message);
-                    btnCancelSendFriendRequest.setText(R.string.button_unfriend);
+                    btnSendFriendRequest.setText(R.string.send_message);
+                    btnCancelSendFriendRequest.setText(R.string.unfriend);
                     btnCancelSendFriendRequest.setVisibility(View.VISIBLE);
                 }
             }
@@ -316,8 +317,8 @@ public class ViewItemContactActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     currentState = "friend";
-                    btnSendFriendRequest.setText(R.string.button_send_message);
-                    btnCancelSendFriendRequest.setText(R.string.button_unfriend);
+                    btnSendFriendRequest.setText(R.string.send_message);
+                    btnCancelSendFriendRequest.setText(R.string.unfriend);
                     btnCancelSendFriendRequest.setVisibility(View.VISIBLE);
                 }
 
@@ -334,12 +335,12 @@ public class ViewItemContactActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     if (snapshot.child("status").getValue().toString().equals("pending")) {
                         currentState = "i_sent_pending";
-                        btnSendFriendRequest.setText(R.string.button_cancel_send);
+                        btnSendFriendRequest.setText(R.string.cancel_request);
                         btnCancelSendFriendRequest.setVisibility(View.GONE);
                     }
                     if (snapshot.child("status").getValue().toString().equals("decline")) {
                         currentState = "i_sent_decline";
-                        btnSendFriendRequest.setText(R.string.button_cancel_send);
+                        btnSendFriendRequest.setText(R.string.cancel_request);
                         btnCancelSendFriendRequest.setVisibility(View.GONE);
                     }
                 }
@@ -362,8 +363,8 @@ public class ViewItemContactActivity extends AppCompatActivity {
                                 if (snapshot.exists()) {
                                     if (snapshot.child("status").getValue().toString().equals("pending")) {
                                         currentState = "he_sent_pending";
-                                        btnSendFriendRequest.setText(R.string.button_accept_friend_request);
-                                        btnCancelSendFriendRequest.setText(R.string.button_decline);
+                                        btnSendFriendRequest.setText(R.string.accept);
+                                        btnCancelSendFriendRequest.setText(R.string.decline);
                                         btnCancelSendFriendRequest.setVisibility(View.VISIBLE);
                                     }
                                 }
@@ -386,7 +387,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
 
         if (currentState.equals("nothing_happen")) {
             currentState = "nothing_happen";
-            btnSendFriendRequest.setText(R.string.button_send_friend_request);
+            btnSendFriendRequest.setText(R.string.add_friend);
             btnCancelSendFriendRequest.setVisibility(View.GONE);
         }
     }
@@ -407,7 +408,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(ViewItemContactActivity.this, "Đã từ chối kết bạn", Toast.LENGTH_SHORT).show();
                                     currentState = "nothing_happen";
-                                    btnSendFriendRequest.setText(R.string.button_send_friend_request);
+                                    btnSendFriendRequest.setText(R.string.add_friend);
                                     btnCancelSendFriendRequest.setVisibility(View.GONE);
                                 }
                             }
@@ -468,7 +469,7 @@ public class ViewItemContactActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 Toast.makeText(ViewItemContactActivity.this, "Đã hủy kết bạn", Toast.LENGTH_SHORT).show();
                                 currentState = "nothing_happen";
-                                btnSendFriendRequest.setText(R.string.button_send_friend_request);
+                                btnSendFriendRequest.setText(R.string.add_friend);
                                 btnCancelSendFriendRequest.setVisibility(View.GONE);
                             }
 
