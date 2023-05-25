@@ -68,7 +68,7 @@
                 android:gravity="center_vertical"
                 android:textColor="@color/slateBlue"
                 android:textSize="15sp"
-                android:textStyle="bold" />
+                 />
     </LinearLayout>
 
     <LinearLayout
@@ -93,7 +93,7 @@
                 android:gravity="center_vertical"
                 android:textColor="@color/slateBlue"
                 android:textSize="15sp"
-                android:textStyle="bold" />
+                 />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -111,14 +111,14 @@
 
         <TextView
             android:id="@+id/tvGenderSingleFriend"
-            android:layout_width="60dp"
+            android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_marginBottom="32dp"
             android:background="@drawable/frame_inputdata"
             android:gravity="center_vertical"
             android:textColor="@color/slateBlue"
             android:textSize="15sp"
-            android:textStyle="bold" />
+             />
     </LinearLayout>
     <Button
         android:id="@+id/btnSendMessage"
