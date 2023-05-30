@@ -57,7 +57,7 @@
                 android:layout_height="48dp"
                 android:background="@drawable/frame_inputdata"
                 android:gravity="center_vertical"
-                android:textColor="@color/slateBlue"
+                android:textColor="@color/gunmetal"
                 android:textSize="15sp"
                  />
         </LinearLayout>
@@ -88,7 +88,7 @@
                 android:layout_height="48dp"
                 android:background="@drawable/frame_inputdata"
                 android:gravity="center_vertical"
-                android:textColor="@color/slateBlue"
+                android:textColor="@color/gunmetal"
                 android:textSize="15sp"
                  />
         </LinearLayout>

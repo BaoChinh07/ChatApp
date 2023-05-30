@@ -129,17 +129,20 @@ public class HistoryCallAdapter extends RecyclerView.Adapter<HistoryCallAdapter.
                                     case R.id.historyCallMenu_delete:
                                         DatabaseReference historyCallReference = FirebaseDatabase.getInstance().getReference().child("HistoryCall").child(mUser.getUid());
                                         String historyCallDelete = listHistoryCall.get(holder.getAdapterPosition()).getHistoryCallId();
-                                        historyCallReference.child(historyCallDelete).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful())
-                                                    Toast.makeText(context, "Xóa thành công", Toast.LENGTH_SHORT).show();
-                                                listHistoryCall.remove(holder.getAdapterPosition());
-                                                notifyDataSetChanged();
-                                            }
-                                        });
+                                            historyCallReference.child(historyCallDelete).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Toast.makeText(context, "Xóa thành công", Toast.LENGTH_SHORT).show();
+                                                }
+                                                    listHistoryCall.remove(holder.getAdapterPosition());
+                                                }
+
+                                            });
+                                        notifyDataSetChanged();
                                         break;
-                                }
+                                        }
+
                                 return false;
                             }
                         });

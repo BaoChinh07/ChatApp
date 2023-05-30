@@ -241,10 +241,4 @@ private void callInformationFriend(String friendID) {
         Utilities.statusActivity("Online");
         super.onRestart();
     }
-
-    @Override
-    protected void onDestroy() {
-        Utilities.statusActivity("Offline");
-        super.onDestroy();
-    }
 }

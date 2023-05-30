@@ -215,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void actionToolbar() {
         setSupportActionBar(toolbar);
+//        setSupportActionBar(null);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.drawable.icon_menu_navigation);
     }

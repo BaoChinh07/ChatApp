@@ -74,7 +74,7 @@ public class ChatActivity extends AppCompatActivity {
     LinearLayout userChat;
     RecyclerView rvMessage;
     EditText edtInputMessage;
-    ImageView imageViewSendImage, imageViewSendMessage, imageViewSendEnmoji, ivStatusActivity;
+    ImageView imageViewSendImage, imageViewSendMessage, ivStatusActivity;
     CircleImageView civAvatarUserChat;
     TextView tvUserNameToolChat, tvUserOnl_OffChat;
     String userID, avatarURL, userName, dateTime, statusActivity, time;
@@ -99,8 +99,7 @@ public class ChatActivity extends AppCompatActivity {
         chat_toolbar = findViewById(R.id.chat_toolbar);
         userChat = findViewById(R.id.userChat);
         edtInputMessage = findViewById(R.id.edtInputMessage);
-        imageViewSendImage = findViewById(R.id.imageViewSendImage);
-        imageViewSendEnmoji = findViewById(R.id.imageViewSendEnmoji);
+        imageViewSendImage = findViewById(R.id.imageViewSendImage);;
         imageViewSendMessage = findViewById(R.id.imageViewSendMessage);
         rvMessage = findViewById(R.id.rvMessage);
         rvMessage.setLayoutManager(new LinearLayoutManager(this));

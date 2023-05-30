@@ -77,14 +77,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                             } else if (chat1.getType().equals("image") && chat1.getSenderID().equals(mUser.getUid())) {
                                 holder.tvPersonSend.setVisibility(View.VISIBLE);
                                 holder.tvPersonSend.setText("Bạn");
-                                holder.tvLastMessage.setText(R.string.send_image);
+                                holder.tvLastMessage.setText(R.string.sended_image);
                             } else if (chat1.getType().equals("text") && chat1.getSenderID().equals(chat.getFriendID())) {
                                 holder.tvPersonSend.setVisibility(View.GONE);
                                 holder.tvLastMessage.setText(chat1.getMessage());
                             } else if (chat1.getType().equals("image") && chat1.getSenderID().equals(chat.getFriendID())) {
                                 holder.tvPersonSend.setVisibility(View.VISIBLE);
                                 holder.tvPersonSend.setText(chat.getUserName());
-                                holder.tvLastMessage.setText(R.string.send_image);
+                                holder.tvLastMessage.setText(R.string.sended_image);
                             }
                         }
 

@@ -50,17 +50,15 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference mStorageReference = storage.getReference().child("profilePic/default_avatar.png");
         if (user != null) {
-            if (user != null) {
-                if (user.getProfilePic().isEmpty()) {
-                    mStorageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Picasso.get().load(uri.toString()).placeholder(R.drawable.default_avatar).into(holder.civAvatarItemContact);
-                        }
-                    });
-                } else {
-                    Picasso.get().load(user.getProfilePic()).placeholder(R.drawable.default_avatar).into(holder.civAvatarItemContact);
-                }
+            if (user.getProfilePic().isEmpty()) {
+                mStorageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Picasso.get().load(uri.toString()).placeholder(R.drawable.default_avatar).into(holder.civAvatarItemContact);
+                    }
+                });
+            } else {
+                Picasso.get().load(user.getProfilePic()).placeholder(R.drawable.default_avatar).into(holder.civAvatarItemContact);
             }
 
             holder.tvItemContactName.setText(user.getUserName());

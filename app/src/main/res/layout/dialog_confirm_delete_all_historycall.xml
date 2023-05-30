@@ -32,10 +32,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginHorizontal="5dp"
-            android:alpha="0.4"
             android:text="@string/cancel"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textColor="@color/gunmetal"
             android:textStyle="bold"
             app:backgroundTint="@color/grey" />
 

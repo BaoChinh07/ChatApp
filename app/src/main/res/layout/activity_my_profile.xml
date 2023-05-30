@@ -47,7 +47,7 @@
         android:gravity="center"
         android:hint="@string/describe_yourself"
         android:textSize="15sp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/gunmetal"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -86,7 +86,7 @@
                 android:layout_height="48dp"
                 android:background="@drawable/frame_inputdata"
                 android:gravity="center_vertical"
-                android:textColor="@color/slateBlue"
+                android:textColor="@color/gunmetal"
                 android:textSize="15sp" />
         </LinearLayout>
     </LinearLayout>
@@ -128,7 +128,7 @@
                 android:layout_height="48dp"
                 android:background="@drawable/frame_inputdata"
                 android:gravity="center_vertical"
-                android:textColor="@color/slateBlue"
+                android:textColor="@color/gunmetal"
                 android:textSize="15sp"
                 />
         </LinearLayout>
@@ -171,7 +171,7 @@
                 android:layout_height="48dp"
                 android:background="@drawable/frame_inputdata"
                 android:gravity="center_vertical"
-                android:textColor="@color/slateBlue"
+                android:textColor="@color/gunmetal"
                 android:textSize="15sp" />
         </LinearLayout>
     </LinearLayout>
